@@ -1,0 +1,104 @@
+#!/usr/bin/env perl
+## Copyright © 2010 by Daniel Friesel <derf@finalrewind.org>
+## License: WTFPL <http://sam.zoy.org/wtfpl>
+##   0. You just DO WHAT THE FUCK YOU WANT TO.
+use strict;
+use warnings;
+use 5.010;
+
+use LWP::UserAgent;
+use XML::LibXML;
+
+my @now = localtime(time());
+my $date = sprintf("%d.%d.%d", $now[3], $now[4] + 1 , $now[5] + 1900);
+my $time = sprintf("%d:%d", $now[2], $now[1]);
+
+my $post = {
+	input => $ARGV[0],
+	inputRef => '#',
+	date => $date,
+	time => $time,
+	productsFilter => '1111101000000000',
+	REQTrain_name => q{},
+	maxJourneys => 20,
+	delayedJourney => undef,
+	start => 'Suchen',
+	boardType => 'Abfahrt',
+	ao => 'yes',
+};
+
+my $ua = LWP::UserAgent->new();
+my $reply = $ua->post('http://mobile.bahn.de/bin/mobil/bhftafel.exe/dox?rt=1&use_realtime_filter=1', $post)->content();
+
+my $tree = XML::LibXML->load_html(
+	string => $reply,
+	recover => 2,
+	suppress_errors => 1,
+	suppress_warnings => 1,
+);
+
+my $xp_element = XML::LibXML::XPathExpression->new('//div[@class="sqdetailsDep trow"]');
+my $xp_late    = XML::LibXML::XPathExpression->new('./span[@class="red"]');
+my $xp_on_time = XML::LibXML::XPathExpression->new('./span[@class="green bold"]');
+my $xp_bold    = XML::LibXML::XPathExpression->new('.//span[@class="bold"]');
+my $re_platform = qr{
+	Gl\. \s (\d+) $
+}msx;
+my $re_dest = qr{
+	>> \n ([^\n]+) \n
+}msx;
+
+for my $div (@{$tree->findnodes($xp_element)}) {
+
+	my ($n_line, $n_time) = $div->findnodes($xp_bold);
+	my ($n_late) = $div->findnodes($xp_late);
+	my $text   = $div->textContent();
+
+	my ($platform) = ($text =~ $re_platform);
+	my ($destination) = ($text =~ $re_dest);
+	my $line = $n_line->textContent();
+	my $time = $n_time->textContent();
+
+	my $late = (
+		$n_late
+		? $n_late->textContent()
+		: q{}
+	);
+
+	$line =~ tr/ //s;
+
+	printf(
+		"%s  %-10s %-30s %-2d %s\n",
+		$time,
+		$line,
+		$destination,
+		$platform,
+		$late
+	);
+}
+
+__END__
+
+=head1 NAME
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 OPTIONS
+
+=head1 EXIT STATUS
+
+=head1 CONFIGURATION
+
+=head1 DEPENDENCIES
+
+=head1 BUGS AND LIMITATIONS
+
+=head1 AUTHOR
+
+Copyright (C) 2010 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+
+=head1 LICENSE
+
+  0. You just DO WHAT THE FUCK YOU WANT TO.
