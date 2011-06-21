@@ -28,7 +28,7 @@ my $post = {
 };
 
 my $ua = LWP::UserAgent->new();
-my $reply = $ua->post('http://mobile.bahn.de/bin/mobil/bhftafel.exe/dox?rt=1&use_realtime_filter=1', $post)->content();
+my $reply = $ua->post('http://mobile.bahn.de/bin/mobil/bhftafel.exe/dn?rt=1', $post)->content();
 
 my $tree = XML::LibXML->load_html(
 	string => $reply,
@@ -37,44 +37,94 @@ my $tree = XML::LibXML->load_html(
 	suppress_warnings => 1,
 );
 
-my $xp_element = XML::LibXML::XPathExpression->new('//div[@class="sqdetailsDep trow"]');
-my $xp_late    = XML::LibXML::XPathExpression->new('./span[@class="red"]');
-my $xp_on_time = XML::LibXML::XPathExpression->new('./span[@class="green bold"]');
-my $xp_bold    = XML::LibXML::XPathExpression->new('.//span[@class="bold"]');
-my $re_platform = qr{
-	Gl\. \s (\d+) $
-}msx;
-my $re_dest = qr{
-	>> \n ([^\n]+) \n
-}msx;
+my $xp_element  = XML::LibXML::XPathExpression->new('//table[@class="result stboard dep"]/tr');
+my $xp_time     = XML::LibXML::XPathExpression->new('./td[@class="time"]');
+my $xp_train    = XML::LibXML::XPathExpression->new('./td[@class="train"]');
+my $xp_route    = XML::LibXML::XPathExpression->new('./td[@class="route"]');
+my $xp_dest     = XML::LibXML::XPathExpression->new('./td[@class="route"]//a');
+my $xp_platform = XML::LibXML::XPathExpression->new('./td[@class="platform"]');
+my $xp_info     = XML::LibXML::XPathExpression->new('./td[@class="ris"]');
 
-for my $div (@{$tree->findnodes($xp_element)}) {
+my $re_via = qr{
+	^ (.+) \n
+	\d{1,2}:\d{1,2}
+}mx;
 
-	my ($n_line, $n_time) = $div->findnodes($xp_bold);
-	my ($n_late) = $div->findnodes($xp_late);
-	my $text   = $div->textContent();
+for my $tr (@{$tree->findnodes($xp_element)}) {
 
-	my ($platform) = ($text =~ $re_platform);
-	my ($destination) = ($text =~ $re_dest);
-	my $line = $n_line->textContent();
+	my ($n_time)  = $tr->findnodes($xp_time);
+	my (undef, $n_train) = $tr->findnodes($xp_train);
+	my ($n_route) = $tr->findnodes($xp_route);
+	my ($n_dest)  = $tr->findnodes($xp_dest);
+	my ($n_platform)= $tr->findnodes($xp_platform);
+	my ($n_info) = $tr->findnodes($xp_info);
+	my $first = 1;
+
+	if (not ($n_time and $n_dest))
+	{
+		next;
+	}
+
 	my $time = $n_time->textContent();
+	my $train = $n_train->textContent();
+	my $route = $n_route->textContent();
+	my $dest = $n_dest->textContent();
+	my $platform = $n_platform->textContent();
+	my $info = $n_info->textContent();
+	my $via_str;
+	my (@via, @via_main, @via_show);
 
-	my $late = (
-		$n_late
-		? $n_late->textContent()
-		: q{}
-	);
+	for my $str ($time, $train, $dest, $platform, $info) {
+		$str =~ s/\n//mg;
+		$str =~ tr/ //s;
+	}
 
-	$line =~ tr/ //s;
+	$info =~ s/,Grund//;
+
+	while ($route =~ m{$re_via}g) {
+		if ($first) {
+			$first = 0;
+			next;
+		}
+		my $stop = $1;
+		push(@via, $stop);
+		if ($stop =~ /Hbf$/) {
+			push(@via_main, $stop);
+		}
+	}
+	pop(@via);
+
+	if (@via_main and @via and $via[0] eq $via_main[0]) {
+		shift(@via_main);
+	}
+
+	if (@via < 3) {
+		@via_show = @via;
+	}
+	else {
+		@via_show = splice(@via, 0, (@via_main > 2 ? 1 : 3 - @via_main));
+
+		while (@via_show < 3 and @via_main) {
+			my $stop = shift(@via_main);
+			if ($stop ~~ \@via_show) {
+				next;
+			}
+			push(@via_show, $stop);
+		}
+	}
+
+
 
 	printf(
-		"%s  %-10s %-30s %-2d %s\n",
+		"%5s %-10s %-80s %-20s %-2d %s\n",
 		$time,
-		$line,
-		$destination,
+		$train,
+		join(' ', @via_show),
+		$dest,
 		$platform,
-		$late
+		$info,
 	);
+
 }
 
 __END__
