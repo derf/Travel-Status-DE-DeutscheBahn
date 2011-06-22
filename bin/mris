@@ -1,130 +1,55 @@
 #!/usr/bin/env perl
-## Copyright © 2010 by Daniel Friesel <derf@finalrewind.org>
-## License: WTFPL <http://sam.zoy.org/wtfpl>
-##   0. You just DO WHAT THE FUCK YOU WANT TO.
 use strict;
 use warnings;
 use 5.010;
 
-use LWP::UserAgent;
-use XML::LibXML;
+our $VERSION = '0.0';
 
-my @now = localtime(time());
-my $date = sprintf("%d.%d.%d", $now[3], $now[4] + 1 , $now[5] + 1900);
-my $time = sprintf("%d:%d", $now[2], $now[1]);
+use Travel::Status::DE::DeutscheBahn;
 
-my $post = {
-	input => $ARGV[0],
-	inputRef => '#',
-	date => $date,
-	time => $time,
-	productsFilter => '1111101000000000',
-	REQTrain_name => q{},
-	maxJourneys => 20,
-	delayedJourney => undef,
-	start => 'Suchen',
-	boardType => 'Abfahrt',
-	ao => 'yes',
-};
+my $status = Travel::Status::DE::DeutscheBahn->new( station => shift, );
 
-my $ua = LWP::UserAgent->new();
-my $reply = $ua->post('http://mobile.bahn.de/bin/mobil/bhftafel.exe/dn?rt=1', $post)->content();
+for my $d ( $status->departures() ) {
 
-my $tree = XML::LibXML->load_html(
-	string => $reply,
-	recover => 2,
-	suppress_errors => 1,
-	suppress_warnings => 1,
-);
+	my ( @via, @via_main, @via_show );
 
-my $xp_element  = XML::LibXML::XPathExpression->new('//table[@class="result stboard dep"]/tr');
-my $xp_time     = XML::LibXML::XPathExpression->new('./td[@class="time"]');
-my $xp_train    = XML::LibXML::XPathExpression->new('./td[@class="train"]');
-my $xp_route    = XML::LibXML::XPathExpression->new('./td[@class="route"]');
-my $xp_dest     = XML::LibXML::XPathExpression->new('./td[@class="route"]//a');
-my $xp_platform = XML::LibXML::XPathExpression->new('./td[@class="platform"]');
-my $xp_info     = XML::LibXML::XPathExpression->new('./td[@class="ris"]');
+	@via = $d->route;
 
-my $re_via = qr{
-	^ (.+) \n
-	\d{1,2}:\d{1,2}
-}mx;
-
-for my $tr (@{$tree->findnodes($xp_element)}) {
-
-	my ($n_time)  = $tr->findnodes($xp_time);
-	my (undef, $n_train) = $tr->findnodes($xp_train);
-	my ($n_route) = $tr->findnodes($xp_route);
-	my ($n_dest)  = $tr->findnodes($xp_dest);
-	my ($n_platform)= $tr->findnodes($xp_platform);
-	my ($n_info) = $tr->findnodes($xp_info);
-	my $first = 1;
-
-	if (not ($n_time and $n_dest))
-	{
-		next;
-	}
-
-	my $time = $n_time->textContent();
-	my $train = $n_train->textContent();
-	my $route = $n_route->textContent();
-	my $dest = $n_dest->textContent();
-	my $platform = $n_platform->textContent();
-	my $info = $n_info->textContent();
-	my $via_str;
-	my (@via, @via_main, @via_show);
-
-	for my $str ($time, $train, $dest, $platform, $info) {
-		$str =~ s/\n//mg;
-		$str =~ tr/ //s;
-	}
-
-	$info =~ s/,Grund//;
-
-	while ($route =~ m{$re_via}g) {
-		if ($first) {
-			$first = 0;
-			next;
-		}
-		my $stop = $1;
-		push(@via, $stop);
-		if ($stop =~ /Hbf$/) {
-			push(@via_main, $stop);
+	for my $stop (@via) {
+		if ( $stop =~ m{ ?Hbf} ) {
+			push( @via_main, $stop );
 		}
 	}
 	pop(@via);
 
-	if (@via_main and @via and $via[0] eq $via_main[0]) {
+	if ( @via_main and @via and $via[0] eq $via_main[0] ) {
 		shift(@via_main);
 	}
 
-	if (@via < 3) {
+	if ( @via < 3 ) {
 		@via_show = @via;
 	}
 	else {
-		@via_show = splice(@via, 0, (@via_main > 2 ? 1 : 3 - @via_main));
+		@via_show = splice( @via, 0, ( @via_main > 2 ? 1 : 3 - @via_main ) );
 
-		while (@via_show < 3 and @via_main) {
+		while ( @via_show < 3 and @via_main ) {
 			my $stop = shift(@via_main);
-			if ($stop ~~ \@via_show) {
+			if ( $stop ~~ \@via_show or $stop eq $d->destination ) {
 				next;
 			}
-			push(@via_show, $stop);
+			push( @via_show, $stop );
 		}
 	}
 
-
+	for my $stop (@via_show) {
+		$stop =~ s{ ?Hbf}{};
+	}
 
 	printf(
 		"%5s %-10s %-80s %-20s %-2d %s\n",
-		$time,
-		$train,
-		join(' ', @via_show),
-		$dest,
-		$platform,
-		$info,
+		$d->time, $d->train, join( q{ }, @via_show ),
+		$d->destination, $d->platform, $d->info
 	);
-
 }
 
 __END__
@@ -132,6 +57,10 @@ __END__
 =head1 NAME
 
 =head1 SYNOPSIS
+
+=head1 VERSION
+
+version 0.0
 
 =head1 DESCRIPTION
 
@@ -151,4 +80,4 @@ Copyright (C) 2010 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 
-  0. You just DO WHAT THE FUCK YOU WANT TO.
+This program is licensed under the same terms as Perl itself.
