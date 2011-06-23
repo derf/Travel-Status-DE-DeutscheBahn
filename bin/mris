@@ -47,7 +47,7 @@ for my $d ( $status->departures() ) {
 
 	printf(
 		"%5s %-10s %-80s %-20s %-2d %s\n",
-		$d->time, $d->train, join( q{ }, @via_show ),
+		$d->time, $d->train, join( q{  }, @via_show ),
 		$d->destination, $d->platform, $d->info
 	);
 }

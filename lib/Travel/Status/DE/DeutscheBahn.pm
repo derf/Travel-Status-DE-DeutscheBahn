@@ -53,6 +53,21 @@ sub new {
 	return bless( $ref, $obj );
 }
 
+sub new_from_html {
+	my ( $obj, $html ) = @_;
+
+	my $ref = { html => $html, };
+
+	$ref->{tree} = XML::LibXML->load_html(
+		string            => $ref->{html},
+		recover           => 2,
+		suppress_errors   => 1,
+		suppress_warnings => 1,
+	);
+
+	return bless( $ref, $obj );
+}
+
 sub departures {
 	my ($self) = @_;
 
@@ -137,29 +152,91 @@ departure monitor
 
 =head1 SYNOPSIS
 
+	use Travel::Status::DE::DeutscheBahn;
+
+	my $status = Travel::Status::DE::DeutscheBahn->new(
+		station => 'Essen Hbf',
+	);
+
+	for my $departure ($status->departures) {
+		printf(
+			"At %s: %s to %s from platform %s\n",
+			$departure->time,
+			$departure->train,
+			$departure->destination,
+			$departure->platform,
+		);
+	}
+
 =head1 VERSION
 
 version 0.0
 
 =head1 DESCRIPTION
 
+Travel::Status::DE::DeutscheBahn is an interface to the DeutscheBahn
+arrival/departure monitor available at
+L<http://mobile.bahn.de/bin/mobil/bhftafel.exe/dn?rt=1>.
+
+It takes a station name and (optional) date and time and reports all
+departures at that station starting at the specified point in time (now if
+unspecified). By default, it will list the next 20 departures.
+
 =head1 METHODS
 
 =over
+
+=item my $status = Travel::Status::DE::DeutscheBahn->new(I<%opts>)
+
+Returns a new Travel::Status::DE::DeutscheBahn element. Supported I<opts> are:
+
+=over
+
+=item B<station> => I<station>
+
+The train station to report for, e.g. "Essen HBf". Mandatory.
+
+=item B<date> => I<dd>.I<mm>.I<yyyy>
+
+Date to report for. Defaults to the current day.
+
+=item B<time> => I<hh>:I<mm>
+
+Time to report for. Defaults to now.
+
+=back
+
+=item $status->departures()
+
+Returns a list of departures (20 by default). Each list element is a
+Travel::Status::DE::DeutscheBahn::Departure(3pm) object.
 
 =back
 
 =head1 DIAGNOSTICS
 
+None.
+
 =head1 DEPENDENCIES
 
 =over
+
+=item * Class::Accessor(3pm)
+
+=item * LWP::UserAgent(3pm)
+
+=item * XML::LibXML(3pm)
 
 =back
 
 =head1 BUGS AND LIMITATIONS
 
+The web interface also offers arrival monitoring. This is not yet supported
+in this module.
+
 =head1 SEE ALSO
+
+mris(1), Travel::Status::DE::DeutscheBahn::Departure(3pm).
 
 =head1 AUTHOR
 
