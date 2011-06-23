@@ -40,7 +40,7 @@ sub new {
 	};
 
 	$ref->{html}
-	  = $ua->post( 'http://mobile.bahn.de/bin/mobil/bhftafel.exe/dn?rt=1',
+	  = $ua->post( 'http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn?rt=1',
 		$ref->{post} )->content();
 
 	$ref->{tree} = XML::LibXML->load_html(
@@ -176,7 +176,7 @@ version 0.0
 
 Travel::Status::DE::DeutscheBahn is an interface to the DeutscheBahn
 arrival/departure monitor available at
-L<http://mobile.bahn.de/bin/mobil/bhftafel.exe/dn?rt=1>.
+L<http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn>.
 
 It takes a station name and (optional) date and time and reports all
 departures at that station starting at the specified point in time (now if
