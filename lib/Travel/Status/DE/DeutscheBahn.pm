@@ -24,20 +24,33 @@ sub new {
 	}
 
 	my $ref = {
+		mot_filter => [
+			$conf{mot}->{ice}   // 1,
+			$conf{mot}->{ic_ec} // 1,
+			$conf{mot}->{d}     // 1,
+			$conf{mot}->{nv}    // 1,
+			$conf{mot}->{s}     // 1,
+			$conf{mot}->{bus}   // 0,
+			$conf{mot}->{ferry} // 0,
+			$conf{mot}->{u}     // 0,
+			$conf{mot}->{tram}  // 0,
+		],
 		post => {
-			input          => $conf{station},
-			inputRef       => q{#},
-			date           => $conf{date} || $date,
-			time           => $conf{time} || $time,
-			productsFilter => '1111101000000000',
-			REQTrain_name  => q{},
-			maxJourneys    => 20,
-			delayedJourney => undef,
-			start          => 'Suchen',
-			boardType      => 'Abfahrt',
-			ao             => 'yes',
+			advancedProductMode => q{},
+			input               => $conf{station},
+			date                => $conf{date} || $date,
+			time                => $conf{time} || $time,
+			REQTrain_name       => q{},
+			start               => 'Suchen',
+			boardType           => 'dep',
 		},
 	};
+
+	for my $i ( 0 .. @{ $ref->{mot_filter} } ) {
+		if ( $ref->{mot_filter}->[$i] ) {
+			$ref->{post}->{"GUIREQProduct_$i"} = 'on';
+		}
+	}
 
 	$ref->{html}
 	  = $ua->post( 'http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn?rt=1',
@@ -203,6 +216,18 @@ Date to report for. Defaults to the current day.
 =item B<time> => I<hh>:I<mm>
 
 Time to report for. Defaults to now.
+
+=item B<mot> => I<\%hashref>
+
+Modes of transport to show. Accepted keys are: B<ice> (ICE trains), B<ic_ec>
+(IC and EC trains), B<d> (InterRegio and similarly fast trains), B<nv>
+("Nahverkehr", mostly RegionalExpress trains), B<s> ("S-Bahn"), B<bus>,
+B<ferry>, B<u> ("U-Bahn") and B<tram>.
+
+Setting a mode (as hash key) to 1 includes it, 0 excludes it.  undef leaves it
+at the default.
+
+By default, the following are shown: ice, ic_ec, d, nv, s.
 
 =back
 
