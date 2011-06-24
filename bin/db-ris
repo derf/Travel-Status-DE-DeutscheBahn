@@ -6,16 +6,19 @@ use 5.010;
 our $VERSION = '0.0';
 
 use Getopt::Long;
+use List::Util qw(first);
 use Travel::Status::DE::DeutscheBahn;
 
 my ( $date, $time );
 my $types = q{};
 my %train_type;
+my $filter_via;
 
 binmode( STDOUT, ':encoding(utf-8)' );
 
 GetOptions(
 	'd|date=s' => \$date,
+	'v|via=s'  => \$filter_via,
 	'm|mot=s'  => \$types,
 	't|time=s' => \$time,
 );
@@ -41,6 +44,10 @@ for my $d ( $status->departures() ) {
 	my ( @via, @via_main, @via_show );
 
 	@via = $d->route;
+
+	if ( $filter_via and not( first { $_ =~ m{$filter_via}io } @via ) ) {
+		next;
+	}
 
 	for my $stop (@via) {
 		if ( $stop =~ m{ ?Hbf} ) {
