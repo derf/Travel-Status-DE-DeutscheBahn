@@ -5,9 +5,21 @@ use 5.010;
 
 our $VERSION = '0.0';
 
+use Getopt::Long;
 use Travel::Status::DE::DeutscheBahn;
 
-my $status = Travel::Status::DE::DeutscheBahn->new( station => shift, );
+my ( $date, $time );
+
+GetOptions(
+	'd|date=s' => \$date,
+	't|time=s' => \$time,
+);
+
+my $status = Travel::Status::DE::DeutscheBahn->new(
+	date    => $date,
+	station => shift,
+	time    => $time,
+);
 
 for my $d ( $status->departures() ) {
 

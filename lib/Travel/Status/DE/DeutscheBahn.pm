@@ -105,7 +105,7 @@ sub departures {
 		my $route    = $n_route->textContent();
 		my $dest     = $n_dest->textContent();
 		my $platform = $n_platform->textContent();
-		my $info     = $n_info->textContent();
+		my $info     = $n_info ? $n_info->textContent() : q{};
 		my @via;
 
 		for my $str ( $time, $train, $dest, $platform, $info ) {
