@@ -6,13 +6,14 @@ use 5.010;
 our $VERSION = '0.0';
 
 use Getopt::Long;
-use List::Util qw(first);
+use List::Util qw(first max);
 use Travel::Status::DE::DeutscheBahn;
 
 my ( $date, $time );
 my $types = q{};
 my %train_type;
 my $filter_via;
+my @output;
 
 binmode( STDOUT, ':encoding(utf-8)' );
 
@@ -38,6 +39,27 @@ my $status = Travel::Status::DE::DeutscheBahn->new(
 	station => shift,
 	time    => $time,
 );
+
+sub display_result {
+	my (@lines) = @_;
+
+	my @line_length;
+
+	if ( not @lines ) {
+		die("Nothing to show\n");
+	}
+
+	for my $i ( 0 .. 5 ) {
+		$line_length[$i] = max map { length( $_->[$i] ) } @lines;
+	}
+
+	for my $line (@lines) {
+		printf( join( q{  }, ( map { "%-${_}s" } @line_length ) ) . "\n",
+			@{$line}, );
+	}
+
+	return;
+}
 
 for my $d ( $status->departures() ) {
 
@@ -79,12 +101,17 @@ for my $d ( $status->departures() ) {
 		$stop =~ s{ ?Hbf}{};
 	}
 
-	printf(
-		"%5s %-10s %-80s %-20s %-2s %s\n",
-		$d->time, $d->train, join( q{  }, @via_show ),
-		$d->destination, $d->platform, $d->info
+	push(
+		@output,
+		[
+			$d->time, $d->train,
+			join( q{  }, @via_show ), $d->destination,
+			$d->platform, $d->info
+		]
 	);
 }
+
+display_result(@output);
 
 __END__
 
