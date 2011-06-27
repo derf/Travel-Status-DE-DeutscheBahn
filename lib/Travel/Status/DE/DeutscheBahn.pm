@@ -7,7 +7,7 @@ use 5.010;
 use Carp qw(confess);
 use LWP::UserAgent;
 use POSIX qw(strftime);
-use Travel::Status::DE::DeutscheBahn::Departure;
+use Travel::Status::DE::DeutscheBahn::Result;
 use XML::LibXML;
 
 our $VERSION = '0.0';
@@ -81,7 +81,7 @@ sub new_from_html {
 	return bless( $ref, $obj );
 }
 
-sub departures {
+sub results {
 	my ($self) = @_;
 	my $mode = $self->{post}->{boardType};
 
@@ -139,20 +139,20 @@ sub departures {
 		}
 
 		push(
-			@{ $self->{departures} },
-			Travel::Status::DE::DeutscheBahn::Departure->new(
-				time        => $time,
-				train       => $train,
-				route_raw   => $route,
-				route       => \@via,
-				destination => $dest,
-				platform    => $platform,
-				info        => $info,
+			@{ $self->{results} },
+			Travel::Status::DE::DeutscheBahn::Result->new(
+				time      => $time,
+				train     => $train,
+				route_raw => $route,
+				route     => \@via,
+				route_end => $dest,
+				platform  => $platform,
+				info      => $info,
 			)
 		);
 	}
 
-	return @{ $self->{departures} };
+	return @{ $self->{results} };
 }
 
 1;
@@ -162,7 +162,7 @@ __END__
 =head1 NAME
 
 Travel::Status::DE::DeutscheBahn - Interface to the DeutscheBahn online
-departure monitor
+arrival/departure monitor
 
 =head1 SYNOPSIS
 
@@ -172,7 +172,7 @@ departure monitor
 		station => 'Essen Hbf',
 	);
 
-	for my $departure ($status->departures) {
+	for my $departure ($status->results) {
 		printf(
 			"At %s: %s to %s from platform %s\n",
 			$departure->time,
@@ -192,9 +192,9 @@ Travel::Status::DE::DeutscheBahn is an interface to the DeutscheBahn
 arrival/departure monitor available at
 L<http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn>.
 
-It takes a station name and (optional) date and time and reports all
-departures at that station starting at the specified point in time (now if
-unspecified). By default, it will list the next 20 departures.
+It takes a station name and (optional) date and time and reports all arrivals
+or departures at that station starting at the specified point in time (now if
+unspecified).
 
 =head1 METHODS
 
@@ -223,9 +223,6 @@ Time to report for. Defaults to now.
 By default, Travel::Status::DE::DeutscheBahn reports train departures
 (B<dep>). Set this to B<arr> to get arrivals instead.
 
-For arrivals, the C<departures()> method will report the arrival time, the
-train's origin and their route until the selected I<station>.
-
 =item B<mot> => I<\%hashref>
 
 Modes of transport to show. Accepted keys are: B<ice> (ICE trains), B<ic_ec>
@@ -240,10 +237,10 @@ By default, the following are shown: ice, ic_ec, d, nv, s.
 
 =back
 
-=item $status->departures()
+=item $status->results()
 
-Returns a list of departures (20 by default). Each list element is a
-Travel::Status::DE::DeutscheBahn::Departure(3pm) object.
+Returns a list of arrivals/departures. Each list element is a
+Travel::Status::DE::DeutscheBahn::Result(3pm) object.
 
 =back
 
@@ -269,7 +266,7 @@ Unknown.
 
 =head1 SEE ALSO
 
-mris(1), Travel::Status::DE::DeutscheBahn::Departure(3pm).
+mris(1), Travel::Status::DE::DeutscheBahn::Result(3pm).
 
 =head1 AUTHOR
 

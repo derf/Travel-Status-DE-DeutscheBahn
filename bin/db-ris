@@ -61,7 +61,7 @@ sub display_result {
 	return;
 }
 
-for my $d ( $status->departures() ) {
+for my $d ( $status->results() ) {
 
 	my ( @via, @via_main, @via_show );
 
@@ -130,7 +130,7 @@ version 0.0
 
 =head1 DESCRIPTION
 
-db-riss is an interface to the DeutscheBahn arrival/departure monitor
+db-ris is an interface to the DeutscheBahn departure monitor
 available at L<http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn>.
 
 It requests all departures at I<station> (optionally filtered by date, time,
