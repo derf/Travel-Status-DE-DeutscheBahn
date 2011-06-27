@@ -1,0 +1,4 @@
+Travel::Status::DE::DeutscheBahn 0.01 - Mon Jun 27 2011
+
+    * Initial release
+    * Crawls almost all data available in the web interface

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.0';
+our $VERSION = '0.01';
 
 use Getopt::Long qw(:config no_ignore_case);
 use List::Util qw(first max);
@@ -153,7 +153,7 @@ I<station>
 
 =head1 VERSION
 
-version 0.0
+version 0.01
 
 =head1 DESCRIPTION
 

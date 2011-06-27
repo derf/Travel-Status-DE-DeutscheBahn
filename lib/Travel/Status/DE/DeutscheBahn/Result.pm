@@ -6,7 +6,7 @@ use 5.010;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '0.0';
+our $VERSION = '0.01';
 
 Travel::Status::DE::DeutscheBahn::Result->mk_ro_accessors(
 	qw(time train route_end platform info));
@@ -71,7 +71,7 @@ arrival/departure received by Travel::Status::DE::DeutscheBahn
 
 =head1 VERSION
 
-version 0.0
+version 0.01
 
 =head1 DESCRIPTION
 
