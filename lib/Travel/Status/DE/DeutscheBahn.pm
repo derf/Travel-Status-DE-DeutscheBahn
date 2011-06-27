@@ -123,7 +123,7 @@ sub results {
 		my @via;
 
 		for my $str ( $time, $train, $dest, $platform, $info ) {
-			$str =~ s/\n//mg;
+			$str =~ s/\n/ /mg;
 			$str =~ tr/ //s;
 		}
 
