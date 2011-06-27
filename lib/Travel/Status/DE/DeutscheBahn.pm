@@ -19,6 +19,8 @@ sub new {
 
 	my $ua = LWP::UserAgent->new();
 
+	my $reply;
+
 	if ( not $conf{station} ) {
 		confess('You need to specify a station');
 	}
@@ -52,9 +54,15 @@ sub new {
 		}
 	}
 
-	$ref->{html}
-	  = $ua->post( 'http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn?rt=1',
-		$ref->{post} )->content();
+	$reply = $ua->post( 'http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn?rt=1',
+		$ref->{post} );
+
+	if ( $reply->is_error ) {
+		my $errstr = $reply->status_line();
+		confess("Could not submit POST request: ${errstr}");
+	}
+
+	$ref->{html} = $reply->content();
 
 	$ref->{tree} = XML::LibXML->load_html(
 		string            => $ref->{html},
