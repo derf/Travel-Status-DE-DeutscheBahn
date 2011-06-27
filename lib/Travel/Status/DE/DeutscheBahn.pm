@@ -202,30 +202,30 @@ unspecified).
 
 =item my $status = Travel::Status::DE::DeutscheBahn->new(I<%opts>)
 
-Returns a new Travel::Status::DE::DeutscheBahn element. Supported I<opts> are:
+Returns a new Travel::Status::DE::DeutscheBahn element.  Supported I<opts> are:
 
 =over
 
 =item B<station> => I<station>
 
-The train station to report for, e.g. "Essen HBf". Mandatory.
+The train station to report for, e.g.  "Essen HBf".  Mandatory.
 
 =item B<date> => I<dd>.I<mm>.I<yyyy>
 
-Date to report for. Defaults to the current day.
+Date to report for.  Defaults to the current day.
 
 =item B<time> => I<hh>:I<mm>
 
-Time to report for. Defaults to now.
+Time to report for.  Defaults to now.
 
 =item B<mode> => B<arr>|B<dep>
 
 By default, Travel::Status::DE::DeutscheBahn reports train departures
-(B<dep>). Set this to B<arr> to get arrivals instead.
+(B<dep>).  Set this to B<arr> to get arrivals instead.
 
 =item B<mot> => I<\%hashref>
 
-Modes of transport to show. Accepted keys are: B<ice> (ICE trains), B<ic_ec>
+Modes of transport to show.  Accepted keys are: B<ice> (ICE trains), B<ic_ec>
 (IC and EC trains), B<d> (InterRegio and similarly fast trains), B<nv>
 ("Nahverkehr", mostly RegionalExpress trains), B<s> ("S-Bahn"), B<bus>,
 B<ferry>, B<u> ("U-Bahn") and B<tram>.
@@ -239,7 +239,7 @@ By default, the following are shown: ice, ic_ec, d, nv, s.
 
 =item $status->results()
 
-Returns a list of arrivals/departures. Each list element is a
+Returns a list of arrivals/departures.  Each list element is a
 Travel::Status::DE::DeutscheBahn::Result(3pm) object.
 
 =back
@@ -266,7 +266,7 @@ Unknown.
 
 =head1 SEE ALSO
 
-mris(1), Travel::Status::DE::DeutscheBahn::Result(3pm).
+Travel::Status::DE::DeutscheBahn::Result(3pm).
 
 =head1 AUTHOR
 

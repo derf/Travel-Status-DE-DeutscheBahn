@@ -76,7 +76,7 @@ version 0.0
 =head1 DESCRIPTION
 
 Travel::Status::DE::DeutscheBahn::Result describes a single arrival/departure
-as obtained by Travel::Status::DE::DeutscheBahn. It contains information about
+as obtained by Travel::Status::DE::DeutscheBahn.  It contains information about
 the platform, time, route and more.
 
 =head1 METHODS

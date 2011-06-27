@@ -162,7 +162,7 @@ available at L<http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn>.
 
 It requests all departures at I<station> (optionally filtered by date, time,
 route and means of transport) and lists them on stdout, similar to the big
-departure screens installed on most main stations.
+departure screens installed at most main stations.
 
 =head1 OPTIONS
 
@@ -174,7 +174,7 @@ Date to list departures for.  Default: today
 
 =item B<-m>, B<--mot> I<motlist>
 
-Comma-separated list of modes of transport to show/hide. Accepts the following
+Comma-separated list of modes of transport to show/hide.  Accepts the following
 argements:
 
 	ice    InterCity Express trains
@@ -187,14 +187,14 @@ argements:
 	u      U-Bahn
 	tram
 
-You can prefix an argument with "!" to hide it. The default is C<<
-ice,ic_ec,d,nv,s >>. Note that B<-m> does not replace the default, so if you
+You can prefix an argument with "!" to hide it.  The default is C<<
+ice,ic_ec,d,nv,s >>.  Note that B<-m> does not replace the default, so if you
 only want to see S-Bahn und U-Bahn departures, you'd have to use C<< -m
 !ice,!ic_ec,!d,!nv,u >>.
 
 =item B<-t>, B<--time> I<hh>:I<mm>
 
-Time to list departures for. Default: now.
+Time to list departures for.  Default: now.
 
 =item B<-v>, B<--via> I<regex>
 
