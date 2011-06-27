@@ -1,0 +1,31 @@
+Travel::Status::DE::DeutscheBahn -
+Interface to the DeutscheBahn online departure monitor
+------------------------------------------------------
+
+* <http://derf.homelinux.org/projects/Travel-Status-DE-DeutscheBahn/>
+
+
+Dependencies
+------------
+
+ * perl version 5.10 or newer
+ * Clas::Accessor
+ * LWP::UserAgent (usually shipped by libwww-perl)
+ * XML::LibXML
+
+Installation
+------------
+
+$ perl Build.PL
+$ perl Build
+$ sudo perl Build install
+
+You can then run 'man Travel::Status::DE::DeutscheBahn' for more information.
+Thi distribution also ships the example script 'db-ris', see 'man db-ris'.
+
+Testing
+-------
+
+$ perl Build test
+
+This will require the Test::More, Test::Compile and Test::Pod modules.
