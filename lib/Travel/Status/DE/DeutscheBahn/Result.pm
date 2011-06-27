@@ -9,7 +9,7 @@ use parent 'Class::Accessor';
 our $VERSION = '0.01';
 
 Travel::Status::DE::DeutscheBahn::Result->mk_ro_accessors(
-	qw(time train route_end platform info));
+	qw(time train route_end route_raw platform info));
 
 sub new {
 	my ( $obj, %conf ) = @_;
@@ -111,6 +111,10 @@ arrive.
 
 Returns a list of station names the train will pass between the selected
 station and its origin/destination.
+
+=item $result->route_raw
+
+Returns the raw string used to create the route array.
 
 =item $result->time
 
