@@ -117,7 +117,12 @@ __END__
 
 =head1 NAME
 
+db-ris - Interface to the DeutscheBahn online departure monitor
+
 =head1 SYNOPSIS
+
+B<db-ris> [B<-d> I<date>] [B<-m> I<motlist>] [B<-t> I<time>] [B<-v> I<via>]
+I<station>
 
 =head1 VERSION
 
@@ -125,19 +130,82 @@ version 0.0
 
 =head1 DESCRIPTION
 
+db-riss is an interface to the DeutscheBahn arrival/departure monitor
+available at L<http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn>.
+
+It requests all departures at I<station> (optionally filtered by date, time,
+route and means of transport) and lists them on stdout, similar to the big
+departure screens installed on most main stations.
+
 =head1 OPTIONS
+
+=over
+
+=item B<-d>, B<--date> I<dd>.I<mm>.I<yyyy>
+
+Date to list departures for.  Default: today
+
+=item B<-m>, B<--mot> I<motlist>
+
+Comma-separated list of modes of transport to show/hide. Accepts the following
+argements:
+
+	ice    InterCity Express trains
+	ic_ec  InterCity / EuroCity trains
+	d      InterRegio and similar
+	nv     "Nahverkehr", RegionalExpress and such
+	s      S-Bahn
+	bus
+	ferry
+	u      U-Bahn
+	tram
+
+You can prefix an argument with "!" to hide it. The default is C<<
+ice,ic_ec,d,nv,s >>. Note that B<-m> does not replace the default, so if you
+only want to see S-Bahn und U-Bahn departures, you'd have to use C<< -m
+!ice,!ic_ec,!d,!nv,u >>.
+
+=item B<-t>, B<--time> I<hh>:I<mm>
+
+Time to list departures for. Default: now.
+
+=item B<-v>, B<--via> I<regex>
+
+Only display trains whose route (all stations between the current stop and the
+destination) matches the perl regular expression I<regex>.  The match is not
+case-sensitive.  Use '^regex$' to match a full string, but be aware that this
+may not work as expected.
+
+=back
 
 =head1 EXIT STATUS
 
+Zero unless things went wrong.
+
 =head1 CONFIGURATION
+
+None.
 
 =head1 DEPENDENCIES
 
+=over
+
+=item * Class::Accessor(3pm)
+
+=item * LWP::UserAgent(3pm)
+
+=item * XML::LibXML(3pm)
+
+=back
+
 =head1 BUGS AND LIMITATIONS
+
+There are a few character encoding problems (most notably, B<--via> does not
+understand UTF-8 umlauts).
 
 =head1 AUTHOR
 
-Copyright (C) 2010 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2011 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 
