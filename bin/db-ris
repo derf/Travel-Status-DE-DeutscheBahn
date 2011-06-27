@@ -5,7 +5,7 @@ use 5.010;
 
 our $VERSION = '0.0';
 
-use Getopt::Long;
+use Getopt::Long qw(:config no_ignore_case);
 use List::Util qw(first max);
 use Travel::Status::DE::DeutscheBahn;
 
@@ -18,11 +18,14 @@ my @output;
 binmode( STDOUT, ':encoding(utf-8)' );
 
 GetOptions(
-	'd|date=s' => \$date,
-	'v|via=s'  => \$filter_via,
-	'm|mot=s'  => \$types,
-	't|time=s' => \$time,
-);
+	'd|date=s'  => \$date,
+	'h|help'    => sub { show_help(0) },
+	'm|mot=s'   => \$types,
+	't|time=s'  => \$time,
+	'v|via=s'   => \$filter_via,
+	'V|version' => \&show_version,
+
+) or show_help(1);
 
 for my $type ( split( qr{,}, $types ) ) {
 	if ( substr( $type, 0, 1 ) eq q{!} ) {
@@ -39,6 +42,22 @@ my $status = Travel::Status::DE::DeutscheBahn->new(
 	station => shift,
 	time    => $time,
 );
+
+sub show_help {
+	my ($code) = @_;
+
+	print 'Usage: db-ris [-d <dd.mm.yyyy>] [-m <motlist>] [-t <time>] '
+	  . "[-v <via>] <station>\n"
+	  . "See also: man db-ris\n";
+
+	exit $code;
+}
+
+sub show_version {
+	say "db-ris version ${VERSION}";
+
+	exit 0;
+}
 
 sub display_result {
 	my (@lines) = @_;
@@ -61,22 +80,17 @@ sub display_result {
 	return;
 }
 
-for my $d ( $status->results() ) {
+sub filter_via {
+	my (@via) = @_;
 
-	my ( @via, @via_main, @via_show );
-
-	@via = $d->route;
-
-	if ( $filter_via and not( first { $_ =~ m{$filter_via}io } @via ) ) {
-		next;
-	}
+	my ( @via_main, @via_show, $last_stop );
 
 	for my $stop (@via) {
 		if ( $stop =~ m{ ?Hbf} ) {
 			push( @via_main, $stop );
 		}
 	}
-	pop(@via);
+	$last_stop = pop(@via);
 
 	if ( @via_main and @via and $via[0] eq $via_main[0] ) {
 		shift(@via_main);
@@ -90,7 +104,7 @@ for my $d ( $status->results() ) {
 
 		while ( @via_show < 3 and @via_main ) {
 			my $stop = shift(@via_main);
-			if ( $stop ~~ \@via_show or $stop eq $d->destination ) {
+			if ( $stop ~~ \@via_show or $stop eq $last_stop ) {
 				next;
 			}
 			push( @via_show, $stop );
@@ -101,11 +115,24 @@ for my $d ( $status->results() ) {
 		$stop =~ s{ ?Hbf}{};
 	}
 
+	return @via_show;
+}
+
+for my $d ( $status->results() ) {
+
+	my ( @via, @via_main, @via_show );
+
+	@via = $d->route;
+
+	if ( $filter_via and not( first { $_ =~ m{$filter_via}io } @via ) ) {
+		next;
+	}
+
 	push(
 		@output,
 		[
 			$d->time, $d->train,
-			join( q{  }, @via_show ), $d->destination,
+			join( q{  }, filter_via(@via) ), $d->destination,
 			$d->platform, $d->info
 		]
 	);
@@ -175,6 +202,10 @@ Only display trains whose route (all stations between the current stop and the
 destination) matches the perl regular expression I<regex>.  The match is not
 case-sensitive.  Use '^regex$' to match a full string, but be aware that this
 may not work as expected.
+
+=item B<-V>, B<--version>
+
+Show version information
 
 =back
 
