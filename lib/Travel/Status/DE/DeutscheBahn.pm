@@ -42,7 +42,7 @@ sub new {
 			time                => $conf{time} || $time,
 			REQTrain_name       => q{},
 			start               => 'Suchen',
-			boardType           => 'dep',
+			boardType           => $conf{mode} // 'dep',
 		},
 	};
 
@@ -83,9 +83,10 @@ sub new_from_html {
 
 sub departures {
 	my ($self) = @_;
+	my $mode = $self->{post}->{boardType};
 
 	my $xp_element = XML::LibXML::XPathExpression->new(
-		'//table[@class="result stboard dep"]/tr');
+		"//table[\@class=\"result stboard ${mode}\"]/tr");
 	my $xp_time  = XML::LibXML::XPathExpression->new('./td[@class="time"]');
 	my $xp_train = XML::LibXML::XPathExpression->new('./td[@class="train"]');
 	my $xp_route = XML::LibXML::XPathExpression->new('./td[@class="route"]');
@@ -217,6 +218,14 @@ Date to report for. Defaults to the current day.
 
 Time to report for. Defaults to now.
 
+=item B<mode> => B<arr>|B<dep>
+
+By default, Travel::Status::DE::DeutscheBahn reports train departures
+(B<dep>). Set this to B<arr> to get arrivals instead.
+
+For arrivals, the C<departures()> method will report the arrival time, the
+train's origin and their route until the selected I<station>.
+
 =item B<mot> => I<\%hashref>
 
 Modes of transport to show. Accepted keys are: B<ice> (ICE trains), B<ic_ec>
@@ -256,8 +265,7 @@ None.
 
 =head1 BUGS AND LIMITATIONS
 
-The web interface also offers arrival monitoring. This is not yet supported
-in this module.
+Unknown.
 
 =head1 SEE ALSO
 
