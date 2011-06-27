@@ -91,7 +91,11 @@ Returns the last element of the route.  Depending on how you set up
 Travel::Status::DE::DeutscheBahn (arrival or departure listing), this is
 either the train's destination or its origin station.
 
-For convenienc, this method can also be called as B<destination> or B<origin>.
+=item $result->destination
+
+=item $result->origin
+
+Convenience aliases for $result->route_end.
 
 =item $result->info
 
