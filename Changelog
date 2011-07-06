@@ -4,6 +4,7 @@ git HEAD
     * Only display info when a train is late, not when on time / unknown
 
     [Travel::Status::DE::DeutscheBahn]
+    * Add route_raw accessor
     * Proper HTTP request error handling
     * Strip leading whitespace from ::Result info
 
