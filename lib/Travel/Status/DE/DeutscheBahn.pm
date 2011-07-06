@@ -144,6 +144,11 @@ sub results {
 				next;
 			}
 			my $stop = $1;
+
+			if ( $stop =~ m{ [(] Halt \s entf.llt [)] }ox ) {
+				next;
+			}
+
 			push( @via, $stop );
 		}
 
