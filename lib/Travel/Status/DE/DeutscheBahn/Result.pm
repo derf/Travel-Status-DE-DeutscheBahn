@@ -116,6 +116,9 @@ station and its origin/destination.
 
 Returns the raw string used to create the route array.
 
+Note that canceled stops are filtered from B<route>, but still present in
+B<route_raw>.
+
 =item $result->time
 
 Returns the arrival/departure time as string in "hh:mm" format.
