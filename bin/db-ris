@@ -190,7 +190,11 @@ departure screens installed at most main stations.
 
 =item B<-d>, B<--date> I<dd>.I<mm>.I<yyyy>
 
-Date to list departures for.  Default: today
+Date to list departures for.  Default: today.
+
+=item B<-L>, B<--ignore-late>
+
+Do not display delayed trains.
 
 =item B<-m>, B<--mot> I<motlist>
 
@@ -225,7 +229,7 @@ may not work as expected.
 
 =item B<-V>, B<--version>
 
-Show version information
+Show version information.
 
 =back
 
