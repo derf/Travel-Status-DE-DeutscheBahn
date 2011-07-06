@@ -135,7 +135,8 @@ sub results {
 			$str =~ tr/ //s;
 		}
 
-		$info =~ s/,Grund//;
+		$info =~ s{ ,Grund }{}ox;
+		$info =~ s{ ^ \s+ }{}ox;
 
 		while ( $route =~ m{$re_via}g ) {
 			if ($first) {
