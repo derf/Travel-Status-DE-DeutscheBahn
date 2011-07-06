@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Getopt::Long qw(:config no_ignore_case);
 use List::Util qw(first max);
@@ -168,12 +168,12 @@ db-ris - Interface to the DeutscheBahn online departure monitor
 
 =head1 SYNOPSIS
 
-B<db-ris> [B<-d> I<date>] [B<-m> I<motlist>] [B<-t> I<time>] [B<-v> I<via>]
-I<station>
+B<db-ris> [B<-d> I<date>] [B<-L>] [B<-m> I<motlist>] [B<-t> I<time>]
+[B<-v> I<via>] I<station>
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 DESCRIPTION
 

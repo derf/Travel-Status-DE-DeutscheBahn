@@ -20,6 +20,7 @@ Module::Build->new(
 		'Getopt::Long'    => 0,
 		'List::Util'      => 0,
 		'LWP::UserAgent'  => 0,
+		'POSIX'           => 0,
 		'XML::LibXML'     => '1.70',
 	},
 	script_files => 'bin/',

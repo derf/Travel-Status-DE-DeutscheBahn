@@ -1,4 +1,4 @@
-git HEAD
+Travel::Status::DE::DeutscheBahn 0.02 - Wed Jul 06 2011
 
     [db-ris]
     * Only display info when a train is late, not when on time / unknown
