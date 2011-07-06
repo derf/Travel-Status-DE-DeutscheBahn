@@ -75,9 +75,14 @@ sub new {
 }
 
 sub new_from_html {
-	my ( $obj, $html ) = @_;
+	my ( $obj, %opt ) = @_;
 
-	my $ref = { html => $html, };
+	my $ref = {
+		html => $opt{html},
+		post => { boardType => $opt{mode} // 'dep' }
+	};
+
+	$ref->{post}->{boardType} = $opt{mode} // 'dep';
 
 	$ref->{tree} = XML::LibXML->load_html(
 		string            => $ref->{html},
