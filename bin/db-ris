@@ -9,21 +9,25 @@ use Getopt::Long qw(:config no_ignore_case);
 use List::Util qw(first max);
 use Travel::Status::DE::DeutscheBahn;
 
-my ( $date, $time );
-my $types = q{};
 my %train_type;
+
+my ( $date, $time );
 my $filter_via;
+my $ignore_late = 0;
+my $types       = q{};
+
 my @output;
 
 binmode( STDOUT, ':encoding(utf-8)' );
 
 GetOptions(
-	'd|date=s'  => \$date,
-	'h|help'    => sub { show_help(0) },
-	'm|mot=s'   => \$types,
-	't|time=s'  => \$time,
-	'v|via=s'   => \$filter_via,
-	'V|version' => \&show_version,
+	'd|date=s'      => \$date,
+	'h|help'        => sub { show_help(0) },
+	'L|ignore-late' => \$ignore_late,
+	'm|mot=s'       => \$types,
+	't|time=s'      => \$time,
+	'v|via=s'       => \$filter_via,
+	'V|version'     => \&show_version,
 
 ) or show_help(1);
 
@@ -132,9 +136,15 @@ for my $d ( $status->results() ) {
 
 	my ( @via, @via_main, @via_show );
 
+	my $re_late = qr{ (?: ^ | , ) ca[.] \s \d+ \s Minuten \s sp.ter}ox;
+
 	@via = $d->route;
 
 	if ( $filter_via and not( first { $_ =~ m{$filter_via}io } @via ) ) {
+		next;
+	}
+
+	if ( $ignore_late and $d->info =~ $re_late ) {
 		next;
 	}
 
