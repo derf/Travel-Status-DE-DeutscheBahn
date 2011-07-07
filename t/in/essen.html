@@ -1,0 +1,2609 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>DB BAHN - Haltestelleninformationen - Ausgabe</title>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
+<link rel="shortcut icon" href="/v/820/img/favicon.ico" />
+<link rel="stylesheet" type="text/css" href="/v/820/css/hafas.css" />
+<link rel="stylesheet" type="text/css" href="/v/760/cms/css/bahn.min.css" />
+<!--[if lte IE 6]>
+<link href="/v/760/cms/css/bahn-ie6.min.css" rel="stylesheet" type="text/css" />
+<![endif]-->
+<!--[if IE 7]>
+<link href="/v/760/cms/css/bahn-ie7.min.css" rel="stylesheet" type="text/css" />
+<![endif]-->
+<!--[if lte IE 7]>
+<link href="/v/800/css/hafas-ie.css" rel="stylesheet" type="text/css" />
+<![endif]-->
+<script type="text/javascript">
+// <![CDATA[
+var BAHNCSS = {
+load: function( type ) {
+var scriptStyles = document.createElement( 'link' );
+scriptStyles.rel = 'stylesheet';
+scriptStyles.type = 'text/css';
+if(type == 'hafasDynamic')
+scriptStyles.href = '/v/820/css/hafas-dyn.css';
+else
+scriptStyles.href = '/v/760/cms/css/bahn-dyn.min.css';
+scriptStyles.media = 'screen, projection, handheld, print';
+if ( head = document.getElementsByTagName( 'head' )[0] ) {
+head.appendChild( scriptStyles );
+}
+}
+}
+BAHNCSS.load( 'dynamicCSS' );
+BAHNCSS.load( 'hafasDynamic' );
+// ]]>
+</script>
+<style type="text/css">
+<!--
+-->
+</style>
+<!--[if lte IE 6]>
+<style type="text/css">
+body {behavior:url("/v/600/css/hafas-dyn-hover.htc");}
+</style>
+<![endif]-->
+<script type="text/javascript" src="/v/760/js/external.js"></script>
+<script type="text/javascript" src="/v/820/js/hafas_tp.js"></script>
+<script type="text/javascript" src="/v/760/js/simple_ajax.js"></script>
+<script type="text/javascript">
+<!--
+var tmpDiv = document.createElement("div");
+tmpDiv.innerHTML = "Frage oder Suchbegriff eingeben &hellip;";
+var searchDefault = tmpDiv.innerHTML;
+var defaultString = new Array("",searchDefault);
+var inputFields = new Array({"name":"q","strIndex":1});
+var defaultStringIndex = new Object();
+function sHC(link, name, evaId, time)
+{
+if(document.getElementById("hafasConMenu") != null)
+delConMenu("hafasConMenu","hafasConMenu");
+var menuContainer = document.createElement("div");
+menuContainer.id = "hafasConMenu";
+menuContainer.className = "hafasMenuContainer dep";
+menuContainer.innerHTML = "<div class='floatRight' onclick='delConMenu(\"hafasConMenu\")'><img src='/v/820/img/schliessen_outline_10x10.gif' \/></div>";
+menuContainer.innerHTML += "<div class='dep'><a class='arrowlink' href='http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn?ld=96248&amp;country=DEU&amp;rt=1&amp;evaId="+evaId+"&amp;boardType=dep&amp;time="+time+"&amp;productsFilter=11111&amp;start=yes'>Abfahrtsplan</a></div>";
+if(evaId.substr(0,2) == "80")
+menuContainer.innerHTML += "<div class='dep'><a class='arrowlink' href='http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn?ld=96248&amp;country=DEU&amp;rt=1&amp;showBhfInfo=yes&amp;evaId="+evaId+"&amp;info=yes&amp;' target='stationinfo' onclick='blur();popUp(\"about:blank\",\"stationinfo\",\"stInfo\");'>Bahnhofsinformationen</a></div>";
+var currentNode = link;
+var offsetTop = link.offsetHeight+3;
+var offsetLeft = -10;
+while(currentNode)
+{
+offsetTop += currentNode.offsetTop;
+offsetLeft += currentNode.offsetLeft;
+currentNode = currentNode.offsetParent;
+}
+menuContainer.style.top = offsetTop+"px";
+menuContainer.style.left = offsetLeft+"px";
+document.getElementsByTagName("body")[0].appendChild(menuContainer);
+}
+function delConMenu(menuContainer)
+{
+//document.getElementById(mbsContainer).removeChild(document.getElementById(menuContainer));
+document.getElementsByTagName("body")[0].removeChild(document.getElementById(menuContainer));
+}
+//-->
+</script>
+<script type="text/javascript" src="/v/800/js/FSuggest.js"></script>
+<script type="text/javascript" src="/v/760/js/hafas_standard_calendar_combined.js"></script>
+<link rel="stylesheet" type="text/css" href="/v/760/cms/css/bahn_calendar_div.css" />
+<script type="text/javascript">
+<!--
+function markarrowlink(button) {
+button.style.color="#f00";
+button.style.textDecoration = "underline";
+}
+function resetarrowlink(button) {
+button.style.color="#000";
+button.style.textDecoration = "none";
+}
+// -->
+</script>
+</head>
+<body  onload="removeDefaultValues(false);initFontsize();" style="">
+<div id="doc" style="height:100%;">
+<div id="header" >
+<h1 id="logo">
+<img src="/v/820/img/logo-db-bahn.gif" width="126" height="32" alt="DB Bahn" />
+</h1>
+<div id="header-elements" class="clearfix">
+<form id="search" action="http://www.bahn.de/q" method="get" accept-charset="ISO-8859-1" target="_blank">
+<fieldset>
+<p>
+<label for="search-query">Suchen</label>
+<input id="search-query" type="text" name="q" title="Suche" maxlength="500" value="Frage oder Suchbegriff eingeben &hellip;" class="search-field hasDefault" tabindex="80" role="search" />
+<input id="search-site" type="hidden" name="s" value="p,international,regional" />
+<input id="search-lang" type="hidden" name="l" value="de" />
+<input id="search-maxresults" type="hidden" name="m" value="100" />
+<input type="hidden" disabled="disabled" id="search-query-default" value="Frage oder Suchbegriff eingeben &hellip;" />
+<input type="hidden" disabled="disabled" id="search-query-load-query" value="&amp;height=600&amp;width=657&amp;inlineId=hiddenModalContent&amp;modal=false" />
+</p>
+<!-- Submit -->
+<p class="button-inside">
+<span class="button-border button-normal">
+<noscript>
+<input type="submit" class="button deleteDefaults" name="start" value="Suchen" title="Suchen" />
+</noscript>
+<script type="text/javascript">
+<!--
+document.write('<button type="submit" name="search-submit" tabindex="90">Suchen</button>');
+//-->
+</script>
+</span>
+</p>
+</fieldset>
+</form>
+<ul id="service-nav" class="clearfix">
+<li><a href="http://www.bahn.de/app_kontakt_pk_de_DEU.shtml" tabindex="10" target="_blank" class="first">Kontakt</a></li>
+<li><a href="http://www.bahn.de/app_hilfe_pk_de_DEU.shtml" tabindex="20" target="_blank" >Hilfe</a></li>
+<li><a href="http://www.bahn.de/app_sitemap_pk_de_DEU.shtml" tabindex="30" target="_blank">Sitemap</a></li>
+<li id="font-sizer">
+<a href="http://reiseauskunft.bahn.de/bin/bhftafel.exe?input=Essen+Hbf&amp;GUIREQProduct_2=on&amp;time=19%3A19&amp;date=06.07.2011&amp;REQTrain_name=&amp;GUIREQProduct_4=on&amp;boardType=dep&amp;GUIREQProduct_1=on&amp;GUIREQProduct_3=on&amp;GUIREQProduct_0=on&amp;advancedProductMode=&amp;start=Suchen&amp;&amp;font-size=0" tabindex="40" class="font-normal" title="Schrift normal">a</a><span>,</span>
+<a href="http://reiseauskunft.bahn.de/bin/bhftafel.exe?input=Essen+Hbf&amp;GUIREQProduct_2=on&amp;time=19%3A19&amp;date=06.07.2011&amp;REQTrain_name=&amp;GUIREQProduct_4=on&amp;boardType=dep&amp;GUIREQProduct_1=on&amp;GUIREQProduct_3=on&amp;GUIREQProduct_0=on&amp;advancedProductMode=&amp;start=Suchen&amp;&amp;font-size=1" tabindex="50" class="font-large" title="Schrift gr&#246;&#223;er">a+</a><span>,</span>
+<a href="http://reiseauskunft.bahn.de/bin/bhftafel.exe?input=Essen+Hbf&amp;GUIREQProduct_2=on&amp;time=19%3A19&amp;date=06.07.2011&amp;REQTrain_name=&amp;GUIREQProduct_4=on&amp;boardType=dep&amp;GUIREQProduct_1=on&amp;GUIREQProduct_3=on&amp;GUIREQProduct_0=on&amp;advancedProductMode=&amp;start=Suchen&amp;&amp;font-size=2" tabindex="60" class="font-xl" title="Schrift extra gro&#223;">a++</a>
+</li>
+</ul>
+</div>
+</div>
+<div id="main-nav" class="clearfix">
+<h2>Hauptnavigation</h2>
+<div id="nav1">
+<ul id="main-nav-left">
+<li id="mn-startseite"><a class="first jhover" href="http://www.bahn.de/app_home_pk_de_DEU.shtml" title="Startseite" ><span>Startseite</span></a></li>
+<li id="mn-angebotsberatung">
+<a class="jhover" href="http://www.bahn.de/app_angebote_pk_de_DEU.shtml" title="Angebotsberatung" ><span>Angebotsberatung</span></a>
+</li>
+<li id="mn-fahrplan">
+<a class="jhover active" href="http://www.bahn.de/app_buchen_pk_de_DEU.shtml" title="Fahrplan &amp; Buchung" ><span>Fahrplan &amp; Buchung</span></a>
+</li>
+<li id="mn-services">
+<a class="jhover" href="http://www.bahn.de/app_services_pk_de_DEU.shtml" title="Services" ><span>Services</span></a>
+</li>
+<li id="mn-bahncard">
+<a class="jhover" href="http://www.bahn.de/app_bahncard_pk_de_DEU.shtml" title="BahnCard" ><span>BahnCard</span></a>
+</li>
+<li id="mn-urlaub">
+<a class="jhover" href="http://www.bahn.de/app_urlaub_pk_de_DEU.shtml" title="Urlaub" ><span>Urlaub</span></a>
+</li>
+</ul>
+<form id="login-form" action="#" method="post">
+<ul id="main-nav-right">
+<li id="mn-meinebahn"><a class="first " href="https://fahrkarten.bahn.de/privatkunde/start/start.post?lang=de&amp;country=DEU&amp;scope=meinebahn" title="Meine Bahn"><span>Meine Bahn</span></a></li>
+</ul>
+</form>
+</div>
+</div>
+<div id="content" class="clearfix">
+<div id="key-visual">
+<div class="bar"></div>
+</div>
+<div id="hafasContainer">
+<div class="hafasContent sq_results">
+<h1 class="pagetitle">Abfahrt und Ankunft</h1>
+<form action="http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn?ld=96248&amp;country=DEU&amp;rt=1&amp;" name="formular" method="post" style="display:inline;" onsubmit="return replaceB();">
+<div id="sqQuery" class="clearfix">
+<div class="leftBlock">
+<fieldset>
+<label class="front wrap" for="HFS_input">Bahnhof / Haltestelle</label>
+<input  type="text" id="rplc0" name="input" value="Essen Hbf" size="40" maxlength="60" />
+<input type="hidden" name="inputRef" value="Essen Hbf#008000098" />
+<script type="text/javascript">
+<!--
+rplcArray = new Array();
+rplcArray[0] = "rplc0";
+new FSuggest({loc:"rplc0",
+type:"S",
+minChar:4,
+requestURL:"http://reiseauskunft.bahn.de/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsS0G=",
+stopDelay:400,
+requestType:"js"
+});
+// -->
+</script>
+<br />
+</fieldset>
+<fieldset>
+<label class="front" for="HFS_selectDate">Datum / Zeit</label>
+<input class="emphasized" type="text" name="date" id="date" value="06.07.2011" size="10" maxlength="14" onblur="javascript:this.notify(this);"/> &nbsp;
+<span class="jsShowInline" style="position: relative;">
+<img id="calLater" class="calLater" src="/v/820/img/icons_16x8_up.gif" onclick="calman.shiftDate('callink0',1);" width="16" height="8" alt="Einen Tag sp&#228;ter" title="Einen Tag sp&#228;ter" />
+<img id="calSooner" class="calSooner" src="/v/820/img/icons_16x8_down.gif" onclick="calman.shiftDate('callink0',-1);" width="16" height="8" alt="Einen Tag fr&#252;her" title="Einen Tag fr&#252;her" />
+<script type="text/javascript">
+var monthsTexts = new Array("Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember");
+var weekdayTexts = new Array("Mo","Di","Mi","Do","Fr","Sa","So");
+var closeText = "Schließen";
+</script>
+&nbsp;<a id="callink0" onclick="return calman.toggleDisplay('callink0');" class="calendar"><img src="/v/820/img/kalender_21x16.gif" width="21" height="16" title="Kalender" alt="Kalender" id="calendarlinkicon0"/></a>
+<script type="text/javascript">
+calman.config = {
+"today"           : parseUserDateInput("06.07.11"),
+"viewPeriodS"     : parseUserDateInput("12.12.10"),
+"viewPeriodE"     : parseUserDateInput("10.12.11"),
+"dataPeriodS"     : parseUserDateInput("12.12.10"),
+"dataPeriodE"     : parseUserDateInput("10.12.11"),
+"monthsTexts"     : monthsTexts,
+"weekdaysTexts"   : weekdayTexts,
+"closeText"       : closeText,
+"showShortYear"   : true,
+"styleClass"      : "calendardiv"
+}
+var calcon_config = {
+"formName"        : "document.formular",
+"fieldName"       : "date",
+"referenceObject" : "callink0"
+}
+calman.createCalendar(calcon_config);
+</script>
+</span>
+<input  type="text" id="HFS_time" name="time" value="19:19" size="8" maxlength="20" />
+<span id="changeTime" class="nowrap jsShowInline nopadding sqTimeChange" style="position: relative;  margin-left: 5px;">
+<img src="/v/820/img/icons_16x8_up.gif" onclick="shiftTime('HFS_time',1);" class="calLater" width="16" height="8" alt="Weiter zur vollen Stunde" title="Weiter zur vollen Stunde" />
+<img src="/v/820/img/icons_16x8_down.gif" onclick="shiftTime('HFS_time',-1);" class="calSooner" width="16" height="8" alt="Zur&#252;ck zur vollen Stunde" title="Zur&#252;ck zur vollen Stunde" />
+&nbsp;
+</span>
+<br />
+<input class="leftMargin radio" type="radio" id="dep" name="boardType" value="dep" checked="checked" /><label for="dep">Abfahrt</label>
+<input class="radio" type="radio" id="arr" name="boardType" value="arr"  /><label for="arr">Ankunft</label>
+<br />
+</fieldset>
+</div>
+<div class="rightBlock">
+<fieldset>
+<label class="front" for="HFS_trainName">Linie / Zugnummer (optional)</label>
+<input type="text" id="HFS_trainName" name="REQTrain_name" value="" size="15" maxlength="15" />
+<br />
+</fieldset>
+<fieldset>
+<input type="hidden" name="advancedProductMode" />
+<label class="front" for="prod_0">Verkehrsmittel</label>
+<table class="products">
+<tr class="cb">
+<td>
+<input id="prod_0" class="checkbox " type="checkbox" name="GUIREQProduct_0" checked="checked" />
+</td>
+<td>
+<input id="prod_1" class="checkbox " type="checkbox" name="GUIREQProduct_1" checked="checked" />
+</td>
+<td>
+<input id="prod_2" class="checkbox " type="checkbox" name="GUIREQProduct_2" checked="checked" />
+</td>
+<td>
+<input id="prod_3" class="checkbox " type="checkbox" name="GUIREQProduct_3" checked="checked" />
+</td>
+<td>
+<input id="prod_4" class="checkbox " type="checkbox" name="GUIREQProduct_4" checked="checked" />
+</td>
+<td>
+<input id="prod_5" class="checkbox " type="checkbox" name="GUIREQProduct_5"  />
+</td>
+<td>
+<input id="prod_6" class="checkbox " type="checkbox" name="GUIREQProduct_6"  />
+</td>
+<td>
+<input id="prod_7" class="checkbox " type="checkbox" name="GUIREQProduct_7"  />
+</td>
+<td>
+<input id="prod_8" class="checkbox " type="checkbox" name="GUIREQProduct_8"  />
+</td>
+</tr>
+<tr class="icons">
+<td><img src="/v/820/img/ice_24x24.gif" alt="ICE-Z&#252;ge" title="ICE-Z&#252;ge" width="24" height="24" /></td>
+<td><img src="/v/820/img/ec_ic_24x24.gif" alt="Intercity- und Eurocityz&#252;ge" title="Intercity- und Eurocityz&#252;ge" width="24" height="24" /></td>
+<td><img src="/v/820/img/ir_24x24.gif" alt="Interregio- und Schnellz&#252;ge" title="Interregio- und Schnellz&#252;ge" width="24" height="24" /></td>
+<td><img src="/v/820/img/re_24x24.gif" alt="Nahverkehr, sonstige Z&#252;ge" title="Nahverkehr, sonstige Z&#252;ge" width="24" height="24" /></td>
+<td><img src="/v/820/img/sbahn_24x24.gif" alt="S-Bahn" title="S-Bahn" width="24" height="24" /></td>
+<td><img src="/v/820/img/bus_24x24.gif" alt="Busse" title="Busse" width="24" height="24" /></td>
+<td><img src="/v/820/img/faehre_24x24.gif" alt="Schiffe" title="Schiffe" width="24" height="24" /></td>
+<td><img src="/v/820/img/ubahn_24x24.gif" alt="U-Bahnen" title="U-Bahnen" width="24" height="24" /></td>
+<td><img src="/v/820/img/tram_24x24.gif" alt="Stra&#223;enbahnen" title="Stra&#223;enbahnen" width="24" height="24" /></td>
+</tr>
+</td>
+</table>
+</fieldset>
+</div>
+</div>
+<p class="floatRight button-inside querybutton">
+<span class="button-border">
+<button type="submit" class="highlight" name="start" value="Suchen" title="" />
+<span>Suchen</span>
+</button>
+</span>
+</p>
+<p class="button-inside clearfix querybutton">
+<span class="button-border button-normal">
+<a class="highlight" href="http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn?ld=96248&amp;country=DEU&amp;rt=1&amp;" title="Alle Eingaben l&#246;schen">Eingaben l&#246;schen</a>
+</span>
+</p>
+</form>
+</div>
+<div class="shadowbottom">&nbsp;</div>
+<div class="shadowtop">&nbsp;</div>
+<div id="sqResult" class="hafasContent">
+<h2>
+<a class="arrowlink floatRight fontNormal" href="http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn?ld=96248&amp;country=DEU&amp;rt=1&amp;input=Essen Hbf%238000098&amp;boardType=dep&amp;time=actual&amp;productsFilter=11111&amp;start=yes">Aktualisieren</a>
+<strong>Aktueller Abfahrtsplan von Essen Hbf um 19:19 Uhr</strong>
+</h2>
+<p>
+</p>
+<table class="result stboard dep">
+<tr>
+<th class="time">Zeit</th>
+<th class="icon">&nbsp;</th>
+<th class="train">Zug</th>
+<th class="route">Richtung / Unterwegshaltestellen</th>
+<th class="platform">Gleis</th>
+<th class="ris">Aktuelles</th>
+</tr>
+<tr class="browse">
+<td class="time">
+<a href="http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn?ld=96248&amp;country=DEU&amp;rt=1&amp;input=Essen Hbf%238000098&amp;boardType=dep&amp;time=19:19%2D60&amp;productsFilter=11111&amp;&amp;&amp;date=06.07.11&amp;selectDate=&amp;maxJourneys=&amp;start=yes" class="arrowlink arrowlinktop">fr&#252;her</a>
+</td>
+<td colspan="2" class="train">&nbsp;</td>
+<td class="route">
+</td>
+<td class="platform">&nbsp;</td>
+<td class="ris">&nbsp;</td>
+</tr>
+<tr class="current">
+<td class="time">19:19</td>
+<td class="train" colspan="2">aktuelle Uhrzeit</td>
+<td class="route">&nbsp;</td>
+<td class="track">&nbsp;</td>
+<td class="ris">&nbsp;</td>
+</tr>
+<tr>
+<td class="time">19:21</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/829575/383245/970550/208750/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:21&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/re_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/829575/383245/970550/208750/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:21&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+RE 10228
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000086','19:33'); return false;" href="/bin/bhftafel.exe/dn?input=Duisburg Hbf%238000086&amp;boardType=dep&amp;time=19:33&amp;productsFilter=11111&amp;start=yes">
+Duisburg Hbf
+</a>
+</span>
+<br />
+Essen Hbf 
+19:21
+-
+M&#252;lheim(Ruhr)Hbf 
+19:26
+-
+Duisburg Hbf 
+19:33
+</td>
+<td class="platform">
+<strong>2</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">19:21</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/950673/427599/812348/89295/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:21&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/sbahn_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/950673/427599/812348/89295/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:21&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+S      9
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000047','19:37'); return false;" href="/bin/bhftafel.exe/dn?input=Bottrop Hbf%238000047&amp;boardType=dep&amp;time=19:37&amp;productsFilter=11111&amp;start=yes">
+Bottrop Hbf
+</a>
+</span>
+<br />
+Essen Hbf 
+19:21
+-
+Essen West 
+19:23
+-
+Essen-Borbeck S&#252;d 
+19:26
+-
+Essen-Borbeck 
+19:28
+-
+Essen-Gerschede 
+19:30
+-
+Essen-Dellwig Ost 
+19:33
+-
+Bottrop Hbf 
+19:37
+</td>
+<td class="platform">
+<strong>7</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">19:21</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/111342/147883/664506/295140/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:21&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/sbahn_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/111342/147883/664506/295140/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:21&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+S      9
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000266','20:07'); return false;" href="/bin/bhftafel.exe/dn?input=Wuppertal Hbf%238000266&amp;boardType=dep&amp;time=20:07&amp;productsFilter=11111&amp;start=yes">
+Wuppertal Hbf
+</a>
+</span>
+<br />
+Essen Hbf 
+19:21
+-
+Essen-Steele 
+19:25
+-
+Essen-&#220;berruhr 
+19:28
+-
+Essen-Holthausen 
+19:30
+-
+Essen-Kupferdreh 
+19:33
+-
+Velbert-Nierenhof 
+19:38
+-
+Velbert-Langenberg 
+19:42
+-
+Velbert-Neviges 
+19:46
+-
+Velbert Rosenh&#252;gel 
+19:50
+-
+W&#252;lfrath-Aprath 
+19:53
+-
+Wuppertal-Vohwinkel 
+19:58
+-
+Wuppertal-Sonnborn 
+20:01
+-
+Wuppertal-Zoologischer Garten 
+20:02
+-
+Wuppertal-Steinbeck 
+20:05
+-
+Wuppertal Hbf 
+20:07
+</td>
+<td class="platform">
+<strong>11</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">19:21</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/234612/849968/953510/398551/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:21&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/re_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/234612/849968/953510/398551/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:21&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+RE 10228
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000085','19:53'); return false;" href="/bin/bhftafel.exe/dn?input=D&#252;sseldorf Hbf%238000085&amp;boardType=dep&amp;time=19:53&amp;productsFilter=11111&amp;start=yes">
+D&#252;sseldorf Hbf
+</a>
+</span>
+<br />
+Essen Hbf 
+19:21
+-
+M&#252;lheim(Ruhr)Hbf 
+19:26
+-
+Duisburg Hbf 
+19:33
+-
+D&#252;sseldorf Flughafen 
+19:45
+-
+D&#252;sseldorf Hbf 
+19:53
+</td>
+<td class="platform">
+<strong>2</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">19:26</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/432654/251439/745638/228601/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:26&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/sbahn_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/432654/251439/745638/228601/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:26&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+S      3
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000286','19:43'); return false;" href="/bin/bhftafel.exe/dn?input=Oberhausen Hbf%238000286&amp;boardType=dep&amp;time=19:43&amp;productsFilter=11111&amp;start=yes">
+Oberhausen Hbf
+</a>
+</span>
+<br />
+Essen Hbf 
+19:26
+-
+Essen West 
+19:28
+-
+Essen-Frohnhausen 
+19:30
+-
+M&#252;lheim(Ruhr)Hbf 
+19:34
+-
+M&#252;lheim(Ruhr)West 
+19:37
+-
+M&#252;lheim(Ruhr)Styrum 
+19:39
+-
+Oberhausen Hbf 
+19:43
+</td>
+<td class="platform">
+<strong>7</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">19:26</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/62940/131335/800496/379269/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:26&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/sbahn_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/62940/131335/800496/379269/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:26&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+S      1
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000080','20:06'); return false;" href="/bin/bhftafel.exe/dn?input=Dortmund Hbf%238000080&amp;boardType=dep&amp;time=20:06&amp;productsFilter=11111&amp;start=yes">
+Dortmund Hbf
+</a>
+</span>
+<br />
+Essen Hbf 
+19:26
+-
+Essen-Steele 
+19:29
+-
+Essen-Steele Ost 
+19:31
+-
+Essen-Eiberg 
+19:34
+-
+Wattenscheid-H&#246;ntrop 
+19:37
+-
+Bochum-Ehrenfeld 
+19:41
+-
+Bochum Hbf 
+19:43
+-
+Bochum-Langendreer West 
+19:48
+-
+Bochum-Langendreer 
+19:50
+-
+Dortmund-Kley 
+19:53
+-
+Dortmund-Oespel 
+19:55
+-
+Dortmund Universit&#228;t 
+19:58
+-
+Dortmund-Dorstfeld S&#252;d 
+20:00
+-
+Dortmund-Dorstfeld 
+20:02
+-
+Dortmund Hbf 
+20:06
+</td>
+<td class="platform">
+<strong>11</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">19:28</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/652038/324435/744806/155070/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:28&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/sbahn_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/652038/324435/744806/155070/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:28&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+S      6
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8003372','21:08'); return false;" href="/bin/bhftafel.exe/dn?input=K&#246;ln-Nippes%238003372&amp;boardType=dep&amp;time=21:08&amp;productsFilter=11111&amp;start=yes">
+K&#246;ln-Nippes
+</a>
+</span>
+<br />
+Essen Hbf 
+19:28
+-
+Essen S&#252;d 
+19:30
+-
+Essen Stadtwald 
+19:33
+-
+Essen-H&#252;gel 
+19:36
+-
+Essen-Werden 
+19:39
+-
+Kettwig 
+19:43
+-
+Kettwig Stausee 
+19:45
+-
+H&#246;sel 
+19:49
+-
+Ratingen Ost 
+19:54
+-
+D&#252;sseldorf-Rath 
+19:58
+-
+D&#252;sseldorf-Rath Mitte 
+20:01
+-
+D&#252;sseldorf-Derendorf 
+20:04
+-
+D&#252;sseldorf-Zoo 
+20:06
+-
+D&#252;sseldorf Wehrhahn 
+20:08
+-
+D&#252;sseldorf Hbf 
+20:10
+-
+D&#252;sseldorf Volksgarten 
+20:14
+-
+D&#252;sseldorf-Oberbilk 
+20:16
+-
+D&#252;sseldorf-Eller S&#252;d 
+20:19
+-
+D&#252;sseldorf-Reisholz 
+20:21
+-
+D&#252;sseldorf-Benrath 
+20:24
+-
+D&#252;sseldorf-Garath 
+20:27
+-
+D&#252;sseldorf-Hellerhof 
+20:29
+-
+Langenfeld(Rhld)-Berghausen 
+20:32
+-
+Langenfeld(Rhld) 
+20:34
+-
+Leverkusen-Rheindorf 
+20:38
+-
+Leverkusen-K&#252;ppersteg 
+20:41
+-
+Leverkusen Mitte 
+20:43
+-
+Bayerwerk 
+20:46
+-
+K&#246;ln-Stammheim 
+20:49
+-
+K&#246;ln-M&#252;lheim 
+20:53
+-
+K&#246;ln-Buchforst 
+20:56
+-
+K&#246;ln Messe/Deutz Gl. 9-10 
+21:00
+-
+K&#246;ln Hbf 
+21:03
+-
+K&#246;ln Hansaring 
+21:05
+-
+K&#246;ln-Nippes 
+21:08
+</td>
+<td class="platform">
+<strong>12</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">19:29</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/847062/392953/328812/117958/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:29&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/re_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/847062/392953/328812/117958/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:29&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+RE 10631
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000252','21:30'); return false;" href="/bin/bhftafel.exe/dn?input=Minden(Westf)%238000252&amp;boardType=dep&amp;time=21:30&amp;productsFilter=11111&amp;start=yes">
+Minden(Westf)
+</a>
+</span>
+<br />
+Essen Hbf 
+19:29
+-
+Wattenscheid 
+19:34
+-
+Bochum Hbf 
+19:39
+-
+Dortmund Hbf 
+19:52
+-
+Kamen 
+20:03
+-
+Hamm(Westf) 
+20:13
+-
+Heessen 
+20:18
+-
+Ahlen(Westf) 
+20:23
+-
+Neubeckum 
+20:30
+-
+Oelde 
+20:36
+-
+Rheda-Wiedenbr&#252;ck 
+20:42
+-
+G&#252;tersloh Hbf 
+20:48
+-
+Bielefeld Hbf 
+20:58
+-
+Herford 
+21:07
+-
+L&#246;hne(Westf) 
+21:13
+-
+Bad Oeynhausen 
+21:18
+-
+Porta Westfalica 
+21:24
+-
+Minden(Westf) 
+21:30
+</td>
+<td class="platform">
+<strong>4</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">19:31</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/735006/382159/528888/19442/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:31&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/re_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/735006/382159/528888/19442/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:31&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+NWB75366
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000346','20:27'); return false;" href="/bin/bhftafel.exe/dn?input=Borken(Westf)%238000346&amp;boardType=dep&amp;time=20:27&amp;productsFilter=11111&amp;start=yes">
+Borken(Westf)
+</a>
+</span>
+<br />
+Essen Hbf 
+19:31
+-
+Essen-Borbeck 
+19:36
+-
+Bottrop Hbf 
+19:43
+-
+Gladbeck West 
+19:50
+-
+Gladbeck-Zweckel 
+19:53
+-
+Feldhausen 
+19:56
+-
+Dorsten 
+20:01
+-
+Hervest-Dorsten 
+20:05
+-
+Deuten 
+20:10
+-
+Rhade 
+20:15
+-
+Marbeck-Heiden 
+20:21
+-
+Borken(Westf) 
+20:27
+</td>
+<td class="platform">
+<strong>8</strong><br />
+</td>
+<td class="ris">
+<span><span title="Es liegen keine aktuellen Informationen vor.">k.A.</span></span></td>
+</tr>
+<tr>
+<td class="time">19:32</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/934872/422339/473892/74683/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:32&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/re_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/934872/422339/473892/74683/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:32&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+RE 10630
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000085','20:05'); return false;" href="/bin/bhftafel.exe/dn?input=D&#252;sseldorf Hbf%238000085&amp;boardType=dep&amp;time=20:05&amp;productsFilter=11111&amp;start=yes">
+D&#252;sseldorf Hbf
+</a>
+</span>
+<br />
+Essen Hbf 
+19:32
+-
+M&#252;lheim(Ruhr)Hbf 
+19:37
+-
+Duisburg Hbf 
+19:44
+-
+D&#252;sseldorf Flughafen 
+19:56
+-
+D&#252;sseldorf Hbf 
+20:05
+</td>
+<td class="platform">
+<strong>2</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">19:34</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/287067/235284/57178/67100/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:34&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/re_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/287067/235284/57178/67100/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:34&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+ABR89480
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000046','21:54'); return false;" href="/bin/bhftafel.exe/dn?input=Siegen%238000046&amp;boardType=dep&amp;time=21:54&amp;productsFilter=11111&amp;start=yes">
+Siegen
+</a>
+</span>
+<br />
+Essen Hbf 
+19:34
+-
+Wattenscheid 
+19:40
+-
+Bochum Hbf 
+19:46
+-
+Witten Hbf 
+19:56
+-
+Wetter(Ruhr) 
+20:01
+-
+Hagen Hbf 
+20:09
+-
+Hohenlimburg 
+20:25
+-
+Letmathe 
+20:30
+-
+Altena(Westf) 
+20:40
+-
+Werdohl 
+20:48
+-
+Plettenberg 
+20:55
+-
+Finnentrop 
+21:07
+-
+Lennestadt-Grevenbr&#252;ck 
+21:11
+-
+Lennestadt-Meggen 
+21:15
+-
+Lennestadt-Altenhundem 
+21:19
+-
+Kirchhundem 
+21:22
+-
+Welschen Ennest 
+21:30
+-
+Kreuztal-Littfeld 
+21:34
+-
+Eichen(Kr Siegen) 
+21:38
+-
+Kreuztal 
+21:41
+-
+Siegen-Geisweid 
+21:46
+-
+Siegen-Weidenau 
+21:49
+-
+Siegen 
+21:54
+</td>
+<td class="platform">
+<strong>9</strong><br />
+</td>
+<td class="ris">
+<span><span title="Es liegen keine aktuellen Informationen vor.">k.A.</span></span></td>
+</tr>
+<tr>
+<td class="time">19:34</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/980208/487956/578808/37332/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:34&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/re_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/980208/487956/578808/37332/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:34&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+ABR89540
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000186','20:42'); return false;" href="/bin/bhftafel.exe/dn?input=Iserlohn%238000186&amp;boardType=dep&amp;time=20:42&amp;productsFilter=11111&amp;start=yes">
+Iserlohn
+</a>
+</span>
+<br />
+Essen Hbf 
+19:34
+-
+Wattenscheid 
+19:40
+-
+Bochum Hbf 
+19:46
+-
+Witten Hbf 
+19:56
+-
+Wetter(Ruhr) 
+20:01
+-
+Hagen Hbf 
+20:09
+-
+Hohenlimburg 
+20:25
+-
+Letmathe 
+20:30
+-
+Letmathe Dechenh&#246;hle 
+20:38
+-
+Iserlohn 
+20:42
+</td>
+<td class="platform">
+<strong>9</strong><br />
+</td>
+<td class="ris">
+<span><span title="Es liegen keine aktuellen Informationen vor.">k.A.</span></span></td>
+</tr>
+<tr>
+<td class="time">19:35</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/103056/142750/494120/212715/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:35&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/sbahn_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/103056/142750/494120/212715/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:35&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+S      1
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000087','20:47'); return false;" href="/bin/bhftafel.exe/dn?input=Solingen Hbf%238000087&amp;boardType=dep&amp;time=20:47&amp;productsFilter=11111&amp;start=yes">
+Solingen Hbf
+</a>
+</span>
+<br />
+Essen Hbf 
+19:35
+-
+Essen West 
+19:37
+-
+Essen-Frohnhausen 
+19:40
+-
+M&#252;lheim(Ruhr)Hbf 
+19:45
+-
+M&#252;lheim(Ruhr)Styrum 
+19:48
+-
+Duisburg Hbf 
+19:53
+-
+Duisburg-Schlenk 
+19:57
+-
+Duisburg-Buchholz 
+20:00
+-
+Duisburg-Gro&#223;enbaum 
+20:02
+-
+Duisburg-Rahm 
+20:05
+-
+Angermund 
+20:07
+-
+D&#252;sseldorf Flughafen 
+20:11
+-
+D&#252;sseldorf-Unterrath 
+20:14
+-
+D&#252;sseldorf-Derendorf 
+20:17
+-
+D&#252;sseldorf-Zoo 
+20:19
+-
+D&#252;sseldorf Wehrhahn 
+20:21
+-
+D&#252;sseldorf Hbf 
+20:23
+-
+D&#252;sseldorf Volksgarten 
+20:26
+-
+D&#252;sseldorf-Oberbilk 
+20:28
+-
+D&#252;sseldorf-Eller Mitte 
+20:31
+-
+D&#252;sseldorf-Eller 
+20:33
+-
+Hilden 
+20:38
+-
+Hilden S&#252;d 
+20:40
+-
+Solingen Vogelpark 
+20:44
+-
+Solingen Hbf 
+20:47
+</td>
+<td class="platform">
+<strong>7</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">19:36</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/632781/319361/284026/68928/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:36&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/sbahn_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/632781/319361/284026/68928/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:36&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+S      3
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8002640','19:55'); return false;" href="/bin/bhftafel.exe/dn?input=Hattingen(R) Mitte%238002640&amp;boardType=dep&amp;time=19:55&amp;productsFilter=11111&amp;start=yes">
+Hattingen(R) Mitte
+</a>
+</span>
+<br />
+Essen Hbf 
+19:36
+-
+Essen-Steele 
+19:39
+-
+Essen-Steele Ost 
+19:42
+-
+Essen-Horst 
+19:44
+-
+Bochum-Dahlhausen 
+19:47
+-
+Hattingen(Ruhr) 
+19:52
+-
+Hattingen(R) Mitte 
+19:55
+</td>
+<td class="platform">
+<strong>11</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">19:36</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/109038/179904/414878/171093/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:36&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/ice_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/109038/179904/414878/171093/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:36&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+ICE  605
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000026','00:58'); return false;" href="/bin/bhftafel.exe/dn?input=Basel Bad Bf%238000026&amp;boardType=dep&amp;time=00:58&amp;productsFilter=11111&amp;start=yes">
+Basel Bad Bf
+</a>
+</span>
+<br />
+Essen Hbf 
+19:36
+-
+Duisburg Hbf 
+19:47
+-
+D&#252;sseldorf Flughafen 
+19:57
+-
+D&#252;sseldorf Hbf 
+20:12
+-
+K&#246;ln Messe/Deutz Gl.11-12 
+20:36
+-
+Siegburg/Bonn 
+20:58
+-
+Montabaur 
+21:19
+-
+Limburg S&#252;d 
+21:29
+-
+Frankfurt(M) Flughafen Fernbf 
+21:51
+-
+Mannheim Hbf 
+22:24
+-
+Karlsruhe Hbf 
+23:00
+-
+Baden-Baden 
+23:28
+-
+Offenburg 
+23:48
+-
+Freiburg(Breisgau) Hbf 
+00:20
+-
+Basel Bad Bf 
+00:58
+</td>
+<td class="platform">
+<strong>1</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">19:36</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/453681/308651/321274/9410/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:36&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/ec_ic_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/453681/308651/321274/9410/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:36&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+IC   118
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000263','20:29'); return false;" href="/bin/bhftafel.exe/dn?input=M&#252;nster(Westf)Hbf%238000263&amp;boardType=dep&amp;time=20:29&amp;productsFilter=11111&amp;start=yes">
+M&#252;nster(Westf)Hbf
+</a>
+</span>
+<br />
+Essen Hbf 
+19:36
+-
+Gelsenkirchen Hbf 
+19:44
+-
+Wanne-Eickel Hbf 
+19:50
+-
+Recklinghausen Hbf 
+19:58
+-
+M&#252;nster(Westf)Hbf 
+20:29
+</td>
+<td class="platform">
+<strong>6</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#f00;">ca.&nbsp;15&nbsp;Minuten&nbsp;sp&#228;ter</span></span>,<br/><span class="red">Grund: Stellwerksst&#246;rung /-ausfall</span></td>
+</tr>
+<tr>
+<td class="time">19:41</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/612687/314938/939896/265731/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:41&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/sbahn_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/612687/314938/939896/265731/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:41&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+S      9
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000145','20:27'); return false;" href="/bin/bhftafel.exe/dn?input=Haltern am See%238000145&amp;boardType=dep&amp;time=20:27&amp;productsFilter=11111&amp;start=yes">
+Haltern am See
+</a>
+</span>
+<br />
+Essen Hbf 
+19:41
+-
+Essen West 
+19:43
+-
+Essen-Borbeck S&#252;d 
+19:46
+-
+Essen-Borbeck 
+19:48
+-
+Essen-Gerschede 
+19:50
+-
+Essen-Dellwig Ost 
+19:53
+-
+Bottrop Hbf 
+19:57
+-
+Bottrop-Boy 
+20:01
+-
+Gladbeck West 
+20:05
+-
+Gelsenkirchen-Buer Nord 
+20:10
+-
+Gelsenkirchen-Hassel 
+20:13
+-
+Marl Mitte 
+20:17
+-
+Marl-Hamm 
+20:20
+-
+Haltern am See 
+20:27
+</td>
+<td class="platform">
+<strong>7</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">19:41</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/194409/207931/152134/11264/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:41&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/ice_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/194409/207931/152134/11264/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:41&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+ICE  846
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000207','20:33'); return false;" href="/bin/bhftafel.exe/dn?input=K&#246;ln Hbf%238000207&amp;boardType=dep&amp;time=20:33&amp;productsFilter=11111&amp;start=yes">
+K&#246;ln Hbf
+</a>
+</span>
+<br />
+Essen Hbf 
+19:41
+-
+Duisburg Hbf 
+19:52
+-
+D&#252;sseldorf Hbf 
+20:06
+-
+K&#246;ln Hbf 
+20:33
+</td>
+<td class="platform">
+<strong>2</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">19:44</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/441111/253759/648808/177367/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:44&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/re_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/441111/253759/648808/177367/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:44&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+RE 10231
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000263','20:50'); return false;" href="/bin/bhftafel.exe/dn?input=M&#252;nster(Westf)Hbf%238000263&amp;boardType=dep&amp;time=20:50&amp;productsFilter=11111&amp;start=yes">
+M&#252;nster(Westf)Hbf
+</a>
+</span>
+<br />
+Essen Hbf 
+19:44
+-
+Gelsenkirchen Hbf 
+19:52
+-
+Wanne-Eickel Hbf 
+19:57
+-
+Recklinghausen Hbf 
+20:03
+-
+Marl-Sinsen 
+20:09
+-
+Haltern am See 
+20:15
+-
+Sythen 
+20:19
+-
+D&#252;lmen 
+20:24
+-
+Buldern 
+20:29
+-
+Nottuln-Appelh&#252;lsen 
+20:33
+-
+B&#246;sensell 
+20:37
+-
+M&#252;nster-Albachten 
+20:41
+-
+M&#252;nster(Westf)Hbf 
+20:50
+</td>
+<td class="platform">
+<strong>4</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">19:46</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/692907/1002715/585568/61815/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:46&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/re_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/692907/1002715/585568/61815/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:46&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+RE 10028
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000253','20:41'); return false;" href="/bin/bhftafel.exe/dn?input=M&#246;nchengladbach Hbf%238000253&amp;boardType=dep&amp;time=20:41&amp;productsFilter=11111&amp;start=yes">
+M&#246;nchengladbach Hbf
+</a>
+</span>
+<br />
+Essen Hbf 
+19:46
+-
+M&#252;lheim(Ruhr)Hbf 
+19:51
+-
+Duisburg Hbf 
+19:58
+-
+Rheinhausen 
+20:05
+-
+Krefeld-Uerdingen 
+20:10
+-
+Krefeld Hbf 
+20:16
+-
+Viersen 
+20:27
+-
+M&#246;nchengladbach Hbf 
+20:41
+</td>
+<td class="platform">
+<strong>1</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">19:48</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/88806/137766/507708/224254/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:48&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/sbahn_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/88806/137766/507708/224254/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:48&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+S      6
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8003372','21:28'); return false;" href="/bin/bhftafel.exe/dn?input=K&#246;ln-Nippes%238003372&amp;boardType=dep&amp;time=21:28&amp;productsFilter=11111&amp;start=yes">
+K&#246;ln-Nippes
+</a>
+</span>
+<br />
+Essen Hbf 
+19:48
+-
+Essen S&#252;d 
+19:50
+-
+Essen Stadtwald 
+19:53
+-
+Essen-H&#252;gel 
+19:56
+-
+Essen-Werden 
+19:59
+-
+Kettwig 
+20:03
+-
+Kettwig Stausee 
+20:05
+-
+H&#246;sel 
+20:09
+-
+Ratingen Ost 
+20:14
+-
+D&#252;sseldorf-Rath 
+20:18
+-
+D&#252;sseldorf-Rath Mitte 
+20:21
+-
+D&#252;sseldorf-Derendorf 
+20:24
+-
+D&#252;sseldorf-Zoo 
+20:26
+-
+D&#252;sseldorf Wehrhahn 
+20:28
+-
+D&#252;sseldorf Hbf 
+20:30
+-
+D&#252;sseldorf Volksgarten 
+20:34
+-
+D&#252;sseldorf-Oberbilk 
+20:36
+-
+D&#252;sseldorf-Eller S&#252;d 
+20:39
+-
+D&#252;sseldorf-Reisholz 
+20:41
+-
+D&#252;sseldorf-Benrath 
+20:44
+-
+D&#252;sseldorf-Garath 
+20:47
+-
+D&#252;sseldorf-Hellerhof 
+20:49
+-
+Langenfeld(Rhld)-Berghausen 
+20:52
+-
+Langenfeld(Rhld) 
+20:54
+-
+Leverkusen-Rheindorf 
+20:58
+-
+Leverkusen-K&#252;ppersteg 
+21:01
+-
+Leverkusen Mitte 
+21:03
+-
+Bayerwerk 
+21:06
+-
+K&#246;ln-Stammheim 
+21:09
+-
+K&#246;ln-M&#252;lheim 
+21:13
+-
+K&#246;ln-Buchforst 
+21:16
+-
+K&#246;ln Messe/Deutz Gl. 9-10 
+21:20
+-
+K&#246;ln Hbf 
+21:23
+-
+K&#246;ln Hansaring 
+21:25
+-
+K&#246;ln-Nippes 
+21:28
+</td>
+<td class="platform">
+<strong>12</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">19:50</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/111363/180613/497286/211522/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:50&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/ice_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/111363/180613/497286/211522/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:50&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+ICE 1746
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000085','20:16'); return false;" href="/bin/bhftafel.exe/dn?input=D&#252;sseldorf Hbf%238000085&amp;boardType=dep&amp;time=20:16&amp;productsFilter=11111&amp;start=yes">
+D&#252;sseldorf Hbf
+</a>
+</span>
+<br />
+Essen Hbf 
+19:50
+-
+Duisburg Hbf 
+20:02
+-
+D&#252;sseldorf Hbf 
+20:16
+</td>
+<td class="platform">
+<strong>2</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">19:51</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/910140/414152/334288/136236/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:51&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/sbahn_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/910140/414152/334288/136236/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:51&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+S      9
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000266','20:37'); return false;" href="/bin/bhftafel.exe/dn?input=Wuppertal Hbf%238000266&amp;boardType=dep&amp;time=20:37&amp;productsFilter=11111&amp;start=yes">
+Wuppertal Hbf
+</a>
+</span>
+<br />
+Essen Hbf 
+19:51
+-
+Essen-Steele 
+19:55
+-
+Essen-&#220;berruhr 
+19:58
+-
+Essen-Holthausen 
+20:00
+-
+Essen-Kupferdreh 
+20:03
+-
+Velbert-Nierenhof 
+20:08
+-
+Velbert-Langenberg 
+20:12
+-
+Velbert-Neviges 
+20:16
+-
+Velbert Rosenh&#252;gel 
+20:20
+-
+W&#252;lfrath-Aprath 
+20:23
+-
+Wuppertal-Vohwinkel 
+20:28
+-
+Wuppertal-Sonnborn 
+20:31
+-
+Wuppertal-Zoologischer Garten 
+20:32
+-
+Wuppertal-Steinbeck 
+20:35
+-
+Wuppertal Hbf 
+20:37
+</td>
+<td class="platform">
+<strong>11</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">19:53</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/270825/199240/792524/305987/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:53&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/re_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/270825/199240/792524/305987/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:53&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+RE 10135
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000149','20:36'); return false;" href="/bin/bhftafel.exe/dn?input=Hamm(Westf)%238000149&amp;boardType=dep&amp;time=20:36&amp;productsFilter=11111&amp;start=yes">
+Hamm(Westf)
+</a>
+</span>
+<br />
+Essen Hbf 
+19:53
+-
+Wattenscheid 
+19:58
+-
+Bochum Hbf 
+20:03
+-
+Dortmund Hbf 
+20:15
+-
+Kamen 
+20:25
+-
+Hamm(Westf) 
+20:36
+</td>
+<td class="platform">
+<strong>6</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">19:56</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/291048/204237/500602/153286/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:56&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/sbahn_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/291048/204237/500602/153286/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:56&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+S      3
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000286','20:13'); return false;" href="/bin/bhftafel.exe/dn?input=Oberhausen Hbf%238000286&amp;boardType=dep&amp;time=20:13&amp;productsFilter=11111&amp;start=yes">
+Oberhausen Hbf
+</a>
+</span>
+<br />
+Essen Hbf 
+19:56
+-
+Essen West 
+19:58
+-
+Essen-Frohnhausen 
+20:00
+-
+M&#252;lheim(Ruhr)Hbf 
+20:04
+-
+M&#252;lheim(Ruhr)West 
+20:07
+-
+M&#252;lheim(Ruhr)Styrum 
+20:09
+-
+Oberhausen Hbf 
+20:13
+</td>
+<td class="platform">
+<strong>7</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">19:56</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/435786/255626/81684/104420/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:56&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/sbahn_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/435786/255626/81684/104420/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:56&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+S      1
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000080','20:36'); return false;" href="/bin/bhftafel.exe/dn?input=Dortmund Hbf%238000080&amp;boardType=dep&amp;time=20:36&amp;productsFilter=11111&amp;start=yes">
+Dortmund Hbf
+</a>
+</span>
+<br />
+Essen Hbf 
+19:56
+-
+Essen-Steele 
+19:59
+-
+Essen-Steele Ost 
+20:01
+-
+Essen-Eiberg 
+20:04
+-
+Wattenscheid-H&#246;ntrop 
+20:07
+-
+Bochum-Ehrenfeld 
+20:11
+-
+Bochum Hbf 
+20:13
+-
+Bochum-Langendreer West 
+20:18
+-
+Bochum-Langendreer 
+20:20
+-
+Dortmund-Kley 
+20:23
+-
+Dortmund-Oespel 
+20:25
+-
+Dortmund Universit&#228;t 
+20:28
+-
+Dortmund-Dorstfeld S&#252;d 
+20:30
+-
+Dortmund-Dorstfeld 
+20:32
+-
+Dortmund Hbf 
+20:36
+</td>
+<td class="platform">
+<strong>11</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">19:59</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/372702/279706/611116/181324/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:59&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/ec_ic_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/372702/279706/611116/181324/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=19:59&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+EC     6
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8002553','23:30'); return false;" href="/bin/bhftafel.exe/dn?input=Hamburg-Altona%238002553&amp;boardType=dep&amp;time=23:30&amp;productsFilter=11111&amp;start=yes">
+Hamburg-Altona
+</a>
+</span>
+<br />
+Essen Hbf 
+19:59
+-
+Bochum Hbf 
+20:08
+-
+Dortmund Hbf 
+20:21
+-
+M&#252;nster(Westf)Hbf 
+20:54
+-
+Osnabr&#252;ck Hbf 
+21:21
+-
+Diepholz 
+21:46
+-
+Bremen Hbf 
+22:18
+-
+Hamburg-Harburg 
+23:03
+-
+Hamburg Hbf 
+23:15
+-
+Hamburg Dammtor 
+23:21
+-
+Hamburg-Altona 
+23:30
+</td>
+<td class="platform">
+<strong>4</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#f00;">ca.&nbsp;15&nbsp;Minuten&nbsp;sp&#228;ter</span></span>,<br/><span class="red">Grund: Stellwerksst&#246;rung /-ausfall</span></td>
+</tr>
+<tr>
+<td class="time">20:00</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/526677/318952/652836/150859/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=20:00&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/ec_ic_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/526677/318952/652836/150859/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=20:00&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+IC  2315
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000105','23:11'); return false;" href="/bin/bhftafel.exe/dn?input=Frankfurt(Main)Hbf%238000105&amp;boardType=dep&amp;time=23:11&amp;productsFilter=11111&amp;start=yes">
+Frankfurt(Main)Hbf
+</a>
+</span>
+<br />
+Essen Hbf 
+20:00
+-
+Duisburg Hbf 
+20:10
+-
+D&#252;sseldorf Hbf 
+20:25
+-
+K&#246;ln Hbf 
+20:50
+-
+Bonn Hbf 
+21:12
+-
+Koblenz Hbf 
+21:46
+-
+Mainz Hbf 
+22:38
+-
+Frankfurt(M) Flughafen Fernbf 
+22:59
+-
+Frankfurt(Main)Hbf 
+23:11
+</td>
+<td class="platform">
+<strong>2</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">20:05</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/155067/160070/775204/335913/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=20:05&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/sbahn_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/155067/160070/775204/335913/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=20:05&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+S      1
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000087','21:17'); return false;" href="/bin/bhftafel.exe/dn?input=Solingen Hbf%238000087&amp;boardType=dep&amp;time=21:17&amp;productsFilter=11111&amp;start=yes">
+Solingen Hbf
+</a>
+</span>
+<br />
+Essen Hbf 
+20:05
+-
+Essen West 
+20:07
+-
+Essen-Frohnhausen 
+20:10
+-
+M&#252;lheim(Ruhr)Hbf 
+20:15
+-
+M&#252;lheim(Ruhr)Styrum 
+20:18
+-
+Duisburg Hbf 
+20:23
+-
+Duisburg-Schlenk 
+20:27
+-
+Duisburg-Buchholz 
+20:30
+-
+Duisburg-Gro&#223;enbaum 
+20:32
+-
+Duisburg-Rahm 
+20:35
+-
+Angermund 
+20:37
+-
+D&#252;sseldorf Flughafen 
+20:41
+-
+D&#252;sseldorf-Unterrath 
+20:44
+-
+D&#252;sseldorf-Derendorf 
+20:47
+-
+D&#252;sseldorf-Zoo 
+20:49
+-
+D&#252;sseldorf Wehrhahn 
+20:51
+-
+D&#252;sseldorf Hbf 
+20:53
+-
+D&#252;sseldorf Volksgarten 
+20:56
+-
+D&#252;sseldorf-Oberbilk 
+20:58
+-
+D&#252;sseldorf-Eller Mitte 
+21:01
+-
+D&#252;sseldorf-Eller 
+21:03
+-
+Hilden 
+21:08
+-
+Hilden S&#252;d 
+21:10
+-
+Solingen Vogelpark 
+21:14
+-
+Solingen Hbf 
+21:17
+</td>
+<td class="platform">
+<strong>7</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">20:06</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/939699/421653/539178/43644/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=20:06&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/sbahn_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/939699/421653/539178/43644/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=20:06&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+S      3
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8002640','20:25'); return false;" href="/bin/bhftafel.exe/dn?input=Hattingen(R) Mitte%238002640&amp;boardType=dep&amp;time=20:25&amp;productsFilter=11111&amp;start=yes">
+Hattingen(R) Mitte
+</a>
+</span>
+<br />
+Essen Hbf 
+20:06
+-
+Essen-Steele 
+20:09
+-
+Essen-Steele Ost 
+20:12
+-
+Essen-Horst 
+20:14
+-
+Bochum-Dahlhausen 
+20:17
+-
+Hattingen(Ruhr) 
+20:22
+-
+Hattingen(R) Mitte 
+20:25
+</td>
+<td class="platform">
+<strong>11</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">20:07</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/279441/231405/931188/372461/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=20:07&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/re_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/279441/231405/931188/372461/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=20:07&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+ABR 5681
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000142','20:46'); return false;" href="/bin/bhftafel.exe/dn?input=Hagen Hbf%238000142&amp;boardType=dep&amp;time=20:46&amp;productsFilter=11111&amp;start=yes">
+Hagen Hbf
+</a>
+</span>
+<br />
+Essen Hbf 
+20:07
+-
+Essen-Kray S&#252;d 
+20:10
+-
+Wattenscheid 
+20:14
+-
+Bochum Hbf 
+20:20
+-
+Witten Hbf 
+20:32
+-
+Wetter(Ruhr) 
+20:37
+-
+Hagen-Vorhalle 
+20:41
+-
+Hagen Hbf 
+20:46
+</td>
+<td class="platform">
+<strong>10</strong><br />
+</td>
+<td class="ris">
+<span><span title="Es liegen keine aktuellen Informationen vor.">k.A.</span></span></td>
+</tr>
+<tr>
+<td class="time">20:09</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/287949/204662/623744/215890/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=20:09&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/re_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/287949/204662/623744/215890/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=20:09&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+RE 10138
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000001','22:07'); return false;" href="/bin/bhftafel.exe/dn?input=Aachen Hbf%238000001&amp;boardType=dep&amp;time=22:07&amp;productsFilter=11111&amp;start=yes">
+Aachen Hbf
+</a>
+</span>
+<br />
+Essen Hbf 
+20:09
+-
+M&#252;lheim(Ruhr)Hbf 
+20:14
+-
+Duisburg Hbf 
+20:20
+-
+D&#252;sseldorf Flughafen 
+20:31
+-
+D&#252;sseldorf Hbf 
+20:37
+-
+D&#252;sseldorf-Benrath 
+20:45
+-
+Leverkusen Mitte 
+20:54
+-
+K&#246;ln-M&#252;lheim 
+21:01
+-
+K&#246;ln Messe/Deutz 
+21:07
+-
+K&#246;ln Hbf 
+21:12
+-
+K&#246;ln-Ehrenfeld 
+21:19
+-
+Horrem 
+21:27
+-
+D&#252;ren 
+21:38
+-
+Langerwehe 
+21:45
+-
+Eschweiler Hbf 
+21:52
+-
+Stolberg(Rheinl)Hbf 
+21:56
+-
+Aachen-Rothe Erde 
+22:02
+-
+Aachen Hbf 
+22:07
+</td>
+<td class="platform">
+<strong>2</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">20:11</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/340353/224231/18196/104353/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=20:11&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/sbahn_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/340353/224231/18196/104353/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=20:11&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+S      9
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000047','20:28'); return false;" href="/bin/bhftafel.exe/dn?input=Bottrop Hbf%238000047&amp;boardType=dep&amp;time=20:28&amp;productsFilter=11111&amp;start=yes">
+Bottrop Hbf
+</a>
+</span>
+<br />
+Essen Hbf 
+20:11
+-
+Essen West 
+20:13
+-
+Essen-Borbeck S&#252;d 
+20:16
+-
+Essen-Borbeck 
+20:18
+-
+Essen-Gerschede 
+20:21
+-
+Essen-Dellwig Ost 
+20:24
+-
+Bottrop Hbf 
+20:28
+</td>
+<td class="platform">
+<strong>7</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">20:14</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/158772/824721/523722/208940/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=20:14&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/re_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/158772/824721/523722/208940/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=20:14&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+RE 10029
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000149','21:10'); return false;" href="/bin/bhftafel.exe/dn?input=Hamm(Westf)%238000149&amp;boardType=dep&amp;time=21:10&amp;productsFilter=11111&amp;start=yes">
+Hamm(Westf)
+</a>
+</span>
+<br />
+Essen Hbf 
+20:14
+-
+Wattenscheid 
+20:19
+-
+Bochum Hbf 
+20:24
+-
+Dortmund Hbf 
+20:37
+-
+Dortmund-Scharnhorst 
+20:50
+-
+Dortmund-Kurl 
+20:53
+-
+Kamen-Methler 
+20:56
+-
+Kamen 
+20:59
+-
+Hamm(Westf) 
+21:10
+</td>
+<td class="platform">
+<strong>6</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">20:17</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/996606/474621/929754/132675/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=20:17&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/ice_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/996606/474621/929754/132675/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=20:17&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+ICE  947
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8098160','00:46'); return false;" href="/bin/bhftafel.exe/dn?input=Berlin Hbf (tief)%238098160&amp;boardType=dep&amp;time=00:46&amp;productsFilter=11111&amp;start=yes">
+Berlin Hbf (tief)
+</a>
+</span>
+<br />
+Essen Hbf 
+20:17
+-
+Bochum Hbf 
+20:28
+-
+Dortmund Hbf 
+20:41
+-
+Hamm(Westf) 
+20:59
+-
+Bielefeld Hbf 
+21:27
+-
+Hannover Hbf 
+22:28
+-
+Wolfsburg Hbf 
+23:21
+-
+Stendal 
+00:02
+-
+Berlin-Spandau 
+00:36
+-
+Berlin Hbf (tief) 
+00:46
+</td>
+<td class="platform">
+<strong>4</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">20:18</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/197847/173512/85568/23165/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=20:18&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/re_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/197847/173512/85568/23165/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=20:18&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+RB 11245
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8000263','21:22'); return false;" href="/bin/bhftafel.exe/dn?input=M&#252;nster(Westf)Hbf%238000263&amp;boardType=dep&amp;time=21:22&amp;productsFilter=11111&amp;start=yes">
+M&#252;nster(Westf)Hbf
+</a>
+</span>
+<br />
+Essen Hbf 
+20:18
+-
+Gelsenkirchen Hbf 
+20:25
+-
+Wanne-Eickel Hbf 
+20:30
+-
+Recklinghausen S&#252;d 
+20:34
+-
+Recklinghausen Hbf 
+20:38
+-
+Marl-Sinsen 
+20:43
+-
+Haltern am See 
+20:49
+-
+Sythen 
+20:53
+-
+D&#252;lmen 
+20:58
+-
+Buldern 
+21:03
+-
+Nottuln-Appelh&#252;lsen 
+21:07
+-
+B&#246;sensell 
+21:11
+-
+M&#252;nster-Albachten 
+21:14
+-
+M&#252;nster(Westf)Hbf 
+21:22
+</td>
+<td class="platform">
+<strong>9</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr>
+<td class="time">20:18</td>
+<td class="train"><a href="http://reiseauskunft.bahn.de/bin/traininfo.exe/dn/150147/158211/543588/221745/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=20:18&amp;station_evaId=8000098&amp;station_type=dep&amp;"><img src="/v/820/img/sbahn_24x24.gif" class="middle" alt="" /></a></td><td class="train">
+<a href="/bin/traininfo.exe/dn/150147/158211/543588/221745/80?ld=96248&amp;country=DEU&amp;rt=1&amp;date=06.07.11&amp;time=20:18&amp;station_evaId=8000098&amp;station_type=dep&amp;">
+S      6
+</a>
+</td>
+<td class="route">
+<span class="bold">
+<a onclick="sHC(this, '', '8003372','21:58'); return false;" href="/bin/bhftafel.exe/dn?input=K&#246;ln-Nippes%238003372&amp;boardType=dep&amp;time=21:58&amp;productsFilter=11111&amp;start=yes">
+K&#246;ln-Nippes
+</a>
+</span>
+<br />
+Essen Hbf 
+20:18
+-
+Essen S&#252;d 
+20:20
+-
+Essen Stadtwald 
+20:23
+-
+Essen-H&#252;gel 
+20:26
+-
+Essen-Werden 
+20:29
+-
+Kettwig 
+20:33
+-
+Kettwig Stausee 
+20:35
+-
+H&#246;sel 
+20:39
+-
+Ratingen Ost 
+20:44
+-
+D&#252;sseldorf-Rath 
+20:48
+-
+D&#252;sseldorf-Rath Mitte 
+20:51
+-
+D&#252;sseldorf-Derendorf 
+20:54
+-
+D&#252;sseldorf-Zoo 
+20:56
+-
+D&#252;sseldorf Wehrhahn 
+20:58
+-
+D&#252;sseldorf Hbf 
+21:00
+-
+D&#252;sseldorf Volksgarten 
+21:04
+-
+D&#252;sseldorf-Oberbilk 
+21:06
+-
+D&#252;sseldorf-Eller S&#252;d 
+21:09
+-
+D&#252;sseldorf-Reisholz 
+21:11
+-
+D&#252;sseldorf-Benrath 
+21:14
+-
+D&#252;sseldorf-Garath 
+21:17
+-
+D&#252;sseldorf-Hellerhof 
+21:19
+-
+Langenfeld(Rhld)-Berghausen 
+21:22
+-
+Langenfeld(Rhld) 
+21:24
+-
+Leverkusen-Rheindorf 
+21:28
+-
+Leverkusen-K&#252;ppersteg 
+21:31
+-
+Leverkusen Mitte 
+21:33
+-
+Bayerwerk 
+21:36
+-
+K&#246;ln-Stammheim 
+21:39
+-
+K&#246;ln-M&#252;lheim 
+21:43
+-
+K&#246;ln-Buchforst 
+21:46
+-
+K&#246;ln Messe/Deutz Gl. 9-10 
+21:50
+-
+K&#246;ln Hbf 
+21:53
+-
+K&#246;ln Hansaring 
+21:55
+-
+K&#246;ln-Nippes 
+21:58
+</td>
+<td class="platform">
+<strong>12</strong><br />
+</td>
+<td class="ris">
+<span><span style="color:#50aa50;">p&#252;nktlich</span></span></td>
+</tr>
+<tr class="browse">
+<td class="time">
+<a href="http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn?ld=96248&amp;country=DEU&amp;rt=1&amp;input=Essen Hbf%238000098&amp;boardType=dep&amp;time=19:19%2B60&amp;productsFilter=11111&amp;&amp;&amp;date=06.07.11&amp;&amp;selectDate=&amp;maxJourneys=&amp;start=yes" class="arrowlink arrowlinkbottom">sp&#228;ter</a>
+</td>
+<td colspan="2" class="train">&nbsp;</td>
+<td class="route">
+</td>
+<td class="platform">&nbsp;</td>
+<td class="ris">&nbsp;</td>
+</tr>
+</table>
+<p class="lastParagraph">
+Anzeige aller Halte bis zu diesem Zeichen <img src="/v/820/img/sq_sep.gif" />, dahinter Anzeige der wichtigsten Halte.
+</p>
+<a name="end"></a>
+</div>
+<div id="hafasContentEnd">&nbsp;</div>
+</div>
+<div id="hafasLegend" >
+<div class="content">
+<div class="woIcon clearfix">Alle <a href="http://www.bahn.de/app_hilfe_angabengewaehr_pk_de_DEU.shtml" onclick="popUp('about:blank','angaben','cms');" target="angaben" >Angaben</a> ohne Gew&#228;hr.</div>
+</div>
+<div class="end">
+</div>
+</div>
+<div id="hafasSystembar" class="box site-actions">
+<ul class="clearfix">
+<li><a href="javascript:window.print(self)" id="link-print">Seite drucken</a></li>
+<li><a href="#" id="link-top">Zum Seitenanfang</a></li>
+</ul>
+</div>
+</div>
+<div id="footer">
+<!-- Footer navigation -->
+<ul id="footer-nav">
+<li><span>&copy;&nbsp;Deutsche&nbsp;Bahn&nbsp;AG</span></li>
+<li><a href="http://www.bahn.de/app_agb_pk_de_DEU.shtml" target="_blank">AGB</a></li>
+<li><a href="http://www.bahn.de/app_impressum_pk_de_DEU.shtml" target="_blank">Impressum</a></li>
+<li><a href="http://www.bahn.de/app_datenschutz_pk_de_DEU.shtml" target="_blank">Datenschutzgrunds&#228;tze</a></li>
+<li><a href="http://www.deutschebahn.com" target="_blank">www.deutschebahn.com</a></li>
+</ul>
+<form method="get" action="/">
+<fieldset>
+<input type="hidden" name="bufferUpdater" id="bufferUpdater" disabled="disabled" value="" />
+</fieldset>
+</form>
+<div class="bar"></div>
+<!-- Softwareversion/Datenstand: HAFAS 5.29.DB.R8.20.k [5.29.DB.R8.20.m/8.20.14(11)_data:f35bcbe2] 96248 -->
+</div>
+<div class="webtrack">
+<!-- SiteCatalyst Version: H.20.3. Copyright 1996-2009 Adobe, Inc. All Rights Reserved-->
+<script language="JavaScript">var s_account="dbbahnprod";</script>
+<script language="JavaScript" type="text/javascript" src="/v/760/js/s_code.js"></script>
+<script language="JavaScript" type="text/javascript"><!--
+s.pageName="Auskunft_Abfahrtsplan";
+s.channel="Auskunft";
+s.prop4="Auskunft";
+/* Conversion Variables */
+s.eVar4="Auskunft";
+/************* DO NOT ALTER ANYTHING BELOW THIS LINE ! *************/
+var s_code=s.t();if(s_code)document.write(s_code)//--></script>
+<script language="JavaScript" type="text/javascript"><!--
+if(navigator.appVersion.indexOf('MSIE')>=0)document.write(unescape('%3C')+'\!-'+'-')
+//--></script>
+<noscript><img
+src="http://t.bahn.de/b/ss/dbbahnprod/1/H.20.3--NS/1802787822?pageName=Auskunft_Abfahrtsplan&ch=Auskunft&c4=Auskunft&v4=Auskunft"
+height="1" width="1" border="0" alt="" /></a></noscript><!--/NICHT
+ENTFERNEN/-->
+<!-- End SiteCatalyst Code Version: H.20.3. -->
+</div>
+</div>
+</body>
+</html>
