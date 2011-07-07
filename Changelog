@@ -1,3 +1,8 @@
+git HEAD
+
+    [Travel::Status::DE::DeutscheBahn]
+    * Strip leading / trailing whitespace in result fields
+
 Travel::Status::DE::DeutscheBahn 0.02 - Wed Jul 06 2011
 
     [db-ris]

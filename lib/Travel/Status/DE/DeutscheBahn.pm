@@ -62,7 +62,7 @@ sub new {
 		confess("Could not submit POST request: ${errstr}");
 	}
 
-	$ref->{html} = $reply->content();
+	$ref->{html} = $reply->content;
 
 	$ref->{tree} = XML::LibXML->load_html(
 		string            => $ref->{html},
@@ -138,6 +138,8 @@ sub results {
 		for my $str ( $time, $train, $dest, $platform, $info ) {
 			$str =~ s/\n/ /mg;
 			$str =~ tr/ //s;
+			$str =~ s/^ +//;
+			$str =~ s/ +$//;
 		}
 
 		$info =~ s{ ,Grund }{}ox;
