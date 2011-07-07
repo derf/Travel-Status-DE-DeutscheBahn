@@ -87,9 +87,7 @@ sub display_result {
 sub filter_info {
 	my ($info) = @_;
 
-	if ( $info =~ m{ ^ (?: p.nktlich | k [.] A [.] ) $ }ox ) {
-		return q{};
-	}
+	$info =~ s{ (?: ^ | , ) (?: p.nktlich | k [.] A [.] ) }{}x;
 
 	return $info;
 }
