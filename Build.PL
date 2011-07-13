@@ -15,7 +15,7 @@ Module::Build->new(
 	module_name => 'Travel::Status::DE::DeutscheBahn',
 	license     => 'perl',
 	requires    => {
-		'perl'            => '5.10.0',
+		'perl'            => '5.10.1',
 		'Carp'            => 0,
 		'Class::Accessor' => '0.16',
 		'Getopt::Long'    => 0,

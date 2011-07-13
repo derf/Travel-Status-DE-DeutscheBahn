@@ -1,5 +1,7 @@
 git HEAD
 
+    * Clarify derl dependency (we actually need >= 5.10.1)
+
     [Travel::Status::DE::DeutscheBahn]
     * Strip leading / trailing whitespace in result fields
 

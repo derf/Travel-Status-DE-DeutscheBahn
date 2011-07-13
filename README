@@ -8,7 +8,7 @@ Interface to the DeutscheBahn online departure monitor
 Dependencies
 ------------
 
- * perl version 5.10 or newer
+ * perl version 5.10.1 or newer
  * Clas::Accessor
  * LWP::UserAgent (usually shipped by libwww-perl)
  * XML::LibXML
