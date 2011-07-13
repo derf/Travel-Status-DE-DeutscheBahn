@@ -79,6 +79,10 @@ sub route_interesting {
 	}
 	$last_stop = pop(@via);
 
+	if ( @via_main and $via_main[-1] eq $last_stop ) {
+		pop(@via_main);
+	}
+
 	if ( @via_main and @via and $via[0] eq $via_main[0] ) {
 		shift(@via_main);
 	}
