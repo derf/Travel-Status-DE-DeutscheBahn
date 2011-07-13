@@ -1,4 +1,4 @@
-git HEAD
+Travel::Status::DE::DeutscheBahn 0.04 - Wed Jul 13 2011
 
     [Travel::Status::DE::DeutscheBahn::Result]
     * The info accessor now strips the mostly useless "k.A." / "pünktlich"

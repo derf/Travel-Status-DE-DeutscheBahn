@@ -6,7 +6,7 @@ use 5.010;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 Travel::Status::DE::DeutscheBahn::Result->mk_ro_accessors(
 	qw(time train route_end route_raw platform info_raw));
@@ -149,7 +149,7 @@ arrival/departure received by Travel::Status::DE::DeutscheBahn
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 DESCRIPTION
 
@@ -177,7 +177,7 @@ Convenience aliases for $result->route_end.
 
 =item $result->delay
 
-Returns the train's delay in steps of 5 minutes, or undef if it is unknown.
+Returns the train's delay in minutes, or undef if it is unknown.
 
 =item $result->info
 
@@ -196,12 +196,17 @@ station and its origin/destination.
 
 =item $result->route_interesting([I<max>])
 
-Returns a list of (at most I<max>) interesting stations the train will pass on
-its journey. This is somewhat tricky (and therefore experimental).
+Returns a list of up to I<max> (default: 3) interesting stations the train
+will pass on its journey. Since deciding whether a station is interesting or
+not is somewhat tricky, this feature should be considered experimental.
 
 The first element of the list is always the train's next stop. The following
 elements contain as many main stations as possible, but there may also be
 smaller stations if not enough main stations are available.
+
+In future versions, other factors may be taken into account as well.  For
+example, right now airport stations are usually not included in this list,
+although they should be.
 
 Note that all main stations will be stripped of their "Hbf" suffix.
 
@@ -248,7 +253,7 @@ Required I<data>:
 
 =item B<platform> => I<string>
 
-=item B<info> => I<string>
+=item B<info_raw> => I<string>
 
 =back
 
@@ -268,7 +273,7 @@ None.
 
 =head1 BUGS AND LIMITATIONS
 
-Unknown.
+Arrival times are present in B<route_raw>, but not accessible via B<route>.
 
 =head1 SEE ALSO
 
