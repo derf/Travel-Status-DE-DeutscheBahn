@@ -4,7 +4,7 @@ use warnings;
 use 5.010;
 
 use File::Slurp qw(slurp);
-use Test::More tests => 93;
+use Test::More tests => 96;
 
 BEGIN {
 	use_ok('Travel::Status::DE::DeutscheBahn');
@@ -30,6 +30,7 @@ is($departures[0]->time, '19:21', 'first result: time ok');
 is($departures[0]->train, 'RE 10228', 'first result: train ok');
 is($departures[0]->destination, 'Duisburg Hbf', 'first result: destination ok');
 is($departures[0]->platform, '2', 'first result: platform ok');
+is($departures[0]->delay, 0, 'first result: delay ok');
 
 is($departures[-1]->time, '20:18', 'last result: time ok');
 is($departures[-1]->train, 'S 6', 'last result: train ok');
@@ -39,6 +40,9 @@ is($departures[8]->time, '19:31', '9th result: time ok');
 is($departures[8]->train, 'NWB75366', '9th result: train ok');
 is($departures[8]->info_raw, 'k.A.', '9th result: info_raw ok');
 is($departures[8]->info, q{}, '9th result: info ok');
+is($departures[8]->delay, undef, '9th result: delay ok');
+
+is($departures[15]->delay, 15, '16th result: delay ok');
 
 is_deeply([$departures[8]->route],
 	['Essen-Borbeck', 'Bottrop Hbf', 'Gladbeck West', 'Gladbeck-Zweckel',
