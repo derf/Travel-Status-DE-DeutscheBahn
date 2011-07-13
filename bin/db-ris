@@ -84,47 +84,9 @@ sub display_result {
 	return;
 }
 
-sub filter_via {
-	my (@via) = @_;
-
-	my ( @via_main, @via_show, $last_stop );
-
-	for my $stop (@via) {
-		if ( $stop =~ m{ ?Hbf} ) {
-			push( @via_main, $stop );
-		}
-	}
-	$last_stop = pop(@via);
-
-	if ( @via_main and @via and $via[0] eq $via_main[0] ) {
-		shift(@via_main);
-	}
-
-	if ( @via < 3 ) {
-		@via_show = @via;
-	}
-	else {
-		@via_show = splice( @via, 0, ( @via_main > 2 ? 1 : 3 - @via_main ) );
-
-		while ( @via_show < 3 and @via_main ) {
-			my $stop = shift(@via_main);
-			if ( $stop ~~ \@via_show or $stop eq $last_stop ) {
-				next;
-			}
-			push( @via_show, $stop );
-		}
-	}
-
-	for my $stop (@via_show) {
-		$stop =~ s{ ?Hbf}{};
-	}
-
-	return @via_show;
-}
-
 for my $d ( $status->results() ) {
 
-	my ( @via, @via_main, @via_show );
+	my @via;
 
 	my $re_late = qr{ (?: ^ | , ) ca[.] \s \d+ \s Minuten \s sp.ter}ox;
 
@@ -142,7 +104,7 @@ for my $d ( $status->results() ) {
 		@output,
 		[
 			$d->time, $d->train,
-			join( q{  }, filter_via(@via) ), $d->destination,
+			join( q{  }, $d->route_interesting ), $d->destination,
 			$d->platform, $d->info,
 		]
 	);

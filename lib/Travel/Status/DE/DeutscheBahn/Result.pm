@@ -50,6 +50,52 @@ sub route {
 	return @{ $self->{route} };
 }
 
+sub route_interesting {
+	my ( $self, $max_parts ) = @_;
+
+	my @via = $self->route;
+	my ( @via_main, @via_show, $last_stop );
+	$max_parts //= 3;
+
+	for my $stop (@via) {
+		if ( $stop =~ m{ ?Hbf}o ) {
+			push( @via_main, $stop );
+		}
+	}
+	$last_stop = pop(@via);
+
+	if ( @via_main and @via and $via[0] eq $via_main[0] ) {
+		shift(@via_main);
+	}
+
+	if ( @via < $max_parts ) {
+		@via_show = @via;
+	}
+	else {
+		if ( @via_main >= $max_parts ) {
+			@via_show = ( $via[0] );
+		}
+		else {
+			@via_show = splice( @via, 0, $max_parts - @via_main );
+		}
+
+		while ( @via_show < $max_parts and @via_main ) {
+			my $stop = shift(@via_main);
+			if ( $stop ~~ \@via_show or $stop eq $last_stop ) {
+				next;
+			}
+			push( @via_show, $stop );
+		}
+	}
+
+	for (@via_show) {
+		s{ ?Hbf}{};
+	}
+
+	return @via_show;
+
+}
+
 1;
 
 __END__
@@ -130,6 +176,17 @@ arrive.
 
 Returns a list of station names the train will pass between the selected
 station and its origin/destination.
+
+=item $result->route_interesting([I<max>])
+
+Returns a list of (at most I<max>) interesting stations the train will pass on
+its journey. This is somewhat tricky (and therefore experimental).
+
+The first element of the list is always the train's next stop. The following
+elements contain as many main stations as possible, but there may also be
+smaller stations if not enough main stations are available.
+
+Note that all main stations will be stripped of their "Hbf" suffix.
 
 =item $result->route_raw
 

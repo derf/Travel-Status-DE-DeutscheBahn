@@ -4,6 +4,7 @@ git HEAD
     * The info accessor now strips the mostly useless "k.A." / "pünktlich"
       (train on time) text parts
     * Use the new info_raw accessor to get the old info results
+    * Add (slightly experimental) route_interesting accessor
 
 Travel::Status::DE::DeutscheBahn 0.03 - Wed Jul 13 2011
 
