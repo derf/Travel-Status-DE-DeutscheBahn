@@ -38,6 +38,21 @@ sub info {
 	return $info;
 }
 
+sub delay {
+	my ($self) = @_;
+
+	my $info = $self->info_raw;
+
+	if ( $info =~ m{ p.nktlich }ox ) {
+		return 0;
+	}
+	if ( $info =~ m{ ca[.] \s (?<delay> \d+ ) \s Minuten \s sp.ter }ox ) {
+		return $+{delay};
+	}
+
+	return;
+}
+
 sub origin {
 	my ($self) = @_;
 
@@ -156,16 +171,14 @@ either the train's destination or its origin station.
 
 Convenience aliases for $result->route_end.
 
+=item $result->delay
+
+Returns the train's delay in steps of 5 minutes, or undef if it is unknown.
+
 =item $result->info
 
-Returns additional information, for instance in case the train is delayed. May
-be an empty string if no (useful) information is available.
-
-=item $result->info_raw
-
-Returns the raw info string. B<info> only tells you about delays, platform
-changes and such, B<info_raw> also explicitly states wether a train is on time
-or no information is available.
+Returns additional information, for instance the reason why the train is
+delayed. May be an empty string if no (useful) information is available.
 
 =item $result->platform
 

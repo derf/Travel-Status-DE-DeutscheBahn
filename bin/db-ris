@@ -88,15 +88,13 @@ for my $d ( $status->results() ) {
 
 	my @via;
 
-	my $re_late = qr{ (?: ^ | , ) ca[.] \s \d+ \s Minuten \s sp.ter}ox;
-
 	@via = $d->route;
 
 	if ( $filter_via and not( first { $_ =~ m{$filter_via}io } @via ) ) {
 		next;
 	}
 
-	if ( $ignore_late and $d->info =~ $re_late ) {
+	if ( $ignore_late and $d->delay ) {
 		next;
 	}
 
