@@ -84,14 +84,6 @@ sub display_result {
 	return;
 }
 
-sub filter_info {
-	my ($info) = @_;
-
-	$info =~ s{ (?: ^ | , ) (?: p.nktlich | k [.] A [.] ) }{}x;
-
-	return $info;
-}
-
 sub filter_via {
 	my (@via) = @_;
 
@@ -151,7 +143,7 @@ for my $d ( $status->results() ) {
 		[
 			$d->time, $d->train,
 			join( q{  }, filter_via(@via) ), $d->destination,
-			$d->platform, filter_info( $d->info )
+			$d->platform, $d->info,
 		]
 	);
 }

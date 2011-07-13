@@ -9,7 +9,7 @@ use parent 'Class::Accessor';
 our $VERSION = '0.03';
 
 Travel::Status::DE::DeutscheBahn::Result->mk_ro_accessors(
-	qw(time train route_end route_raw platform info));
+	qw(time train route_end route_raw platform info_raw));
 
 sub new {
 	my ( $obj, %conf ) = @_;
@@ -23,6 +23,19 @@ sub destination {
 	my ($self) = @_;
 
 	return $self->{route_end};
+}
+
+sub info {
+	my ($self) = @_;
+
+	my $info = $self->info_raw;
+
+	$info =~ s{ ,Grund }{}ox;
+	$info =~ s{ ^ \s+ }{}ox;
+	$info =~ s{ (?: ^ | , ) (?: p.nktlich | k [.] A [.] ) }{}ox;
+	$info =~ s{ ^ , }{}ox;
+
+	return $info;
 }
 
 sub origin {
@@ -99,8 +112,14 @@ Convenience aliases for $result->route_end.
 
 =item $result->info
 
-Returns additional information, usually wether the train is on time or
-delayed.
+Returns additional information, for instance in case the train is delayed. May
+be an empty string if no (useful) information is available.
+
+=item $result->info_raw
+
+Returns the raw info string. B<info> only tells you about delays, platform
+changes and such, B<info_raw> also explicitly states wether a train is on time
+or no information is available.
 
 =item $result->platform
 

@@ -142,9 +142,6 @@ sub results {
 			$str =~ s/ +$//;
 		}
 
-		$info =~ s{ ,Grund }{}ox;
-		$info =~ s{ ^ \s+ }{}ox;
-
 		while ( $route =~ m{$re_via}g ) {
 			if ($first) {
 				$first = 0;
@@ -168,7 +165,7 @@ sub results {
 				route     => \@via,
 				route_end => $dest,
 				platform  => $platform,
-				info      => $info,
+				info_raw  => $info,
 			)
 		);
 	}

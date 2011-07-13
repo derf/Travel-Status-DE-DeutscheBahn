@@ -1,3 +1,10 @@
+git HEAD
+
+    [Travel::Status::DE::DeutscheBahn::Result]
+    * The info accessor now strips the mostly useless "k.A." / "pünktlich"
+      (train on time) text parts
+    * Use the new info_raw accessor to get the old info results
+
 Travel::Status::DE::DeutscheBahn 0.03 - Wed Jul 13 2011
 
     * Clarify derl dependency (we actually need >= 5.10.1)
