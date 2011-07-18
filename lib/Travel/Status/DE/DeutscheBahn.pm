@@ -113,6 +113,10 @@ sub results {
 		\d{1,2}:\d{1,2}
 	}mx;
 
+	if ( defined $self->{results} ) {
+		return @{ $self->{results} };
+	}
+
 	for my $tr ( @{ $self->{tree}->findnodes($xp_element) } ) {
 
 		my ($n_time) = $tr->findnodes($xp_time);
