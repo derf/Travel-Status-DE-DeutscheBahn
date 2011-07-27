@@ -84,6 +84,11 @@ sub display_result {
 	return;
 }
 
+if ( my $err = $status->errstr ) {
+	say "Request error: ${err}";
+	exit 2;
+}
+
 for my $d ( $status->results() ) {
 
 	my @via;

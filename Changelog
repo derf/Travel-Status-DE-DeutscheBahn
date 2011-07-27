@@ -3,6 +3,8 @@ git HEAD
     [Travel::Status::DE::DeutscheBahn]
     * Fix ->results returning duplicate connections when accessed more than
       one time
+    * new: Only die when encountering wrong options, set ->error otherwise
+    * Adds new ->errstr accessor to check for request errors
 
 Travel::Status::DE::DeutscheBahn 0.04 - Wed Jul 13 2011
 

@@ -54,12 +54,14 @@ sub new {
 		}
 	}
 
+	bless( $ref, $obj );
+
 	$reply = $ua->post( 'http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn?rt=1',
 		$ref->{post} );
 
 	if ( $reply->is_error ) {
-		my $errstr = $reply->status_line();
-		confess("Could not submit POST request: ${errstr}");
+		$ref->{errstr} = $reply->status_line();
+		return $ref;
 	}
 
 	$ref->{html} = $reply->content;
@@ -71,7 +73,7 @@ sub new {
 		suppress_warnings => 1,
 	);
 
-	return bless( $ref, $obj );
+	return $ref;
 }
 
 sub new_from_html {
@@ -92,6 +94,12 @@ sub new_from_html {
 	);
 
 	return bless( $ref, $obj );
+}
+
+sub errstr {
+	my ($self) = @_;
+
+	return $self->{errstr};
 }
 
 sub results {
@@ -115,6 +123,9 @@ sub results {
 
 	if ( defined $self->{results} ) {
 		return @{ $self->{results} };
+	}
+	if ( not defined $self->{tree} ) {
+		return;
 	}
 
 	for my $tr ( @{ $self->{tree}->findnodes($xp_element) } ) {
@@ -194,6 +205,10 @@ arrival/departure monitor
 		station => 'Essen Hbf',
 	);
 
+	if (my $err = $status->errstr) {
+		die("Request error: ${err}\n");
+	}
+
 	for my $departure ($status->results) {
 		printf(
 			"At %s: %s to %s from platform %s\n",
@@ -224,7 +239,11 @@ unspecified).
 
 =item my $status = Travel::Status::DE::DeutscheBahn->new(I<%opts>)
 
-Returns a new Travel::Status::DE::DeutscheBahn element.  Supported I<opts> are:
+Requests the departures/arrivals as specified by I<opts> and returns a new
+Travel::Status::DE::DeutscheBahn element with the results.  Dies if the wrong
+I<opts> were passed.
+
+Supported I<opts> are:
 
 =over
 
@@ -259,10 +278,18 @@ By default, the following are shown: ice, ic_ec, d, nv, s.
 
 =back
 
-=item $status->results()
+=item $status->error
+
+In case of an error in the HTTP request, returns a string describing it.  If
+no error occured, returns undef.
+
+=item $status->results
 
 Returns a list of arrivals/departures.  Each list element is a
 Travel::Status::DE::DeutscheBahn::Result(3pm) object.
+
+If no matching results were found or the parser / http request failed, returns
+undef.
 
 =back
 
