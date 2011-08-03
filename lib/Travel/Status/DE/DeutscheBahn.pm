@@ -278,7 +278,7 @@ By default, the following are shown: ice, ic_ec, d, nv, s.
 
 =back
 
-=item $status->error
+=item $status->errstr
 
 In case of an error in the HTTP request, returns a string describing it.  If
 no error occured, returns undef.
