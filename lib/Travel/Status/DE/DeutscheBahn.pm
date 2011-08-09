@@ -10,7 +10,7 @@ use POSIX qw(strftime);
 use Travel::Status::DE::DeutscheBahn::Result;
 use XML::LibXML;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub new {
 	my ( $obj, %conf ) = @_;
@@ -221,7 +221,7 @@ arrival/departure monitor
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 DESCRIPTION
 

@@ -1,4 +1,4 @@
-git HEAD
+Travel::Status::DE::DeutscheBahn 0.05 - Tue Aug 09 2011
 
     [Travel::Status::DE::DeutscheBahn]
     * Fix ->results returning duplicate connections when accessed more than
