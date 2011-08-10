@@ -46,6 +46,7 @@ sub new {
 			start               => 'Suchen',
 			boardType           => $conf{mode} // 'dep',
 		},
+		results => [],
 	};
 
 	for my $i ( 0 .. @{ $ref->{mot_filter} } ) {
