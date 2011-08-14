@@ -46,7 +46,6 @@ sub new {
 			start               => 'Suchen',
 			boardType           => $conf{mode} // 'dep',
 		},
-		results => [],
 	};
 
 	for my $i ( 0 .. @{ $ref->{mot_filter} } ) {
@@ -128,6 +127,8 @@ sub results {
 	if ( not defined $self->{tree} ) {
 		return;
 	}
+
+	$self->{results} = [];
 
 	for my $tr ( @{ $self->{tree}->findnodes($xp_element) } ) {
 
