@@ -148,7 +148,7 @@ sub results {
 		my $train    = $n_train->textContent();
 		my $route    = $n_route->textContent();
 		my $dest     = $n_dest->textContent();
-		my $platform = $n_platform->textContent();
+		my $platform = $n_platform ? $n_platform->textContent() : q{};
 		my $info     = $n_info ? $n_info->textContent() : q{};
 		my @via;
 
