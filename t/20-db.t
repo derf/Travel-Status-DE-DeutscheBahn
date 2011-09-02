@@ -4,7 +4,7 @@ use warnings;
 use 5.010;
 
 use File::Slurp qw(slurp);
-use Test::More tests => 96;
+use Test::More tests => 97;
 
 BEGIN {
 	use_ok('Travel::Status::DE::DeutscheBahn');
@@ -48,6 +48,22 @@ is_deeply([$departures[8]->route],
 	['Essen-Borbeck', 'Bottrop Hbf', 'Gladbeck West', 'Gladbeck-Zweckel',
 	'Feldhausen', 'Dorsten', 'Hervest-Dorsten', 'Deuten', 'Rhade',
 	'Marbeck-Heiden', 'Borken(Westf)'], '9th result: route ok');
+
+is_deeply([$departures[8]->route_timetable],
+	[
+		['19:36', 'Essen-Borbeck'],
+		['19:43', 'Bottrop Hbf'],
+		['19:50', 'Gladbeck West'],
+		['19:53', 'Gladbeck-Zweckel'],
+		['19:56', 'Feldhausen'],
+		['20:01', 'Dorsten'],
+		['20:05', 'Hervest-Dorsten'],
+		['20:10', 'Deuten'],
+		['20:15', 'Rhade'],
+		['20:21', 'Marbeck-Heiden'],
+		['20:27', 'Borken(Westf)'],
+	],
+	'9th result: route_timetable ok');
 
 is_deeply([$departures[5]->route_interesting(3)],
 	['Essen-Steele', 'Essen-Steele Ost', 'Bochum'],

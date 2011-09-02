@@ -62,7 +62,8 @@ sub origin {
 sub route {
 	my ($self) = @_;
 
-	return @{ $self->{route} };
+	my @stops = map { $_->[1] } @{ $self->{route} };
+	return @stops;
 }
 
 sub route_interesting {
@@ -113,6 +114,12 @@ sub route_interesting {
 
 	return @via_show;
 
+}
+
+sub route_timetable {
+	my ($self) = @_;
+
+	return @{ $self->{route} };
 }
 
 1;
@@ -216,6 +223,11 @@ Returns the raw string used to create the route array.
 
 Note that canceled stops are filtered from B<route>, but still present in
 B<route_raw>.
+
+=item $result->route_timetable
+
+Similar to B<route>.  however, this function returns a list of array
+references of the form C<< [ arrival time, station name ] >>.
 
 =item $result->time
 

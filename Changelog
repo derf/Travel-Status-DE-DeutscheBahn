@@ -1,3 +1,9 @@
+git HEAD
+
+    * Fix bug when receiving no platform numbers from the DB RIS
+    * Result: Add route_timetable accessor containing station names and
+      their corresponding arrival times
+
 Travel::Status::DE::DeutscheBahn 0.05 - Tue Aug 09 2011
 
     [Travel::Status::DE::DeutscheBahn]

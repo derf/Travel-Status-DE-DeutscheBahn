@@ -117,8 +117,8 @@ sub results {
 	my $xp_info = XML::LibXML::XPathExpression->new('./td[@class="ris"]');
 
 	my $re_via = qr{
-		^ \s* (.+?) \s* \n
-		\d{1,2}:\d{1,2}
+		^ \s* (?<stop> .+? ) \s* \n
+		(?<time> \d{1,2}:\d{1,2} )
 	}mx;
 
 	if ( defined $self->{results} ) {
@@ -164,13 +164,12 @@ sub results {
 				$first = 0;
 				next;
 			}
-			my $stop = $1;
 
-			if ( $stop =~ m{ [(] Halt \s entf.llt [)] }ox ) {
+			if ( $+{stop} =~ m{ [(] Halt \s entf.llt [)] }ox ) {
 				next;
 			}
 
-			push( @via, $stop );
+			push( @via, [ $+{time}, $+{stop} ] );
 		}
 
 		push(
