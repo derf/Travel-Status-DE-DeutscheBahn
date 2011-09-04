@@ -13,8 +13,9 @@ my %train_type;
 
 my ( $date, $time );
 my $filter_via;
-my $ignore_late = 0;
-my $types       = q{};
+my $ignore_late     = 0;
+my $show_full_route = 0;
+my $types           = q{};
 
 my @output;
 
@@ -22,6 +23,7 @@ binmode( STDOUT, ':encoding(utf-8)' );
 
 GetOptions(
 	'd|date=s'      => \$date,
+	'f|full-route'  => \$show_full_route,
 	'h|help'        => sub { show_help(0) },
 	'L|ignore-late' => \$ignore_late,
 	'm|mot=s'       => \$types,
@@ -77,8 +79,14 @@ sub display_result {
 	}
 
 	for my $line (@lines) {
-		printf( join( q{  }, ( map { "%-${_}s" } @line_length ) ) . "\n",
-			@{$line}, );
+		printf(
+			join( q{  }, ( map { "%-${_}s" } @line_length ) ) . "\n",
+			@{$line}[ 0 .. 5 ]
+		);
+
+		if ($show_full_route) {
+			print "\n" . $line->[6] . "\n\n\n";
+		}
 	}
 
 	return;
@@ -106,9 +114,14 @@ for my $d ( $status->results() ) {
 	push(
 		@output,
 		[
-			$d->time, $d->train,
-			join( q{  }, $d->route_interesting ), $d->destination,
-			$d->platform, $d->info,
+			$d->time,
+			$d->train,
+			join( q{  }, $d->route_interesting ),
+			$d->destination,
+			$d->platform,
+			$d->info,
+			join( "\n",
+				map { sprintf( '%-5s  %s', @{$_} ) } $d->route_timetable ),
 		]
 	);
 }
@@ -146,6 +159,10 @@ departure screens installed at most main stations.
 =item B<-d>, B<--date> I<dd>.I<mm>.I<yyyy>
 
 Date to list departures for.  Default: today.
+
+=item B<-f>, B<--full-route>
+
+Display complete routes (including arrival times) of all trains.
 
 =item B<-L>, B<--ignore-late>
 
