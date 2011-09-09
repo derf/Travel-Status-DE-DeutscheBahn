@@ -285,7 +285,7 @@ None.
 
 =head1 BUGS AND LIMITATIONS
 
-Arrival times are present in B<route_raw>, but not accessible via B<route>.
+None known.
 
 =head1 SEE ALSO
 
