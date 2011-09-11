@@ -93,7 +93,7 @@ sub display_result {
 }
 
 if ( my $err = $status->errstr ) {
-	say "Request error: ${err}";
+	say STDERR "Request error: ${err}";
 	exit 2;
 }
 

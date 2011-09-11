@@ -102,19 +102,42 @@ sub errstr {
 	return $self->{errstr};
 }
 
+sub get_node {
+	my ( $parent, $name, $xpath, $index ) = @_;
+	$index //= 0;
+
+	my @nodes = $parent->findnodes($xpath);
+
+	if ( $#nodes < $index ) {
+
+		# called by map, so we must explicitly return undef.
+		## no critic (Subroutines::ProhibitExplicitReturnUndef)
+		return undef;
+	}
+
+	my $node = $nodes[$index];
+
+	return $node->textContent;
+}
+
 sub results {
 	my ($self) = @_;
 	my $mode = $self->{post}->{boardType};
 
 	my $xp_element = XML::LibXML::XPathExpression->new(
-		"//table[\@class=\"result stboard ${mode}\"]/tr");
-	my $xp_time  = XML::LibXML::XPathExpression->new('./td[@class="time"]');
-	my $xp_train = XML::LibXML::XPathExpression->new('./td[@class="train"]');
-	my $xp_route = XML::LibXML::XPathExpression->new('./td[@class="route"]');
-	my $xp_dest  = XML::LibXML::XPathExpression->new('./td[@class="route"]//a');
-	my $xp_platform
-	  = XML::LibXML::XPathExpression->new('./td[@class="platform"]');
-	my $xp_info = XML::LibXML::XPathExpression->new('./td[@class="ris"]');
+		"//table[\@class = \"result stboard ${mode}\"]/tr");
+
+	my @parts = (
+		[ 'time',     './td[@class="time"]' ],
+		[ 'train',    './td[3]' ],
+		[ 'route',    './td[@class="route"]' ],
+		[ 'dest',     './td[@class="route"]//a' ],
+		[ 'platform', './td[@class="platform"]' ],
+		[ 'info',     './td[@class="ris"]' ],
+	);
+
+	@parts = map { [ $_->[0], XML::LibXML::XPathExpression->new( $_->[1] ) ] }
+	  @parts;
 
 	my $re_via = qr{
 		^ \s* (?<stop> .+? ) \s* \n
@@ -132,25 +155,17 @@ sub results {
 
 	for my $tr ( @{ $self->{tree}->findnodes($xp_element) } ) {
 
-		my ($n_time) = $tr->findnodes($xp_time);
-		my ( undef, $n_train ) = $tr->findnodes($xp_train);
-		my ($n_route)    = $tr->findnodes($xp_route);
-		my ($n_dest)     = $tr->findnodes($xp_dest);
-		my ($n_platform) = $tr->findnodes($xp_platform);
-		my ($n_info)     = $tr->findnodes($xp_info);
-		my $first        = 1;
+		my @via;
+		my $first = 1;
+		my ( $time, $train, $route, $dest, $platform, $info )
+		  = map { get_node( $tr, @{$_} ) } @parts;
 
-		if ( not( $n_time and $n_dest ) ) {
+		if ( not( $time and $dest ) ) {
 			next;
 		}
 
-		my $time     = $n_time->textContent();
-		my $train    = $n_train->textContent();
-		my $route    = $n_route->textContent();
-		my $dest     = $n_dest->textContent();
-		my $platform = $n_platform ? $n_platform->textContent() : q{};
-		my $info     = $n_info ? $n_info->textContent() : q{};
-		my @via;
+		$platform //= q{};
+		$info     //= q{};
 
 		for my $str ( $time, $train, $dest, $platform, $info ) {
 			$str =~ s/\n/ /mg;
