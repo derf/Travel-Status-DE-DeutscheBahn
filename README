@@ -9,7 +9,7 @@ Dependencies
 ------------
 
  * perl version 5.10.1 or newer
- * Clas::Accessor
+ * Class::Accessor
  * LWP::UserAgent (usually shipped by libwww-perl)
  * XML::LibXML
 
@@ -21,7 +21,7 @@ $ perl Build
 $ sudo perl Build install
 
 You can then run 'man Travel::Status::DE::DeutscheBahn' for more information.
-Thi distribution also ships the example script 'db-ris', see 'man db-ris'.
+This distribution also ships the example script 'db-ris', see 'man db-ris'.
 
 Testing
 -------
