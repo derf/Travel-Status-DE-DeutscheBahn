@@ -73,6 +73,8 @@ sub new {
 		suppress_warnings => 1,
 	);
 
+	$ref->check_input_error();
+
 	return $ref;
 }
 
@@ -94,6 +96,31 @@ sub new_from_html {
 	);
 
 	return bless( $ref, $obj );
+}
+
+sub check_input_error {
+	my ($self) = @_;
+
+	my $xp_errdiv = XML::LibXML::XPathExpression->new(
+		'//div[@class = "errormsg leftMargin"]');
+	my $xp_opts
+	  = XML::LibXML::XPathExpression->new('//select[@class = "error"]');
+	my $xp_values = XML::LibXML::XPathExpression->new('./option');
+
+	my $e_errdiv = ( $self->{tree}->findnodes($xp_errdiv) )[0];
+	my $e_opts   = ( $self->{tree}->findnodes($xp_opts) )[0];
+
+	if ($e_errdiv) {
+		$self->{errstr} = $e_errdiv->textContent;
+
+		if ($e_opts) {
+			my @nodes = ( $e_opts->findnodes($xp_values) );
+			$self->{errstr}
+			  .= join( q{}, map { "\n" . $_->textContent } @nodes );
+		}
+	}
+
+	return;
 }
 
 sub errstr {
