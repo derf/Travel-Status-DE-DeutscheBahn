@@ -25,6 +25,12 @@ sub destination {
 	return $self->{route_end};
 }
 
+sub line {
+	my ($self) = @_;
+
+	return $self->{train};
+}
+
 sub info {
 	my ($self) = @_;
 
@@ -191,6 +197,13 @@ Returns the train's delay in minutes, or undef if it is unknown.
 Returns additional information, for instance the reason why the train is
 delayed. May be an empty string if no (useful) information is available.
 
+=item $result->line
+
+=item $result->train
+
+Returns the line / train name, either in a format like "S 1" (S-Bahn line 1)
+or "RE 10111" (RegionalExpress train 10111, no line information).
+
 =item $result->platform
 
 Returns the platform from which the train will depart / at which it will
@@ -232,11 +245,6 @@ references of the form C<< [ arrival time, station name ] >>.
 =item $result->time
 
 Returns the arrival/departure time as string in "hh:mm" format.
-
-=item $result->train
-
-Returns the line / train name, either in a format like "S 1" (S-Bahn line 1)
-or "RE 10111" (RegionalExpress train 10111, no line information).
 
 =back
 
