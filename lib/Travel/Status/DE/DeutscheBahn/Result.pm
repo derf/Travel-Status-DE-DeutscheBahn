@@ -144,7 +144,7 @@ arrival/departure received by Travel::Status::DE::DeutscheBahn
 		printf(
 			"At %s: %s to %s from platform %s\n",
 			$departure->time,
-			$departure->train,
+			$departure->line,
 			$departure->destination,
 			$departure->platform,
 		);
@@ -155,7 +155,7 @@ arrival/departure received by Travel::Status::DE::DeutscheBahn
 		printf(
 			"At %s: %s from %s on platform %s\n",
 			$arrival->time,
-			$arrival->train,
+			$arrival->line,
 			$arrival->origin,
 			$arrival->platform,
 		);
@@ -194,7 +194,7 @@ delayed. May be an empty string if no (useful) information is available.
 
 =item $result->train
 
-Returns the line / train name, either in a format like "S 1" (S-Bahn line 1)
+Returns the line name, either in a format like "S 1" (S-Bahn line 1)
 or "RE 10111" (RegionalExpress train 10111, no line information).
 
 =item $result->platform

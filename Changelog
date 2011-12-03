@@ -2,6 +2,8 @@ git HEAD
 
     * Detect ambiguous input errors (available via errstr)
     * Add language switch for additional information (german/english)
+
+    [Travel::Status::DE::DeutscheBahn::Result]
     * Result: Add line (== train) and date accessors
 
     [db-ris]

@@ -274,7 +274,7 @@ arrival/departure monitor
 		printf(
 			"At %s: %s to %s from platform %s\n",
 			$departure->time,
-			$departure->train,
+			$departure->line,
 			$departure->destination,
 			$departure->platform,
 		);
@@ -310,7 +310,8 @@ Supported I<opts> are:
 
 =item B<station> => I<station>
 
-The train station to report for, e.g.  "Essen HBf".  Mandatory.
+The train station to report for, e.g.  "Essen HBf" or
+"Alfredusbad, Essen (Ruhr)".  Mandatory.
 
 =item B<date> => I<dd>.I<mm>.I<yyyy>
 
