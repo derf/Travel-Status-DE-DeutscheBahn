@@ -43,8 +43,10 @@ sub new {
 			date                => $conf{date} || $date,
 			time                => $conf{time} || $time,
 			REQTrain_name       => q{},
-			start               => 'Suchen',
+			start               => 'yes',
 			boardType           => $conf{mode} // 'dep',
+			maxJourneys         => 20,
+#			L                   => 'vs_java3',
 		},
 	};
 
@@ -153,6 +155,10 @@ sub results {
 
 	my $xp_element = XML::LibXML::XPathExpression->new(
 		"//table[\@class = \"result stboard ${mode}\"]/tr");
+	my $xp_train_more = XML::LibXML::XPathExpression->new('./td[3]/a');
+
+	# bhftafel.exe is not y2k1-safe
+	my $re_morelink = qr{ date = (?<date> .. [.] .. [.] .. ) }x;
 
 	my @parts = (
 		[ 'time',     './td[@class="time"]' ],
@@ -186,10 +192,17 @@ sub results {
 		my $first = 1;
 		my ( $time, $train, $route, $dest, $platform, $info )
 		  = map { get_node( $tr, @{$_} ) } @parts;
+		my $e_train_more = ($tr->findnodes($xp_train_more))[0];
 
 		if ( not( $time and $dest ) ) {
 			next;
 		}
+
+		$e_train_more->getAttribute('href') =~ $re_morelink;
+
+		my $date = $+{date};
+
+		substr($date, 6, 0) = '20';
 
 		$platform //= q{};
 		$info     //= q{};
@@ -217,6 +230,7 @@ sub results {
 		push(
 			@{ $self->{results} },
 			Travel::Status::DE::DeutscheBahn::Result->new(
+				date      => $date,
 				time      => $time,
 				train     => $train,
 				route_raw => $route,

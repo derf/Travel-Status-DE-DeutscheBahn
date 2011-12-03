@@ -4,7 +4,7 @@ use warnings;
 use 5.010;
 
 use File::Slurp qw(slurp);
-use Test::More tests => 97;
+use Test::More tests => 98;
 
 BEGIN {
 	use_ok('Travel::Status::DE::DeutscheBahn');
@@ -22,10 +22,11 @@ my @departures = $status->results;
 
 for my $departure (@departures) {
 	isa_ok($departure, 'Travel::Status::DE::DeutscheBahn::Result');
-	can_ok($departure, qw(route_end destination origin info platform route
+	can_ok($departure, qw(date route_end destination origin info platform route
 	route_raw time train));
 }
 
+is($departures[0]->date, '06.07.2011', 'first result: date ok');
 is($departures[0]->time, '19:21', 'first result: time ok');
 is($departures[0]->train, 'RE 10228', 'first result: train ok');
 is($departures[0]->destination, 'Duisburg Hbf', 'first result: destination ok');

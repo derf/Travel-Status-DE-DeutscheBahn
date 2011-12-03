@@ -9,7 +9,7 @@ use parent 'Class::Accessor';
 our $VERSION = '1.00';
 
 Travel::Status::DE::DeutscheBahn::Result->mk_ro_accessors(
-	qw(time train route_end route_raw platform info_raw));
+	qw(date time train route_end route_raw platform info_raw));
 
 sub new {
 	my ( $obj, %conf ) = @_;
