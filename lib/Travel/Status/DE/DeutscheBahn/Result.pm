@@ -176,17 +176,9 @@ the platform, time, route and more.
 
 =over
 
-=item $result->route_end
+=item $result->date
 
-Returns the last element of the route.  Depending on how you set up
-Travel::Status::DE::DeutscheBahn (arrival or departure listing), this is
-either the train's destination or its origin station.
-
-=item $result->destination
-
-=item $result->origin
-
-Convenience aliases for $result->route_end.
+Arrival/Departure date in "dd.mm.yyyy" format.
 
 =item $result->delay
 
@@ -213,6 +205,18 @@ arrive.
 
 Returns a list of station names the train will pass between the selected
 station and its origin/destination.
+
+=item $result->route_end
+
+Returns the last element of the route.  Depending on how you set up
+Travel::Status::DE::DeutscheBahn (arrival or departure listing), this is
+either the train's destination or its origin station.
+
+=item $result->destination
+
+=item $result->origin
+
+Convenience aliases for $result->route_end.
 
 =item $result->route_interesting([I<max>])
 
