@@ -45,7 +45,6 @@ sub new {
 			REQTrain_name       => q{},
 			start               => 'yes',
 			boardType           => $conf{mode} // 'dep',
-			maxJourneys         => 20,
 #			L                   => 'vs_java3',
 		},
 	};
