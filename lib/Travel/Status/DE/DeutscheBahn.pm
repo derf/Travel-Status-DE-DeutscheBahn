@@ -21,6 +21,8 @@ sub new {
 
 	my $reply;
 
+	my $lang = $conf{language} // 'd';
+
 	if ( not $conf{station} ) {
 		confess('You need to specify a station');
 	}
@@ -45,7 +47,8 @@ sub new {
 			REQTrain_name       => q{},
 			start               => 'yes',
 			boardType           => $conf{mode} // 'dep',
-#			L                   => 'vs_java3',
+
+			#			L                   => 'vs_java3',
 		},
 	};
 
@@ -57,7 +60,9 @@ sub new {
 
 	bless( $ref, $obj );
 
-	$reply = $ua->post( 'http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn?rt=1',
+	$reply
+	  = $ua->post(
+		"http://reiseauskunft.bahn.de/bin/bhftafel.exe/${lang}n?rt=1",
 		$ref->{post} );
 
 	if ( $reply->is_error ) {
@@ -191,7 +196,7 @@ sub results {
 		my $first = 1;
 		my ( $time, $train, $route, $dest, $platform, $info )
 		  = map { get_node( $tr, @{$_} ) } @parts;
-		my $e_train_more = ($tr->findnodes($xp_train_more))[0];
+		my $e_train_more = ( $tr->findnodes($xp_train_more) )[0];
 
 		if ( not( $time and $dest ) ) {
 			next;
@@ -201,7 +206,7 @@ sub results {
 
 		my $date = $+{date};
 
-		substr($date, 6, 0) = '20';
+		substr( $date, 6, 0 ) = '20';
 
 		$platform //= q{};
 		$info     //= q{};
@@ -310,6 +315,11 @@ The train station to report for, e.g.  "Essen HBf".  Mandatory.
 =item B<date> => I<dd>.I<mm>.I<yyyy>
 
 Date to report for.  Defaults to the current day.
+
+=item B<language> => I<language>
+
+Set language for additional information. Accepted arguments: B<d>eutsch,
+B<e>nglish, B<i>talian, B<n> (dutch).
 
 =item B<time> => I<hh>:I<mm>
 

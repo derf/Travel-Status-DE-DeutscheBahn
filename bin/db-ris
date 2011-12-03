@@ -16,6 +16,7 @@ my $filter_via;
 my $ignore_late     = 0;
 my $show_full_route = 0;
 my $types           = q{};
+my $language;
 
 my @output;
 
@@ -25,6 +26,7 @@ GetOptions(
 	'd|date=s'      => \$date,
 	'f|full-route'  => \$show_full_route,
 	'h|help'        => sub { show_help(0) },
+	'l|lang=s'      => \$language,
 	'L|ignore-late' => \$ignore_late,
 	'm|mot=s'       => \$types,
 	't|time=s'      => \$time,
@@ -43,10 +45,11 @@ for my $type ( split( qr{,}, $types ) ) {
 }
 
 my $status = Travel::Status::DE::DeutscheBahn->new(
-	date    => $date,
-	mot     => \%train_type,
-	station => shift || show_help(1),
-	time    => $time,
+	date     => $date,
+	language => $language,
+	mot      => \%train_type,
+	station  => shift || show_help(1),
+	time     => $time,
 );
 
 sub show_help {
@@ -164,6 +167,11 @@ Date to list departures for.  Default: today.
 
 Display complete routes (including arrival times) of all trains.
 
+=item B<-l>, B<--lang> B<d>|B<e>|B<i>|B<n>
+
+Set language used for additional information. Supports B<d>eutsch (default),
+B<e>nglish, B<i>talian and dutch (B<n>).
+
 =item B<-L>, B<--ignore-late>
 
 Do not display delayed trains.
@@ -185,7 +193,7 @@ argements:
 
 You can prefix an argument with "!" to hide it.  The default is C<<
 ice,ic_ec,d,nv,s >>.  Note that B<-m> does not replace the default, so if you
-only want to see S-Bahn und U-Bahn departures, you'd have to use C<< -m
+only want to see S-Bahn and U-Bahn departures, you'd have to use C<< -m
 !ice,!ic_ec,!d,!nv,u >>.
 
 =item B<-t>, B<--time> I<hh>:I<mm>

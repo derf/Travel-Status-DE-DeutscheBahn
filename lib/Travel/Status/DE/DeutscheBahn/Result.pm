@@ -38,7 +38,8 @@ sub info {
 
 	$info =~ s{ ,Grund }{}ox;
 	$info =~ s{ ^ \s+ }{}ox;
-	$info =~ s{ (?: ^ | , ) (?: p.nktlich | k [.] A [.] ) }{}ox;
+	$info
+	  =~ s{ (?: ^ | , ) (?: p.nktlich | [nk] [.] [Aa] [.] | on \s time ) }{}ox;
 	$info =~ s{ ^ , }{}ox;
 
 	return $info;
