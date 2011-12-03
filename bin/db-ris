@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use Getopt::Long qw(:config no_ignore_case);
 use List::Util qw(first max);
@@ -144,7 +144,7 @@ B<db-ris> [B<-d> I<date>] [B<-L>] [B<-m> I<motlist>] [B<-t> I<time>]
 
 =head1 VERSION
 
-version 1.00
+version 1.01
 
 =head1 DESCRIPTION
 

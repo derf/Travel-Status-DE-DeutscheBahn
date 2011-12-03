@@ -1,4 +1,4 @@
-git HEAD
+Travel::Status::DE::DeutscheBahn 1.01 - Sat Dec 03 2011
 
     * Detect ambiguous input errors (available via errstr)
     * Add language switch for additional information (german/english)
