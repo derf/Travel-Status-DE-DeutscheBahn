@@ -19,6 +19,8 @@ sub new {
 
 	my $ua = LWP::UserAgent->new();
 
+	$ua->env_proxy;
+
 	my $reply;
 
 	my $lang = $conf{language} // 'd';
