@@ -12,6 +12,7 @@ use Travel::Status::DE::DeutscheBahn;
 my %train_type;
 
 my ( $date, $time );
+my $arrivals = 0;
 my $filter_via;
 my $ignore_late     = 0;
 my $show_full_route = 0;
@@ -23,6 +24,7 @@ my @output;
 binmode( STDOUT, ':encoding(utf-8)' );
 
 GetOptions(
+	'a|arrivals'    => \$arrivals,
 	'd|date=s'      => \$date,
 	'f|full-route'  => \$show_full_route,
 	'h|help'        => sub { show_help(0) },
@@ -50,6 +52,7 @@ my $status = Travel::Status::DE::DeutscheBahn->new(
 	mot      => \%train_type,
 	station  => shift || show_help(1),
 	time     => $time,
+	mode     => $arrivals ? 'arr' : 'dep',
 );
 
 sub show_help {
@@ -119,8 +122,8 @@ for my $d ( $status->results() ) {
 		[
 			$d->time,
 			$d->train,
-			join( q{  }, $d->route_interesting ),
-			$d->destination,
+			$arrivals ? q{} : join( q{  }, $d->route_interesting ),
+			$d->route_end,
 			$d->platform,
 			$d->info,
 			join( "\n",
@@ -139,7 +142,7 @@ db-ris - Interface to the DeutscheBahn online departure monitor
 
 =head1 SYNOPSIS
 
-B<db-ris> [B<-d> I<date>] [B<-L>] [B<-m> I<motlist>] [B<-t> I<time>]
+B<db-ris> [B<-a>] [B<-d> I<date>] [B<-L>] [B<-m> I<motlist>] [B<-t> I<time>]
 [B<-v> I<via>] I<station>
 
 =head1 VERSION
@@ -158,6 +161,13 @@ departure screens installed at most main stations.
 =head1 OPTIONS
 
 =over
+
+=item B<-a>, B<--arrivals>
+
+Show arrivals instead of departures, including trains ending at the specified
+station. Note that this causes the output to display the start instead of
+the end station and B<-f> to list all stops between start end
+I<station>, not I<station> and end.
 
 =item B<-d>, B<--date> I<dd>.I<mm>.I<yyyy>
 
