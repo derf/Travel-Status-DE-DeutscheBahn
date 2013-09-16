@@ -1,3 +1,9 @@
+Travel::Status::DE::DeutscheBahn 1.02 - Tue Sep 17 2013
+
+    * Respect proxy environment variables
+    * Add -a / --arrivals option to show arrivals instead of departures
+    * Disable smartmatch warnings on perl >= 5.018
+
 Travel::Status::DE::DeutscheBahn 1.01 - Sat Dec 03 2011
 
     * Detect ambiguous input errors (available via errstr)
