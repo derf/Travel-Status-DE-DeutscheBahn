@@ -131,6 +131,12 @@ sub route_timetable {
 	return @{ $self->{route} };
 }
 
+sub TO_JSON {
+	my ($self) = @_;
+
+	return { %{$self} };
+}
+
 1;
 
 __END__
