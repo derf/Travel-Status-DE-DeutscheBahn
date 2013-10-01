@@ -12,6 +12,9 @@ Module::Build->new(
 		'Test::Compile' => 0,
 		'Test::Pod'     => 0,
 	},
+	configure_requires => {
+		'Module::Build' => 0.40,
+	},
 	module_name => 'Travel::Status::DE::DeutscheBahn',
 	license     => 'perl',
 	requires    => {
