@@ -55,7 +55,7 @@ sub delay {
 	if ( $info =~ m{ p.nktlich }ox ) {
 		return 0;
 	}
-	if ( $info =~ m{ ca[.] \s (?<delay> \d+ ) \s Minuten \s sp.ter }ox ) {
+	if ( $info =~ m{ (?: ca \. \s* )? \+ (?<delay> \d+) :? \s* }ox ) {
 		return $+{delay};
 	}
 
