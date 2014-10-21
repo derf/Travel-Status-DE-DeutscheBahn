@@ -1,7 +1,7 @@
-git HEAD
+Travel::Status::DE::DeutscheBahn 1.03 - Tue Oct 21 2014
 
     * Add primitive JSON serializer to Travel::Status::DE::DeutscheBahn::Result
-    * Fix $result->delay (changes in RIS output format)
+    * Fix $result->delay (was broken by changes in the RIS output format)
 
 Travel::Status::DE::DeutscheBahn 1.02 - Tue Sep 17 2013
 
