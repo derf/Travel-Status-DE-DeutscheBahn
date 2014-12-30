@@ -137,6 +137,15 @@ sub TO_JSON {
 	return { %{$self} };
 }
 
+sub type {
+	my ($self) = @_;
+
+	# $self->{train} is either "TYPE 12345" or "TYPE12345"
+	my ($type) = ( $self->{train} =~ m{ ^ ([A-Z]+) }x );
+
+	return $type;
+}
+
 1;
 
 __END__
@@ -258,6 +267,11 @@ references of the form C<< [ arrival time, station name ] >>.
 =item $result->time
 
 Returns the arrival/departure time as string in "hh:mm" format.
+
+=item $result->type
+
+Returns the type of this train, e.g. "S" for S-Bahn, "RE" for Regional Express
+or "ICE" for InterCity-Express.
 
 =back
 
