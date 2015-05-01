@@ -19,7 +19,9 @@ sub new {
 	my $date = strftime( '%d.%m.%Y', localtime(time) );
 	my $time = strftime( '%H:%M',    localtime(time) );
 
-	my $ua = LWP::UserAgent->new();
+	my %lwp_options = %{ $conf{lwp_options} // { timeout => 10 } };
+
+	my $ua = LWP::UserAgent->new(%lwp_options);
 
 	$ua->env_proxy;
 
@@ -325,6 +327,11 @@ Date to report for.  Defaults to the current day.
 
 Set language for additional information. Accepted arguments: B<d>eutsch,
 B<e>nglish, B<i>talian, B<n> (dutch).
+
+=item B<lwp_options> => I<\%hashref>
+
+Passed on to C<< LWP::UserAgent->new >>. Defaults to C<< { timeout => 10 } >>,
+you can use an empty hashref to override it.
 
 =item B<time> => I<hh>:I<mm>
 

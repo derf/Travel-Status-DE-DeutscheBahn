@@ -1,3 +1,8 @@
+git HEAD
+
+    * DeutscheBahn->new: Add lwp_options parameter to pass options to
+      LWP::UserAgent->new
+
 Travel::Status::DE::DeutscheBahn 1.03 - Tue Oct 21 2014
 
     * Add primitive JSON serializer to Travel::Status::DE::DeutscheBahn::Result
