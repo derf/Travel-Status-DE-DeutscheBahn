@@ -1,5 +1,6 @@
-git HEAD
+Travel::Status::DE::DeutscheBahn 1.04 - Sun May 03 2015
 
+    * Result: Add type accessor
     * DeutscheBahn->new: Add lwp_options parameter to pass options to
       LWP::UserAgent->new
 

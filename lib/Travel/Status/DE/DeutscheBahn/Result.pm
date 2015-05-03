@@ -8,7 +8,7 @@ no if $] >= 5.018, warnings => "experimental::smartmatch";
 
 use parent 'Class::Accessor';
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 Travel::Status::DE::DeutscheBahn::Result->mk_ro_accessors(
 	qw(date time train route_end route_raw platform info_raw));
@@ -180,7 +180,7 @@ arrival/departure received by Travel::Status::DE::DeutscheBahn
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 DESCRIPTION
 
