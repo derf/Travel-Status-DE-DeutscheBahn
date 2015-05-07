@@ -1,3 +1,7 @@
+git HEAD
+
+    * Result: Add is_cancelled accessor
+
 Travel::Status::DE::DeutscheBahn 1.04 - Sun May 03 2015
 
     * Result: Add type accessor
