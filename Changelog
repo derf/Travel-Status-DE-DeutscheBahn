@@ -1,3 +1,7 @@
+git HEAD
+
+    * Result->route_interesting: Also consider airports
+
 Travel::Status::DE::DeutscheBahn 1.04 - Sun May 03 2015
 
     * Result: Add type accessor
