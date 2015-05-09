@@ -171,12 +171,13 @@ sub results {
 	my $re_morelink = qr{ date = (?<date> .. [.] .. [.] .. ) }x;
 
 	my @parts = (
-		[ 'time',     './td[@class="time"]' ],
-		[ 'train',    './td[3]' ],
-		[ 'route',    './td[@class="route"]' ],
-		[ 'dest',     './td[@class="route"]//a' ],
-		[ 'platform', './td[@class="platform"]' ],
-		[ 'info',     './td[@class="ris"]' ],
+		[ 'time',      './td[@class="time"]' ],
+		[ 'train',     './td[3]' ],
+		[ 'route',     './td[@class="route"]' ],
+		[ 'dest',      './td[@class="route"]//a' ],
+		[ 'platform',  './td[@class="platform"]' ],
+		[ 'info',      './td[@class="ris"]' ],
+		[ 'routeinfo', './td[@class="route"]//span[@class="red bold"]' ],
 	);
 
 	@parts = map { [ $_->[0], XML::LibXML::XPathExpression->new( $_->[1] ) ] }
@@ -200,7 +201,7 @@ sub results {
 
 		my @via;
 		my $first = 1;
-		my ( $time, $train, $route, $dest, $platform, $info )
+		my ( $time, $train, $route, $dest, $platform, $info, $routeinfo )
 		  = map { get_node( $tr, @{$_} ) } @parts;
 		my $e_train_more = ( $tr->findnodes($xp_train_more) )[0];
 
@@ -214,10 +215,11 @@ sub results {
 
 		substr( $date, 6, 0 ) = '20';
 
-		$platform //= q{};
-		$info     //= q{};
+		$platform  //= q{};
+		$info      //= q{};
+		$routeinfo //= q{};
 
-		for my $str ( $time, $train, $dest, $platform, $info ) {
+		for my $str ( $time, $train, $dest, $platform, $info, $routeinfo ) {
 			$str =~ s/\n/ /mg;
 			$str =~ tr/ //s;
 			$str =~ s/^ +//;
@@ -240,14 +242,15 @@ sub results {
 		push(
 			@{ $self->{results} },
 			Travel::Status::DE::DeutscheBahn::Result->new(
-				date      => $date,
-				time      => $time,
-				train     => $train,
-				route_raw => $route,
-				route     => \@via,
-				route_end => $dest,
-				platform  => $platform,
-				info_raw  => $info,
+				date          => $date,
+				time          => $time,
+				train         => $train,
+				route_raw     => $route,
+				route         => \@via,
+				route_end     => $dest,
+				platform      => $platform,
+				info_raw      => $info,
+				routeinfo_raw => $routeinfo,
 			)
 		);
 	}

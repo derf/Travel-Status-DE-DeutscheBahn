@@ -11,7 +11,7 @@ use parent 'Class::Accessor';
 our $VERSION = '1.04';
 
 Travel::Status::DE::DeutscheBahn::Result->mk_ro_accessors(
-	qw(date time train route_end route_raw platform info_raw));
+	qw(date time train route_end route_raw platform info_raw routeinfo_raw));
 
 sub new {
 	my ( $obj, %conf ) = @_;
@@ -73,6 +73,17 @@ sub route {
 
 	my @stops = map { $_->[1] } @{ $self->{route} };
 	return @stops;
+}
+
+sub route_info {
+	my ($self) = @_;
+
+	my $route_info = $self->routeinfo_raw;
+
+	$route_info =~ s{ ^ [\s\n]+ }{}x;
+	$route_info =~ s{ [\s\n]+ $ }{}x;
+
+	return $route_info;
 }
 
 sub route_interesting {
@@ -263,6 +274,11 @@ B<route_raw>.
 
 Similar to B<route>.  however, this function returns a list of array
 references of the form C<< [ arrival time, station name ] >>.
+
+=item $result->route_info
+
+Returns a string containing information related to the train's route, such as
+"landslide between X and Y, expect delays".
 
 =item $result->time
 

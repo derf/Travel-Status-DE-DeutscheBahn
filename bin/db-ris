@@ -90,6 +90,10 @@ sub display_result {
 			@{$line}[ 0 .. 5 ]
 		);
 
+		if ( $line->[7] ) {
+			print "       " . $line->[7] . "\n";
+		}
+
 		if ($show_full_route) {
 			print "\n" . $line->[6] . "\n\n\n";
 		}
@@ -128,6 +132,7 @@ for my $d ( $status->results() ) {
 			$d->info,
 			join( "\n",
 				map { sprintf( '%-5s  %s', @{$_} ) } $d->route_timetable ),
+			$d->route_info,
 		]
 	);
 }
