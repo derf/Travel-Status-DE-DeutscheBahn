@@ -2,6 +2,7 @@ git HEAD
 
     * Result->route_interesting: Also consider airports
     * Result: Add route_info accessor
+    * Result: Add is_cancelled accessor
 
 Travel::Status::DE::DeutscheBahn 1.04 - Sun May 03 2015
 

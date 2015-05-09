@@ -62,6 +62,16 @@ sub delay {
 	return;
 }
 
+sub is_cancelled {
+	my ($self) = @_;
+	my $info = $self->info_raw;
+
+	if ( $info =~ m{ Fahrt \s f.llt \s aus }ox ) {
+		return 1;
+	}
+	return 0;
+}
+
 sub origin {
 	my ($self) = @_;
 
@@ -217,6 +227,10 @@ Returns the train's delay in minutes, or undef if it is unknown.
 
 Returns additional information, for instance the reason why the train is
 delayed. May be an empty string if no (useful) information is available.
+
+=item $result->is_cancelled
+
+True if the train was cancelled, false otherwise.
 
 =item $result->line
 
