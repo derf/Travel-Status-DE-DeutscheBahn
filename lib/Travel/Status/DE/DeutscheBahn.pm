@@ -12,7 +12,7 @@ use POSIX qw(strftime);
 use Travel::Status::DE::DeutscheBahn::Result;
 use XML::LibXML;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 sub new {
 	my ( $obj, %conf ) = @_;
@@ -291,7 +291,7 @@ arrival/departure monitor
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 DESCRIPTION
 
@@ -362,7 +362,7 @@ By default, the following are shown: ice, ic_ec, d, nv, s.
 =item $status->errstr
 
 In case of an error in the HTTP request, returns a string describing it.  If
-no error occured, returns undef.
+no error occurred, returns undef.
 
 =item $status->results
 

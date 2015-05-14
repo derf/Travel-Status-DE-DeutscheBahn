@@ -1,4 +1,4 @@
-git HEAD
+Travel::Status::DE::DeutscheBahn 1.05 - Thu May 14 2015
 
     * Result->route_interesting: Also consider airports
     * Result: Add route_info accessor

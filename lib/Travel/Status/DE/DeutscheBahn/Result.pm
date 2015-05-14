@@ -8,7 +8,7 @@ no if $] >= 5.018, warnings => "experimental::smartmatch";
 
 use parent 'Class::Accessor';
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 Travel::Status::DE::DeutscheBahn::Result->mk_ro_accessors(
 	qw(date time train route_end route_raw platform info_raw routeinfo_raw));
@@ -201,7 +201,7 @@ arrival/departure received by Travel::Status::DE::DeutscheBahn
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 DESCRIPTION
 
@@ -281,7 +281,7 @@ Note that all main stations will be stripped of their "Hbf" suffix.
 
 Returns the raw string used to create the route array.
 
-Note that canceled stops are filtered from B<route>, but still present in
+Note that cancelled stops are filtered from B<route>, but still present in
 B<route_raw>.
 
 =item $result->route_timetable
