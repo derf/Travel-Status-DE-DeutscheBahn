@@ -14,6 +14,14 @@ use XML::LibXML;
 
 our $VERSION = '1.05';
 
+my %hafas_instance = (
+	DB => {
+		url         => 'http://reiseauskunft.bahn.de/bin/bhftafel.exe',
+		name        => 'Deutsche Bahn',
+		productbits => [qw[ice ic_ec d nv s bus ferry u tram ondemand x x x x]],
+	}
+);
+
 sub new {
 	my ( $obj, %conf ) = @_;
 
@@ -46,21 +54,13 @@ sub new {
 			boardType => $mode,
 			L         => 'vs_java3',
 		},
-		service => {
-			DB => {
-				url  => 'http://reiseauskunft.bahn.de/bin/bhftafel.exe',
-				name => 'Deutsche Bahn',
-				productbits =>
-				  [qw[ice ic_ec d nv s bus ferry u tram ondemand x x x x]],
-			}
-		},
 	};
 
 	bless( $ref, $obj );
 
 	$ref->set_productfilter;
 
-	my $url = $ref->{service}{$service}{url} . '/' . $lang . 'n';
+	my $url = $hafas_instance{$service}{url} . '/' . $lang . 'n';
 
 	$reply = $ua->post( $url, $ref->{post} );
 
@@ -101,7 +101,7 @@ sub set_productfilter {
 	my $service = $self->{active_service};
 
 	$self->{post}{productsFilter}
-	  = '1' x ( scalar @{ $self->{service}{$service}{productbits} } );
+	  = '1' x ( scalar @{ $hafas_instance{$service}{productbits} } );
 }
 
 sub check_input_error {
@@ -195,6 +195,19 @@ sub results {
 
 # static
 sub get_services {
+	my @services;
+	for my $service ( sort keys %hafas_instance ) {
+		my %desc = %{ $hafas_instance{$service} };
+		$desc{shortname} = $service;
+		push( @services, \%desc );
+	}
+	return @services;
+}
+
+sub get_service {
+	my ($self) = @_;
+
+	return %{ $hafas_instance{ $self->active_service } };
 }
 
 1;

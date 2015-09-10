@@ -17,6 +17,7 @@ my $ignore_late = 0;
 my $types       = q{};
 my $language;
 my $developer_mode;
+my $list_services;
 
 my @output;
 
@@ -32,8 +33,17 @@ GetOptions(
 	't|time=s'      => \$time,
 	'V|version'     => \&show_version,
 	'devmode'       => \$developer_mode,
+	'list'          => \$list_services,
 
 ) or show_help(1);
+
+if ($list_services) {
+	printf( "%-40s %-14s %s\n\n", 'operator', 'abbr. (-s)', 'url (-u)' );
+	for my $service ( Travel::Status::DE::HAFAS::get_services() ) {
+		printf( "%-40s %-14s %s\n", @{$service}{qw(name shortname url)} );
+	}
+	exit 0;
+}
 
 for my $type ( split( qr{,}, $types ) ) {
 	if ( substr( $type, 0, 1 ) eq q{!} ) {
