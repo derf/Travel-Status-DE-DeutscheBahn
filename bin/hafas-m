@@ -137,7 +137,7 @@ for my $d ( $status->results() ) {
 			$d->time,
 			$d->is_cancelled
 			? 'CANCELED'
-			: ( $d->delay ? '+' . $d->delay : q{} ),
+			: ( $d->delay ? sprintf( '%+d', $d->delay ) : q{} ),
 			$d->train,
 			$d->route_end,
 			( $d->platform // q{} ) . ( $d->is_changed_platform ? ' !' : q{} ),
