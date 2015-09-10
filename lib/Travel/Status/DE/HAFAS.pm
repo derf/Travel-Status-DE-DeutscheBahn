@@ -27,9 +27,9 @@ sub new {
 
 	my $date = $conf{date} // strftime( '%d.%m.%Y', localtime(time) );
 	my $time = $conf{time} // strftime( '%H:%M',    localtime(time) );
-	my $lang    = $conf{language} // 'd';
-	my $mode    = $conf{mode}     // 'dep';
-	my $service = $conf{service}  // 'DB';
+	my $lang = $conf{language} // 'd';
+	my $mode = $conf{mode}     // 'dep';
+	my $service = $conf{service};
 
 	my %lwp_options = %{ $conf{lwp_options} // { timeout => 10 } };
 
@@ -41,6 +41,10 @@ sub new {
 
 	if ( not $conf{station} ) {
 		confess('You need to specify a station');
+	}
+
+	if ( not defined $service and not defined $conf{url} ) {
+		$service = 'DB';
 	}
 
 	my $ref = {
@@ -60,7 +64,7 @@ sub new {
 
 	$ref->set_productfilter;
 
-	my $url = $hafas_instance{$service}{url} . '/' . $lang . 'n';
+	my $url = ( $conf{url} // $hafas_instance{$service}{url} ) . "/${lang}n";
 
 	$reply = $ua->post( $url, $ref->{post} );
 
@@ -100,8 +104,10 @@ sub set_productfilter {
 
 	my $service = $self->{active_service};
 
-	$self->{post}{productsFilter}
-	  = '1' x ( scalar @{ $hafas_instance{$service}{productbits} } );
+	if ($service) {
+		$self->{post}{productsFilter}
+		  = '1' x ( scalar @{ $hafas_instance{$service}{productbits} } );
+	}
 }
 
 sub check_input_error {
@@ -207,7 +213,7 @@ sub get_services {
 sub get_service {
 	my ($self) = @_;
 
-	return %{ $hafas_instance{ $self->active_service } };
+	return %{ $hafas_instance{ $self->{active_service} } };
 }
 
 1;
