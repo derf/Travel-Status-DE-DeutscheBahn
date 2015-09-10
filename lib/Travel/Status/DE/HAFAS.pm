@@ -15,11 +15,21 @@ use XML::LibXML;
 our $VERSION = '1.05';
 
 my %hafas_instance = (
+	BVG => {
+		url => 'http://bvg.hafas.de/bin/stboard.exe',
+		name => 'Berliner Verkehrsgesellschaft',
+		productbits => [qw[s u tram bus ferry ice regio ondemand]],
+	},
 	DB => {
 		url         => 'http://reiseauskunft.bahn.de/bin/bhftafel.exe',
 		name        => 'Deutsche Bahn',
-		productbits => [qw[ice ic_ec d nv s bus ferry u tram ondemand x x x x]],
-	}
+		productbits => [qw[ice ic_ec d regio s bus ferry u tram ondemand x x x x]],
+	},
+	NASA => {
+		url => 'http://reiseauskunft.insa.de/bin/stboard.exe',
+		name => 'Nahverkehrsservice Sachsen-Anhalt',
+		productbits => [qw[ice ice regio regio regio tram bus ondemand]],
+	},
 );
 
 sub new {
@@ -104,7 +114,7 @@ sub set_productfilter {
 
 	my $service = $self->{active_service};
 
-	if ($service) {
+	if ($service and exists $hafas_instance{$service}{productbits}) {
 		$self->{post}{productsFilter}
 		  = '1' x ( scalar @{ $hafas_instance{$service}{productbits} } );
 	}
