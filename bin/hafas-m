@@ -6,6 +6,7 @@ use 5.010;
 our $VERSION = '1.05';
 
 use Getopt::Long qw(:config no_ignore_case);
+use List::MoreUtils qw(uniq);
 use List::Util qw(first max);
 use Travel::Status::DE::HAFAS;
 
@@ -56,6 +57,16 @@ for my $type ( split( qr{,}, $types ) ) {
 	else {
 		$train_type{$type} = 1;
 	}
+}
+
+if ( $train_type{help} or $train_type{list} or $train_type{'?'} ) {
+	my @mots
+	  = @{ Travel::Status::DE::HAFAS::get_service($service)->{productbits} };
+	@mots = grep { $_ ne 'x' } @mots;
+	@mots = uniq @mots;
+	@mots = sort @mots;
+	say join( "\n", @mots );
+	exit 0;
 }
 
 my $status = Travel::Status::DE::HAFAS->new(

@@ -237,7 +237,16 @@ sub get_services {
 	return @services;
 }
 
+# static
 sub get_service {
+	my ($service) = @_;
+
+	$service //= 'DB';
+
+	return $hafas_instance{$service};
+}
+
+sub get_active_service {
 	my ($self) = @_;
 
 	return %{ $hafas_instance{ $self->{active_service} } };
