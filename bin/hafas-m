@@ -10,8 +10,6 @@ use List::MoreUtils qw(uniq);
 use List::Util qw(first max);
 use Travel::Status::DE::HAFAS;
 
-my %train_type;
-
 my ( $date, $time );
 my $arrivals    = 0;
 my $ignore_late = 0;
@@ -19,7 +17,7 @@ my $types       = q{};
 my $language;
 my $developer_mode;
 my ( $list_services, $service, $hafas_url );
-my @excluded_mots;
+my ( @excluded_mots, @exclusive_mots );
 
 my @output;
 
@@ -49,30 +47,13 @@ if ($list_services) {
 	exit 0;
 }
 
-for my $type ( split( qr{,}, $types ) ) {
-	if ( substr( $type, 0, 1 ) eq q{!} ) {
-		$train_type{ substr( $type, 1 ) } = 0;
-		push( @excluded_mots, substr( $type, 1 ) );
-	}
-	else {
-		$train_type{$type} = 1;
-	}
-}
-
-if ( $train_type{help} or $train_type{list} or $train_type{'?'} ) {
-	my @mots
-	  = @{ Travel::Status::DE::HAFAS::get_service($service)->{productbits} };
-	@mots = grep { $_ ne 'x' } @mots;
-	@mots = uniq @mots;
-	@mots = sort @mots;
-	say join( "\n", @mots );
-	exit 0;
-}
+parse_mot_options();
 
 my $status = Travel::Status::DE::HAFAS->new(
 	date           => $date,
 	language       => $language,
 	excluded_mots  => \@excluded_mots,
+	exclusive_mots => \@exclusive_mots,
 	station        => shift || show_help(1),
 	time           => $time,
 	mode           => $arrivals ? 'arr' : 'dep',
@@ -95,6 +76,31 @@ sub show_version {
 	say "hafas-m version ${VERSION}";
 
 	exit 0;
+}
+
+sub parse_mot_options {
+
+	my $default_yes = 1;
+	my $help;
+
+	for my $type ( split( qr{,}, $types ) ) {
+		if ( $type eq 'help' or $type eq 'list' or $type eq '?' ) {
+			my @mots
+			  = @{ Travel::Status::DE::HAFAS::get_service($service)
+				  ->{productbits} };
+			@mots = grep { $_ ne 'x' } @mots;
+			@mots = uniq @mots;
+			@mots = sort @mots;
+			say join( "\n", @mots );
+			exit 0;
+		}
+		elsif ( substr( $type, 0, 1 ) eq q{!} ) {
+			push( @excluded_mots, substr( $type, 1 ) );
+		}
+		else {
+			push( @exclusive_mots, $type );
+		}
+	}
 }
 
 sub display_result {

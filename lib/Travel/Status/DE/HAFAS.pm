@@ -61,6 +61,7 @@ sub new {
 	my $ref = {
 		active_service => $service,
 		developer_mode => $conf{developer_mode},
+		exclusive_mots => $conf{exclusive_mots},
 		excluded_mots  => $conf{excluded_mots},
 		post           => {
 			input => $conf{station},
@@ -114,26 +115,42 @@ sub new {
 sub set_productfilter {
 	my ($self) = @_;
 
-	my $service = $self->{active_service};
+	my $service     = $self->{active_service};
+	my $mot_default = '1';
 
 	if ( not $service or not exists $hafas_instance{$service}{productbits} ) {
 		return;
 	}
 
-	$self->{post}{productsFilter}
-	  = '1' x ( scalar @{ $hafas_instance{$service}{productbits} } );
+	my %mot_pos;
+	for my $i ( 0 .. $#{ $hafas_instance{$service}{productbits} } ) {
+		$mot_pos{ $hafas_instance{$service}{productbits}[$i] } = $i;
+	}
 
-	if ( $self->{excluded_mots} and @{ $self->{excluded_mots} } ) {
-		my %mot_pos;
-		for my $i ( 0 .. $#{ $hafas_instance{$service}{productbits} } ) {
-			$mot_pos{ $hafas_instance{$service}{productbits}[$i] } = $i;
-		}
-		for my $mot ( @{ $self->{excluded_mots} } ) {
+	if ( $self->{exclusive_mots} and @{ $self->{exclusive_mots} } ) {
+		$mot_default = '0';
+	}
+
+	$self->{post}{productsFilter}
+	  = $mot_default x ( scalar @{ $hafas_instance{$service}{productbits} } );
+
+	if ( $self->{exclusive_mots} and @{ $self->{exclusive_mots} } ) {
+		for my $mot ( @{ $self->{exclusive_mots} } ) {
 			if ( exists $mot_pos{$mot} ) {
-				substr( $self->{post}{productsFilter}, $mot_pos{$mot}, 1 ) = 0;
+				substr( $self->{post}{productsFilter}, $mot_pos{$mot}, 1, '1' );
 			}
 		}
 	}
+
+	if ( $self->{excluded_mots} and @{ $self->{excluded_mots} } ) {
+		for my $mot ( @{ $self->{excluded_mots} } ) {
+			if ( exists $mot_pos{$mot} ) {
+				substr( $self->{post}{productsFilter}, $mot_pos{$mot}, 1, '0' );
+			}
+		}
+	}
+
+	say $self->{post}{productsFilter};
 
 }
 
@@ -198,7 +215,7 @@ sub results {
 			push( @messages, $n->getAttribute('header') );
 		}
 
-		substr( $date, 6, 0 ) = '20';
+		substr( $date, 6, 0, '20' );
 
 		$info      //= q{};
 		$routeinfo //= q{};
