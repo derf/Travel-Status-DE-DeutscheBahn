@@ -218,23 +218,15 @@ Do not display delayed trains.
 
 =item B<-m>, B<--mot> I<motlist>
 
-Comma-separated list of modes of transport to show/hide.  Accepts the following
-arguments:
+By default, B<hafas-m> shows all modes of transport arriving/departing at the
+specified station. With I<motlist>, it is possible to either exclude a list of
+modes, or exclusively show only a select list of modes.
 
-	ice    InterCity Express trains
-	ic_ec  InterCity / EuroCity trains
-	d      InterRegio and similar
-	nv     "Nahverkehr", RegionalExpress and such
-	s      S-Bahn
-	bus
-	ferry
-	u      U-Bahn
-	tram
+To exclude modes, set I<motlist> to B<!>I<mot1>,B<!>I<mot2>,...
 
-You can prefix an argument with "!" to hide it.  The default is C<<
-ice,ic_ec,d,nv,s >>.  Note that B<-m> does not replace the default, so if you
-only want to see S-Bahn and U-Bahn departures, you'd have to use C<< -m
-!ice,!ic_ec,!d,!nv,u >>.
+To show them exclusively, set I<motlist> to I<mot1>,I<mot2>,...
+
+The I<mot> types depend on the used service. Use C<< -m help >> to list them.
 
 =item B<-t>, B<--time> I<hh>:I<mm>
 
