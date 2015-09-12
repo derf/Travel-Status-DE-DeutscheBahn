@@ -31,6 +31,12 @@ my %hafas_instance = (
 		name        => 'Nahverkehrsservice Sachsen-Anhalt',
 		productbits => [qw[ice ice regio regio regio tram bus ondemand]],
 	},
+	NVV => {
+		url  => 'http://auskunft.nvv.de/auskunft/bin/jp/stboard.exe',
+		name => 'Nordhessischer VerkehrsVerbund',
+		productbits =>
+		  [qw[ice ic_ec regio s u tram bus bus ferry ondemand regio regio]],
+	},
 );
 
 sub new {
@@ -92,16 +98,25 @@ sub new {
 	  . $reply->content
 	  . '</wrap>';
 
+	if ( defined $service and $service eq 'NVV' ) {
+
+		# Returns invalid XML with tags inside HIMMessage's lead attribute.
+		# Fix this.
+		# Also, I couldn't get this to work with
+		#   $ref->{raw_xml} =~ s{ ( lead = " [^"]+? ) < [^>]* > }{$1}xg;
+		# and am probably missing some essential caveat here.
+		# Working patches are very welcome.
+		while ( $ref->{raw_xml} =~ m{ lead = " [^"]+ < }x ) {
+			$ref->{raw_xml} =~ s{ ( lead = " [^"]+ ) < [^>]* > }{$1}x;
+		}
+	}
+
 	if ( $ref->{developer_mode} ) {
 		say $ref->{raw_xml};
 	}
 
 	$ref->{tree} = XML::LibXML->load_xml(
 		string => $ref->{raw_xml},
-
-		#		recover           => 2,
-		#		suppress_errors   => 1,
-		#		suppress_warnings => 1,
 	);
 
 	if ( $ref->{developer_mode} ) {
