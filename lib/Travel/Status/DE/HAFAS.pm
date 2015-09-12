@@ -102,13 +102,7 @@ sub new {
 
 		# Returns invalid XML with tags inside HIMMessage's lead attribute.
 		# Fix this.
-		# Also, I couldn't get this to work with
-		#   $ref->{raw_xml} =~ s{ ( lead = " [^"]+? ) < [^>]* > }{$1}xg;
-		# and am probably missing some essential caveat here.
-		# Working patches are very welcome.
-		while ( $ref->{raw_xml} =~ m{ lead = " [^"]+ < }x ) {
-			$ref->{raw_xml} =~ s{ ( lead = " [^"]+ ) < [^>]* > }{$1}x;
-		}
+		$ref->{raw_xml} =~ s{ lead = " \K ( [^"]+ ) }{ $1 =~ s{ < [^>]+ > }{}egr }ex;
 	}
 
 	if ( $ref->{developer_mode} ) {
