@@ -3,6 +3,7 @@ package Travel::Status::DE::HAFAS;
 use strict;
 use warnings;
 use 5.010;
+use utf8;
 
 no if $] >= 5.018, warnings => "experimental::smartmatch";
 
@@ -26,6 +27,11 @@ my %hafas_instance = (
 		productbits =>
 		  [qw[ice ic_ec d regio s bus ferry u tram ondemand x x x x]],
 	},
+	NAHSH => {
+		url         => 'http://nah.sh.hafas.de/bin/stboard.exe',
+		name        => 'Nahverkehrsverbund Schleswig-Holstein',
+		productbits => [qw[ice ice ice regio s bus ferry u tram ondemand]],
+	},
 	NASA => {
 		url         => 'http://reiseauskunft.insa.de/bin/stboard.exe',
 		name        => 'Nahverkehrsservice Sachsen-Anhalt',
@@ -36,6 +42,33 @@ my %hafas_instance = (
 		name => 'Nordhessischer VerkehrsVerbund',
 		productbits =>
 		  [qw[ice ic_ec regio s u tram bus bus ferry ondemand regio regio]],
+	},
+	'ÖBB' => {
+		url  => 'http://fahrplan.oebb.at/bin/stboard.exe',
+		name => 'Österreichische Bundesbahnen',
+		productbits =>
+		  [qw[ice ice ice regio regio s bus ferry u tram ice ondemand ice]],
+	},
+	RSAG => {
+		url         => 'http://fahrplan.rsag-online.de/hafas/stboard.exe',
+		name        => 'Rostocker Straßenbahn AG',
+		productbits => [qw[ice ice ice regio s bus ferry u tram ondemand]],
+	},
+	SBB => {
+		url  => 'http://fahrplan.sbb.ch/bin/stboard.exe',
+		name => 'Schweizerische Bundesbahnen',
+		productbits =>
+		  [qw[ice ice regio regio ferry s bus cablecar regio tram]],
+	},
+	VBB => {
+		url         => 'http://fahrinfo.vbb.de/bin/stboard.exe',
+		name        => 'Verkehrsverbund Berlin-Brandenburg',
+		productbits => [qw[s u tram bus ferry ice regio]],
+	},
+	VBN => {
+		url         => 'https://fahrplaner.vbn.de/hafas/stboard.exe',
+		name        => 'Verkehrsverbund Bremen/Niedersachsen',
+		productbits => [qw[ice ice regio regio s bus ferry u tram ondemand]],
 	},
 );
 
@@ -92,17 +125,22 @@ sub new {
 		return $ref;
 	}
 
-	# the interface does not return valid XML (but it's close!)
-	$ref->{raw_xml}
-	  = '<?xml version="1.0" encoding="iso-8859-15"?><wrap>'
-	  . $reply->content
-	  . '</wrap>';
+	$ref->{raw_xml} = $reply->content;
+
+	# the interface often does not return valid XML (but it's close!)
+	if ( substr( $ref->{raw_xml}, 0, 5 ) ne '<?xml' ) {
+		$ref->{raw_xml}
+		  = '<?xml version="1.0" encoding="iso-8859-15"?><wrap>'
+		  . $ref->{raw_xml}
+		  . '</wrap>';
+	}
 
 	if ( defined $service and $service eq 'NVV' ) {
 
 		# Returns invalid XML with tags inside HIMMessage's lead attribute.
 		# Fix this.
-		$ref->{raw_xml} =~ s{ lead = " \K ( [^"]+ ) }{ $1 =~ s{ < [^>]+ > }{}egr }ex;
+		$ref->{raw_xml}
+		  =~ s{ lead = " \K ( [^"]+ ) }{ $1 =~ s{ < [^>]+ > }{}egr }ex;
 	}
 
 	if ( $ref->{developer_mode} ) {
