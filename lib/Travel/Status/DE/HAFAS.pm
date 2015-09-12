@@ -150,8 +150,6 @@ sub set_productfilter {
 		}
 	}
 
-	say $self->{post}{productsFilter};
-
 }
 
 sub check_input_error {
