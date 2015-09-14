@@ -333,9 +333,10 @@ sub get_services {
 sub get_service {
 	my ($service) = @_;
 
-	$service //= 'DB';
-
-	return $hafas_instance{$service};
+	if ( defined $service ) {
+		return $hafas_instance{$service};
+	}
+	return;
 }
 
 sub get_active_service {

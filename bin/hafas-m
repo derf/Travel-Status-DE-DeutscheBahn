@@ -85,14 +85,19 @@ sub parse_mot_options {
 
 	for my $type ( split( qr{,}, $types ) ) {
 		if ( $type eq 'help' or $type eq 'list' or $type eq '?' ) {
-			my @mots
-			  = @{ Travel::Status::DE::HAFAS::get_service($service)
-				  ->{productbits} };
-			@mots = grep { $_ ne 'x' } @mots;
-			@mots = uniq @mots;
-			@mots = sort @mots;
-			say join( "\n", @mots );
-			exit 0;
+			my $desc = Travel::Status::DE::HAFAS::get_service($service);
+			  if ($desc) {
+				my @mots = @{ $desc->{productbits} };
+				@mots = grep { $_ ne 'x' } @mots;
+				@mots = uniq @mots;
+				@mots = sort @mots;
+				say join( "\n", @mots );
+				exit 0;
+			}
+			else {
+				say STDERR 'no modes of transport known for this service';
+				exit 1;
+			}
 		}
 		elsif ( substr( $type, 0, 1 ) eq q{!} ) {
 			push( @excluded_mots, substr( $type, 1 ) );
@@ -213,8 +218,7 @@ departure screens installed at most main stations.
 
 Show arrivals instead of departures, including trains ending at the specified
 station. Note that this causes the output to display the start instead of
-the end station and B<-f> to list all stops between start end
-I<station>, not I<station> and end.
+the end station.
 
 =item B<-d>, B<--date> I<dd>.I<mm>.I<yyyy>
 
@@ -223,11 +227,15 @@ Date to list departures for.  Default: today.
 =item B<-l>, B<--lang> B<d>|B<e>|B<i>|B<n>
 
 Set language used for additional information. Supports B<d>eutsch (default),
-B<e>nglish, B<i>talian and dutch (B<n>).
+B<e>nglish, B<i>talian and dutch (B<n>), depending on the used service.
 
 =item B<-L>, B<--ignore-late>
 
 Do not display delayed trains.
+
+=item B<--list>
+
+List known HAFAS installations. See also B<--service> and B<--url>.
 
 =item B<-m>, B<--mot> I<motlist>
 
@@ -241,9 +249,23 @@ To show them exclusively, set I<motlist> to I<mot1>,I<mot2>,...
 
 The I<mot> types depend on the used service. Use C<< -m help >> to list them.
 
+=item B<-s>, B<--service> I<service>
+
+Request arrivals/departures using the API provided by I<service>, defaults
+to DB (Deutsche Bahn). See B<--list> for a list of known services.
+
 =item B<-t>, B<--time> I<hh>:I<mm>
 
 Time to list departures for.  Default: now.
+
+=item B<-u>, B<--url> I<url>
+
+Request arrivals/departures using the API entry point at I<url>, defaults to
+C<< http://reiseauskunft.bahn.de/bin/bhftafel.exe >>. Note that the language
+and output selection suffix (e.g. "/dn") must not be included here.
+
+Again, see B<--list> for a list of known URLs. Unknown URLs are also
+supported, though note that B<--mot> will not work when using this opton.
 
 =item B<-V>, B<--version>
 
