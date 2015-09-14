@@ -1,0 +1,205 @@
+package Travel::Status::DE::HAFAS::StopFinder;
+
+use strict;
+use warnings;
+use 5.010;
+use utf8;
+
+no if $] >= 5.018, warnings => 'experimental::smartmatch';
+
+use Carp qw(confess);
+use JSON;
+use LWP::UserAgent;
+
+our $VERSION = '1.05';
+
+sub new {
+	my ( $obj, %conf ) = @_;
+
+	my $lang = $conf{language} // 'd';
+
+	my %lwp_options = %{ $conf{lwp_options} // { timeout => 10 } };
+
+	my $ua = LWP::UserAgent->new(%lwp_options);
+
+	$ua->env_proxy;
+
+	my $reply;
+
+	if ( not $conf{input} ) {
+		confess('You need to specify an input value');
+	}
+	if ( not $conf{url} ) {
+		confess('You need to specify a URL');
+	}
+
+	my $ref = {
+		developer_mode => $conf{developer_mode},
+		post           => {
+			getstop             => 1,
+			REQ0JourneyStopsS0A => 255,
+			REQ0JourneyStopsS0G => $conf{input},
+		},
+	};
+
+	bless( $ref, $obj );
+
+	my $url = $conf{url} . "/${lang}n";
+
+	$reply = $ua->post( $url, $ref->{post} );
+
+	if ( $reply->is_error ) {
+		$ref->{errstr} = $reply->status_line;
+		return $ref;
+	}
+
+	$ref->{raw_reply} = $reply->content;
+
+	$ref->{raw_reply} =~ s{ ^ SLs [.] sls = }{}x;
+	$ref->{raw_reply} =~ s{ ; SLs [.] showSuggestion [(] [)] ; $ }{}x;
+
+	if ( $ref->{developer_mode} ) {
+		say $ref->{raw_reply};
+	}
+
+	$ref->{json} = from_json( $ref->{raw_reply} );
+
+	return $ref;
+}
+
+sub errstr {
+	my ($self) = @_;
+
+	return $self->{errstr};
+}
+
+sub results {
+	my ($self) = @_;
+
+	$self->{results} = [];
+
+	for my $result ( @{ $self->{json}->{suggestions} } ) {
+		if ( $result->{typeStr} eq '[Bhf/Hst]' ) {
+			push(
+				@{ $self->{results} },
+				{
+					name => $result->{value},
+					id   => $result->{extId}
+				}
+			);
+		}
+	}
+
+	return @{ $self->{results} };
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+Travel::Status::DE::HAFAS::StopFinder - Interface to HAFAS-based online stop
+finder services
+
+=head1 SYNOPSIS
+
+	use Travel::Status::DE::HAFAS::StopFinder;
+
+	my $sf = Travel::Status::DE::HAFAS::StopFinder->new(
+		url => 'http://reiseauskunft.bahn.de/bin/ajax-getstop.exe',
+		input => 'Borbeck',
+	);
+
+	if (my $err = $sf->errstr) {
+		die("Request error: ${err}\n");
+	}
+
+	for my $candidate ($sf->results) {
+		printf("%s (%s)\n", $candidate->{name}, $candidate->{id});
+	}
+
+=head1 VERSION
+
+version 1.05
+
+=head1 DESCRIPTION
+
+Travel::Status::DE::HAFAS::StopFinder is an interface to the stop finder
+service of HAFAS based arrival/departure monitors, for instance the one
+available at L<http://reiseauskunft.bahn.de/bin/ajax-getstop.exe/dn>.
+
+It takes a string (usually a location or station name) and reports all
+stations and stops which are lexically similar to it.
+
+=head1 METHODS
+
+=over
+
+=item my $stopfinder = Travel::Status::DE::HAFAS::StopFinder->new(I<%opts>)
+
+Looks up stops as specified by I<opts> and teruns a new
+Travel::Status::DE::HAFAS::StopFinder element with the results.  Dies if the
+wrong I<opts> were passed.
+
+Supported I<opts> are:
+
+=over
+
+=item B<input> => I<string>
+
+string to look up, e.g. "Borbeck" or "Koeln Bonn Flughafen". Mandatory.
+
+=item B<url> => I<url>
+
+Base I<url> of the stop finder service, without the language and mode
+suffix ("/dn" and similar). Mandatory. See Travel::Status::DE::HAFAS(3pm)'s
+B<get_services> method for a list of URLs.
+
+=back
+
+=item $status->errstr
+
+In case of an error in the HTTP request, returns a string describing it.  If
+no error occurred, returns undef.
+
+=item $status->results
+
+Returns a list of stop candidates. Each list element is a hash reference. The
+hash keys are B<id> (IBNR) and B<name> (stop name). Both can be used as input
+for the Travel::Status::DE::HAFAS(3pm) constructor.
+
+If no matching results were found or the parser / http request failed, returns
+the empty list.
+
+=back
+
+=head1 DIAGNOSTICS
+
+None.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item * LWP::UserAgent(3pm)
+
+=item * JSON(3pm)
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+Unknown.
+
+=head1 SEE ALSO
+
+Travel::Status::DE::HAFAS(3pm).
+
+=head1 AUTHOR
+
+Copyright (C) 2015 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+
+=head1 LICENSE
+
+This module is licensed under the same terms as Perl itself.
