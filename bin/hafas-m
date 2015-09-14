@@ -103,6 +103,16 @@ sub parse_mot_options {
 	}
 }
 
+sub show_similar_stops {
+	my @candidates = $status->similar_stops;
+	if (@candidates) {
+		say 'You might want to try one of the following stops:';
+		for my $c (@candidates) {
+			printf( "%s (%s)\n", $c->{name}, $c->{id} );
+		}
+	}
+}
+
 sub display_result {
 	my (@lines) = @_;
 
@@ -141,6 +151,9 @@ sub display_result {
 
 if ( my $err = $status->errstr ) {
 	say STDERR "Request error: ${err}";
+	if ( $status->errcode and $status->errcode eq 'H730' ) {
+		show_similar_stops();
+	}
 	exit 2;
 }
 

@@ -11,6 +11,7 @@ use Carp qw(confess);
 use LWP::UserAgent;
 use POSIX qw(strftime);
 use Travel::Status::DE::HAFAS::Result;
+use Travel::Status::DE::HAFAS::StopFinder;
 use XML::LibXML;
 
 our $VERSION = '1.05';
@@ -18,12 +19,14 @@ our $VERSION = '1.05';
 my %hafas_instance = (
 	BVG => {
 		url         => 'http://bvg.hafas.de/bin/stboard.exe',
+		stopfinder  => 'http://bvg.hafas.de/bin/ajax-getstop.exe',
 		name        => 'Berliner Verkehrsgesellschaft',
 		productbits => [qw[s u tram bus ferry ice regio ondemand]],
 	},
 	DB => {
-		url  => 'http://reiseauskunft.bahn.de/bin/bhftafel.exe',
-		name => 'Deutsche Bahn',
+		url        => 'http://reiseauskunft.bahn.de/bin/bhftafel.exe',
+		stopfinder => 'http://reiseauskunft.bahn.de/bin/ajax-getstop.exe',
+		name       => 'Deutsche Bahn',
 		productbits =>
 		  [qw[ice ic_ec d regio s bus ferry u tram ondemand x x x x]],
 	},
@@ -102,6 +105,7 @@ sub new {
 		developer_mode => $conf{developer_mode},
 		exclusive_mots => $conf{exclusive_mots},
 		excluded_mots  => $conf{excluded_mots},
+		station        => $conf{station},
 		post           => {
 			input => $conf{station},
 			date  => $date,
@@ -210,15 +214,41 @@ sub check_input_error {
 		  = $err->getAttribute('text')
 		  . ' (code '
 		  . $err->getAttribute('code') . ')';
+		$self->{errcode} = $err->getAttribute('code');
 	}
 
 	return;
+}
+
+sub errcode {
+	my ($self) = @_;
+
+	return $self->{errcode};
 }
 
 sub errstr {
 	my ($self) = @_;
 
 	return $self->{errstr};
+}
+
+sub similar_stops {
+	my ($self) = @_;
+
+	my $service = $self->{active_service};
+
+	if ( $service and exists $hafas_instance{$service}{stopfinder} ) {
+		my $sf = Travel::Status::DE::HAFAS::StopFinder->new(
+			url   => $hafas_instance{$service}{stopfinder},
+			input => $self->{station},
+		);
+		if ( my $err = $sf->errstr ) {
+			$self->{errstr} = $err;
+			return;
+		}
+		return $sf->results;
+	}
+	return;
 }
 
 sub results {
