@@ -5,6 +5,7 @@ use 5.010;
 
 our $VERSION = '1.05';
 
+use Encode qw(decode);
 use Getopt::Long qw(:config no_ignore_case);
 use List::MoreUtils qw(uniq);
 use List::Util qw(first max);
@@ -22,6 +23,9 @@ my ( @excluded_mots, @exclusive_mots );
 my @output;
 
 binmode( STDOUT, ':encoding(utf-8)' );
+for my $arg (@ARGV) {
+	$arg = decode( 'UTF-8', $arg );
+}
 
 GetOptions(
 	'a|arrivals'    => \$arrivals,
@@ -86,7 +90,7 @@ sub parse_mot_options {
 	for my $type ( split( qr{,}, $types ) ) {
 		if ( $type eq 'help' or $type eq 'list' or $type eq '?' ) {
 			my $desc = Travel::Status::DE::HAFAS::get_service($service);
-			  if ($desc) {
+			if ($desc) {
 				my @mots = @{ $desc->{productbits} };
 				@mots = grep { $_ ne 'x' } @mots;
 				@mots = uniq @mots;
