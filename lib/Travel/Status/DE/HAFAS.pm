@@ -342,7 +342,7 @@ sub get_service {
 	my ($service) = @_;
 
 	if ( defined $service ) {
-		return $hafas_instance{$service};
+		return %{ $hafas_instance{$service} };
 	}
 	return;
 }
@@ -414,50 +414,70 @@ Supported I<opts> are:
 
 =item B<station> => I<station>
 
-The train station to report for, e.g.  "Essen HBf" or
+The station or stop to report for, e.g.  "Essen HBf" or
 "Alfredusbad, Essen (Ruhr)".  Mandatory.
 
 =item B<date> => I<dd>.I<mm>.I<yyyy>
 
 Date to report for.  Defaults to the current day.
 
+=item B<excluded_mots> => [I<mot1>, I<mot2>, ...]
+
+By default, all modes of transport (trains, trams, buses etc.) are returned.
+If this option is set, all modes appearing in I<mot1>, I<mot2>, ... will
+be excluded. The supported modes depend on B<service>, use
+B<get_services> or B<get_service> to get the supported values.
+
+Note that this parameter does not work if the B<url> parameter is set.
+
+=item B<exclusive_mots> => [I<mot1>, I<mot2>, ...]
+
+If this option is set, only the modes of transport appearing in I<mot1>,
+I<mot2>, ...  will be returned.  The supported modes depend on B<service>, use
+B<get_services> or B<get_service> to get the supported values.
+
+Note that this parameter does not work if the B<url> parameter is set.
+
 =item B<language> => I<language>
 
-Set language for additional information. Accepted arguments: B<d>eutsch,
-B<e>nglish, B<i>talian, B<n> (dutch).
+Set language for additional information. Accepted arguments are B<d>eutsch,
+B<e>nglish, B<i>talian and B<n> (dutch), depending on the used service.
 
 =item B<lwp_options> => I<\%hashref>
 
 Passed on to C<< LWP::UserAgent->new >>. Defaults to C<< { timeout => 10 } >>,
 you can use an empty hashref to override it.
 
-=item B<time> => I<hh>:I<mm>
-
-Time to report for.  Defaults to now.
-
 =item B<mode> => B<arr>|B<dep>
 
 By default, Travel::Status::DE::HAFAS reports train departures
 (B<dep>).  Set this to B<arr> to get arrivals instead.
 
-=item B<mot> => I<\%hashref>
+=item B<service> => I<service>
 
-Modes of transport to show.  Accepted keys are: B<ice> (ICE trains), B<ic_ec>
-(IC and EC trains), B<d> (InterRegio and similarly fast trains), B<nv>
-("Nahverkehr", mostly RegionalExpress trains), B<s> ("S-Bahn"), B<bus>,
-B<ferry>, B<u> ("U-Bahn") and B<tram>.
+Request results from I<service>, defaults to "DB".
+See B<get_services> (and C<< hafas-m --list >>) for a list of supported
+services.
 
-Setting a mode (as hash key) to 1 includes it, 0 excludes it.  undef leaves it
-at the default.
+=item B<time> => I<hh>:I<mm>
 
-By default, the following are shown: ice, ic_ec, d, nv, s.
+Time to report for.  Defaults to now.
+
+=item B<url> => I<url>
+
+Request results from I<url>, defaults to the one belonging to B<service>.
 
 =back
 
+=item $status->errcode
+
+In case of an error in the HAFAS backend, returns the corresponding error code
+as string. If no backend error occurred, returns undef.
+
 =item $status->errstr
 
-In case of an error in the HTTP request, returns a string describing it.  If
-no error occurred, returns undef.
+In case of an error in the HTTP request or HAFAS backend, returns a string
+describing it.  If no error occurred, returns undef.
 
 =item $status->results
 
@@ -466,6 +486,36 @@ Travel::Status::DE::HAFAS::Result(3pm) object.
 
 If no matching results were found or the parser / http request failed, returns
 undef.
+
+=item $status->similar_stops
+
+Returns a list of hashes describing stops whose name is similar to the one
+requested in the constructor's B<station> parameter. Returns nothing if
+the active service does not support this feature.
+This is most useful if B<errcode> returns 'H730', which means that the
+HAFAS backend could not identify the stop.
+
+See Travel::Status::DE::HAFAS::StopFinder(3pm)'s B<results> method for details
+on the return value.
+
+=item $status->get_active_service
+
+Returns a hash describing the active service. Contains the keys
+B<url> (URL to the station board service), B<stopfinder> (URL to the
+stopfinder service, if supported), B<name>, and B<productbits>
+(arrayref describing the supported modes of transport, may contain duplicates).
+
+=item Travel::Status::DE::HAFAS::get_services()
+
+Returns an array containing all supported HAFAS services. Each element is a
+hashref and contains all keys mentioned in B<get_active_service>.
+It also contains a B<shortname> key, which is the service name used by
+the constructor's B<service> parameter.
+
+=item Travel::Status::DE::HAFAS::get_service(I<$service>)
+
+Returns a hash describing the service I<$service>. See
+B<get_active_service> for the hash layout.
 
 =back
 
@@ -491,7 +541,7 @@ Unknown.
 
 =head1 SEE ALSO
 
-Travel::Status::DE::HAFAS::Result(3pm).
+Travel::Status::DE::HAFAS::Result(3pm), Travel::Status::DE::HAFAS::StopFinder(3pm).
 
 =head1 AUTHOR
 
