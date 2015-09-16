@@ -11,7 +11,7 @@ our $VERSION = '1.05';
 sub new {
 	my ( $class, %opt ) = @_;
 
-	$opt{service} = 'deutschebahn';
+	$opt{service} = 'DB';
 
 	return $class->SUPER::new(%opt);
 }
