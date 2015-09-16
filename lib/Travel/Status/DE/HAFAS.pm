@@ -108,6 +108,10 @@ sub new {
 		$service = 'DB';
 	}
 
+	if ( defined $service and not exists $hafas_instance{$service} ) {
+		confess("The service '$service' is not supported");
+	}
+
 	my $ref = {
 		active_service => $service,
 		developer_mode => $conf{developer_mode},
