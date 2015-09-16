@@ -345,7 +345,7 @@ sub get_services {
 sub get_service {
 	my ($service) = @_;
 
-	if ( defined $service ) {
+	if ( defined $service and exists $hafas_instance{$service}) {
 		return %{ $hafas_instance{$service} };
 	}
 	return;
@@ -354,7 +354,10 @@ sub get_service {
 sub get_active_service {
 	my ($self) = @_;
 
-	return %{ $hafas_instance{ $self->{active_service} } };
+	if (defined $self->{active_service}) {
+		return %{ $hafas_instance{ $self->{active_service} } };
+	}
+	return;
 }
 
 1;
@@ -504,10 +507,11 @@ on the return value.
 
 =item $status->get_active_service
 
-Returns a hash describing the active service. Contains the keys
-B<url> (URL to the station board service), B<stopfinder> (URL to the
-stopfinder service, if supported), B<name>, and B<productbits>
-(arrayref describing the supported modes of transport, may contain duplicates).
+Returns a hash describing the active service when a service is active and
+nothing otherwise. The hash contains the keys B<url> (URL to the station board
+service), B<stopfinder> (URL to the stopfinder service, if supported), B<name>,
+and B<productbits> (arrayref describing the supported modes of transport, may
+contain duplicates).
 
 =item Travel::Status::DE::HAFAS::get_services()
 
@@ -518,7 +522,8 @@ the constructor's B<service> parameter.
 
 =item Travel::Status::DE::HAFAS::get_service(I<$service>)
 
-Returns a hash describing the service I<$service>. See
+Returns a hash describing the service I<$service>. Returns nothing
+if I<$service> is not supported. See
 B<get_active_service> for the hash layout.
 
 =back
