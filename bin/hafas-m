@@ -89,9 +89,12 @@ sub parse_mot_options {
 
 	for my $type ( split( qr{,}, $types ) ) {
 		if ( $type eq 'help' or $type eq 'list' or $type eq '?' ) {
-			my $desc = Travel::Status::DE::HAFAS::get_service($service);
-			if ($desc) {
-				my @mots = @{ $desc->{productbits} };
+			if ( not $hafas_url ) {
+				$service //= 'DB';
+			}
+			my %desc = Travel::Status::DE::HAFAS::get_service($service);
+			if (%desc) {
+				my @mots = @{ $desc{productbits} };
 				@mots = grep { $_ ne 'x' } @mots;
 				@mots = uniq @mots;
 				@mots = sort @mots;
