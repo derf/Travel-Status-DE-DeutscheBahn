@@ -163,8 +163,8 @@ Arrival/Departure date in "dd.mm.yyyy" format.
 
 =item $result->delay
 
-Returns the train's delay in minutes, or undef if it is unknown.
-Also returns undef if the train has been cancelled.
+Returns the delay in minutes, or undef if it is unknown.
+Also returns undef if the arrival/departure has been cancelled.
 
 =item $result->info
 
@@ -173,7 +173,7 @@ Returns an empty string if no (useful) information is available.
 
 =item $result->is_cancelled
 
-True if the train was cancelled, false otherwise.
+True if the arrival/departure was cancelled, false otherwise.
 
 =item $result->is_changed_platform
 
@@ -182,7 +182,7 @@ scheduled one. Note that the scheduled platform is unknown in this case.
 
 =item $result->messages
 
-Returns a list of message strings related to this train. Messages usually are
+Returns a list of message strings related to this result. Messages usually are
 service notices (e.g. "missing carriage") or detailed delay reasons
 (e.g. "switch damage between X and Y, expect delays").
 
@@ -190,25 +190,24 @@ service notices (e.g. "missing carriage") or detailed delay reasons
 
 =item $result->train
 
-Returns the line name, either in a format like "S 1" (S-Bahn line 1)
+Returns the line name, either in a format like "Bus SB16" (Bus line SB16)
 or "RE 10111" (RegionalExpress train 10111, no line information).
+May contain extraneous whitespace characters.
 
 =item $result->platform
 
-Returns the platform from which the train will depart / at which it will
-arrive. Realtime data if available, schedule data otherwise.
+Returns the arrival/departure platform.
+Realtime data if available, schedule data otherwise.
 
 =item $result->route_end
-
-Returns the last element of the route.  Depending on how you set up
-Travel::Status::DE::HAFAS (arrival or departure listing), this is
-either the train's destination or its origin station.
 
 =item $result->destination
 
 =item $result->origin
 
-Convenience aliases for C<< $result->route_end >>.
+Returns the last element of the route.  Depending on how you set up
+Travel::Status::DE::HAFAS (arrival or departure listing), this is
+either the result's destination or its origin station.
 
 =item $result->time
 
@@ -216,35 +215,8 @@ Returns the arrival/departure time as string in "hh:mm" format.
 
 =item $result->type
 
-Returns the type of this train, e.g. "S" for S-Bahn, "RE" for Regional Express
-or "ICE" for InterCity-Express.
-
-=back
-
-=head2 INTERNAL
-
-=over
-
-=item $result = Travel::Status::DE::HAFAS::Result->new(I<%data>)
-
-Returns a new Travel::Status::DE::HAFAS::Result object.
-You usually do not need to call this.
-
-Required I<data>:
-
-=over
-
-=item B<time> => I<hh:mm>
-
-=item B<train> => I<string>
-
-=item B<route_end> => I<string>
-
-=item B<platform> => I<string>
-
-=item B<info_raw> => I<string>
-
-=back
+Returns the type of this result, e.g. "S" for S-Bahn, "RE" for Regional Express
+or "STR" for tram / StraE<szlig>enbahn.
 
 =back
 

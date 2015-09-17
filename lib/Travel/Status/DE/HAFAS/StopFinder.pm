@@ -166,8 +166,8 @@ no error occurred, returns undef.
 =item $status->results
 
 Returns a list of stop candidates. Each list element is a hash reference. The
-hash keys are B<id> (IBNR) and B<name> (stop name). Both can be used as input
-for the Travel::Status::DE::HAFAS(3pm) constructor.
+hash keys are B<id> (IBNR / UIC station code) and B<name> (stop name). Both can
+be used as input for the Travel::Status::DE::HAFAS(3pm) constructor.
 
 If no matching results were found or the parser / http request failed, returns
 the empty list.
