@@ -1,3 +1,30 @@
+git HEAD
+
+    * This release is NOT backwards compatible with 1.xx versions
+    * It now uses the HAFAS API instead of parsing bahn.de/ris and also
+      supports various other HAFAS installations
+    * New module dependencies: JSON, List::MoreUtils
+    * Renamed db-ris to hafas-m
+    * New modules: Travel::Status::DE::HAFAS and
+      Travel::Status::DE::HAFAS::StopFinder
+    * Renamed Travel::Status::DE::DeutscheBahn::Result to
+      Travel::Status::DE::HAFAS::Result
+    * db-ris/hafas-m: The options -f /--full-route and -v/--via are no longer
+      supported
+    * db-ris/hafas-m: New options -s / --service, -u / --url and --list
+    * Travel::Status::DE::DeutscheBahn/HAFAS->new: The mot parameter is no
+      longer supported. Use the new excluded_mots and exclusive_mots parameters
+      instead
+    * Travel::Status::DE::DeutscheBahn/HAFAS->new: Add service and url
+      parameters
+    * Travel::Status::DE::DeutscheBahn/HAFAS: Add errcode, similar_stops
+      and get_active_service accessors
+    * Travel::Status::DE::DeutscheBahn/HAFAS: Add static methods get_services
+      and get_service
+    * Result: Remove route, route_raw, route_info, route_interesting and
+      route_timetable accessors
+    * Result: Add is_changed_platform and messages accessors
+
 Travel::Status::DE::DeutscheBahn 1.05 - Thu May 14 2015
 
     * Result->route_interesting: Also consider airports

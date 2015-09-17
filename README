@@ -10,6 +10,8 @@ Dependencies
 
  * perl version 5.10.1 or newer
  * Class::Accessor
+ * JSON
+ * List::MoreUtils
  * LWP::UserAgent (usually shipped by libwww-perl)
  * XML::LibXML
 
@@ -20,8 +22,8 @@ $ perl Build.PL
 $ perl Build
 $ sudo perl Build install
 
-You can then run 'man Travel::Status::DE::DeutscheBahn' for more information.
-This distribution also ships the example script 'db-ris', see 'man db-ris'.
+You can then run 'man Travel::Status::DE::HAFAS' for more information.
+This distribution also ships the example script 'hafas-m', see 'man hafas-m'.
 
 Testing
 -------

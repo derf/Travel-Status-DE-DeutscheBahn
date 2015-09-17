@@ -22,6 +22,8 @@ Module::Build->new(
 		'Carp'            => 0,
 		'Class::Accessor' => '0.16',
 		'Getopt::Long'    => 0,
+		'JSON'            => 0,
+		'List::MoreUtils' => 0,
 		'List::Util'      => 0,
 		'LWP::UserAgent'  => 0,
 		'POSIX'           => 0,
