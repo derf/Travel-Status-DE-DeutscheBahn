@@ -118,6 +118,7 @@ sub new {
 		exclusive_mots => $conf{exclusive_mots},
 		excluded_mots  => $conf{excluded_mots},
 		station        => $conf{station},
+		ua             => $ua,
 		post           => {
 			input => $conf{station},
 			date  => $date,
@@ -253,6 +254,7 @@ sub similar_stops {
 		my $sf = Travel::Status::DE::HAFAS::StopFinder->new(
 			url   => $hafas_instance{$service}{stopfinder},
 			input => $self->{station},
+			ua    => $self->{ua},
 		);
 		if ( my $err = $sf->errstr ) {
 			$self->{errstr} = $err;
@@ -345,7 +347,7 @@ sub get_services {
 sub get_service {
 	my ($service) = @_;
 
-	if ( defined $service and exists $hafas_instance{$service}) {
+	if ( defined $service and exists $hafas_instance{$service} ) {
 		return %{ $hafas_instance{$service} };
 	}
 	return;
@@ -354,7 +356,7 @@ sub get_service {
 sub get_active_service {
 	my ($self) = @_;
 
-	if (defined $self->{active_service}) {
+	if ( defined $self->{active_service} ) {
 		return %{ $hafas_instance{ $self->{active_service} } };
 	}
 	return;

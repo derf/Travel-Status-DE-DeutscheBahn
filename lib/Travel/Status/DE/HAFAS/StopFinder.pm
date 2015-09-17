@@ -17,12 +17,13 @@ sub new {
 	my ( $obj, %conf ) = @_;
 
 	my $lang = $conf{language} // 'd';
+	my $ua = $conf{ua};
 
-	my %lwp_options = %{ $conf{lwp_options} // { timeout => 10 } };
-
-	my $ua = LWP::UserAgent->new(%lwp_options);
-
-	$ua->env_proxy;
+	if ( not $ua ) {
+		my %lwp_options = %{ $conf{lwp_options} // { timeout => 10 } };
+		$ua = LWP::UserAgent->new(%lwp_options);
+		$ua->env_proxy;
+	}
 
 	my $reply;
 
