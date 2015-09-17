@@ -157,6 +157,11 @@ Base I<url> of the stop finder service, without the language and mode
 suffix ("/dn" and similar). Mandatory. See Travel::Status::DE::HAFAS(3pm)'s
 B<get_services> method for a list of URLs.
 
+=item B<lwp_options> => I<\%hashref>
+
+Passed on to C<< LWP::UserAgent->new >>. Defaults to C<< { timeout => 10 } >>,
+you can use an empty hashref to override it.
+
 =back
 
 =item $status->errstr
