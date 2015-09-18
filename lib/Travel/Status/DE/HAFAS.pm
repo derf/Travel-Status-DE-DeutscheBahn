@@ -309,6 +309,11 @@ sub results {
 		$info      //= q{};
 		$routeinfo //= q{};
 
+		# delayReason=" " means no delay reason
+		if ( $info eq q{ } ) {
+			$info = q{};
+		}
+
 		$train =~ s{#.*$}{};
 
 		push(
