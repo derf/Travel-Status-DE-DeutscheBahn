@@ -24,6 +24,8 @@ git HEAD
     * Result: Remove route, route_raw, route_info, route_interesting and
       route_timetable accessors
     * Result: Add is_changed_platform and messages accessors
+    * Result->info is now undef instead of an empty string when no information
+      is available
 
 Travel::Status::DE::DeutscheBahn 1.05 - Thu May 14 2015
 

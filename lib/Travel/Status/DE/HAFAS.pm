@@ -305,11 +305,9 @@ sub results {
 
 		substr( $date, 6, 0, '20' );
 
-		$info //= q{};
-
 		# delayReason=" " means no delay reason
 		if ( $info eq q{ } ) {
-			$info = q{};
+			$info = undef;
 		}
 
 		$train =~ s{#.*$}{};

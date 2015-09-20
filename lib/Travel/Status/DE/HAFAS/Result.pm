@@ -11,7 +11,7 @@ use parent 'Class::Accessor';
 our $VERSION = '1.05';
 
 Travel::Status::DE::HAFAS::Result->mk_ro_accessors(
-	qw(date info raw_e_delay raw_delay time train route_end info_raw));
+	qw(date info raw_e_delay raw_delay time train route_end));
 
 sub new {
 	my ( $obj, %conf ) = @_;
@@ -169,7 +169,7 @@ Also returns undef if the arrival/departure has been cancelled.
 =item $result->info
 
 Returns additional information, for instance the most recent delay reason.
-Returns an empty string if no (useful) information is available.
+undef if no (useful) information is available.
 
 =item $result->is_cancelled
 
