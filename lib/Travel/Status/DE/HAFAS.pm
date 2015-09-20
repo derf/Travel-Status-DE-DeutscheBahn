@@ -293,7 +293,6 @@ sub results {
 		my $delay         = $tr->getAttribute('delay');
 		my $e_delay       = $tr->getAttribute('e_delay');
 		my $info          = $tr->getAttribute('delayReason');
-		my $routeinfo     = $tr->textContent;
 		my @messages;
 
 		if ( not( $time and $dest ) ) {
@@ -306,8 +305,7 @@ sub results {
 
 		substr( $date, 6, 0, '20' );
 
-		$info      //= q{};
-		$routeinfo //= q{};
+		$info //= q{};
 
 		# delayReason=" " means no delay reason
 		if ( $info eq q{ } ) {
@@ -319,17 +317,16 @@ sub results {
 		push(
 			@{ $self->{results} },
 			Travel::Status::DE::HAFAS::Result->new(
-				date          => $date,
-				raw_delay     => $delay,
-				raw_e_delay   => $e_delay,
-				messages      => \@messages,
-				time          => $time,
-				train         => $train,
-				route_end     => $dest,
-				platform      => $platform,
-				new_platform  => $new_platform,
-				info          => $info,
-				routeinfo_raw => $routeinfo,
+				date         => $date,
+				raw_delay    => $delay,
+				raw_e_delay  => $e_delay,
+				messages     => \@messages,
+				time         => $time,
+				train        => $train,
+				route_end    => $dest,
+				platform     => $platform,
+				new_platform => $new_platform,
+				info         => $info,
 			)
 		);
 	}
