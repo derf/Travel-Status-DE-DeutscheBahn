@@ -22,14 +22,14 @@ __END__
 
 =head1 NAME
 
-Travel::Status::DE::HAFAS - Interface to HAFAS-based online arrival/departure
-monitors
+Travel::Status::DE::DeutscheBahn - Interface to the online arrival/departure
+monitor operated by Deutsche Bahn
 
 =head1 SYNOPSIS
 
-	use Travel::Status::DE::HAFAS;
+	use Travel::Status::DE::DeutscheBahn;
 
-	my $status = Travel::Status::DE::HAFAS->new(
+	my $status = Travel::Status::DE::DeutscheBahn->new(
 		station => 'Essen Hbf',
 	);
 
