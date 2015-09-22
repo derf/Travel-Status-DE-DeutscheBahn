@@ -256,6 +256,7 @@ sub similar_stops {
 			url   => $hafas_instance{$service}{stopfinder},
 			input => $self->{station},
 			ua    => $self->{ua},
+			developer_mode => $self->{developer_mode},
 		);
 		if ( my $err = $sf->errstr ) {
 			$self->{errstr} = $err;
