@@ -5,7 +5,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-no if $] >= 5.018, warnings => "experimental::smartmatch";
+no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
 use Carp qw(confess);
 use LWP::UserAgent;
@@ -214,6 +214,7 @@ sub set_productfilter {
 		}
 	}
 
+	return;
 }
 
 sub check_input_error {

@@ -85,10 +85,9 @@ sub show_version {
 sub parse_mot_options {
 
 	my $default_yes = 1;
-	my $help;
 
 	for my $type ( split( qr{,}, $types ) ) {
-		if ( $type eq 'help' or $type eq 'list' or $type eq '?' ) {
+		if ( $type eq 'help' or $type eq 'list' or $type eq q{?} ) {
 			if ( not $hafas_url ) {
 				$service //= 'DB';
 			}
@@ -113,6 +112,7 @@ sub parse_mot_options {
 			push( @exclusive_mots, $type );
 		}
 	}
+	return;
 }
 
 sub show_similar_stops {
@@ -123,6 +123,7 @@ sub show_similar_stops {
 			printf( "%s (%s)\n", $c->{name}, $c->{id} );
 		}
 	}
+	return;
 }
 
 sub display_result {
