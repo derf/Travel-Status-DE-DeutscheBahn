@@ -8,6 +8,7 @@ use utf8;
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
 use Carp qw(confess);
+use Encode qw(decode);
 use JSON;
 use LWP::UserAgent;
 
@@ -54,7 +55,7 @@ sub new {
 		return $ref;
 	}
 
-	$ref->{raw_reply} = $reply->content;
+	$ref->{raw_reply} = $reply->decoded_content;
 
 	$ref->{raw_reply} =~ s{ ^ SLs [.] sls = }{}x;
 	$ref->{raw_reply} =~ s{ ; SLs [.] showSuggestion [(] [)] ; $ }{}x;
@@ -84,7 +85,7 @@ sub results {
 			push(
 				@{ $self->{results} },
 				{
-					name => $result->{value},
+					name => decode('iso-8859-15', $result->{value}),
 					id   => $result->{extId}
 				}
 			);
