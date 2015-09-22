@@ -349,7 +349,7 @@ sub get_service {
 	my ($service) = @_;
 
 	if ( defined $service and exists $hafas_instance{$service} ) {
-		return %{ $hafas_instance{$service} };
+		return $hafas_instance{$service};
 	}
 	return;
 }
@@ -358,7 +358,7 @@ sub get_active_service {
 	my ($self) = @_;
 
 	if ( defined $self->{active_service} ) {
-		return %{ $hafas_instance{ $self->{active_service} } };
+		return $hafas_instance{ $self->{active_service} };
 	}
 	return;
 }
@@ -499,7 +499,7 @@ undef.
 
 =item $status->similar_stops
 
-Returns a list of hashes describing stops whose name is similar to the one
+Returns a list of hashrefs describing stops whose name is similar to the one
 requested in the constructor's B<station> parameter. Returns nothing if
 the active service does not support this feature.
 This is most useful if B<errcode> returns 'H730', which means that the
@@ -510,11 +510,11 @@ on the return value.
 
 =item $status->get_active_service
 
-Returns a hash describing the active service when a service is active and
-nothing otherwise. The hash contains the keys B<url> (URL to the station board
-service), B<stopfinder> (URL to the stopfinder service, if supported), B<name>,
-and B<productbits> (arrayref describing the supported modes of transport, may
-contain duplicates).
+Returns a hashref describing the active service when a service is active and
+nothing otherwise. The hashref contains the keys B<url> (URL to the station
+board service), B<stopfinder> (URL to the stopfinder service, if supported),
+B<name>, and B<productbits> (arrayref describing the supported modes of
+transport, may contain duplicates).
 
 =item Travel::Status::DE::HAFAS::get_services()
 
@@ -525,9 +525,8 @@ the constructor's B<service> parameter.
 
 =item Travel::Status::DE::HAFAS::get_service(I<$service>)
 
-Returns a hash describing the service I<$service>. Returns nothing
-if I<$service> is not supported. See
-B<get_active_service> for the hash layout.
+Returns a hashref describing the service I<$service>. Returns nothing if
+I<$service> is not supported. See B<get_active_service> for the hashref layout.
 
 =back
 
