@@ -256,6 +256,10 @@ sub similar_stops {
 	my $service = $self->{active_service};
 
 	if ( $service and exists $hafas_instance{$service}{stopfinder} ) {
+
+		# we do not pass our constructor's language argument here,
+		# because most stopfinder services do not return any results
+		# for languages other than german ('d' aka the default)
 		my $sf = Travel::Status::DE::HAFAS::StopFinder->new(
 			url            => $hafas_instance{$service}{stopfinder},
 			input          => $self->{station},
