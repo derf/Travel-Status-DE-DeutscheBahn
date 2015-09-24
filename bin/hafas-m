@@ -154,7 +154,7 @@ sub display_result {
 			@{$line}[ 0 .. 4 ]
 		);
 		if ( $line->[5] ) {
-			print $line->[5];
+			print '  ' . $line->[5];
 		}
 		print "\n";
 	}
