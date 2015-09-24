@@ -160,6 +160,10 @@ sub new {
 		  =~ s{ lead = " \K ( [^"]+ ) }{ $1 =~ s{ < [^>]+ > }{}grx }egx;
 	}
 
+	# TODO the DB backend also retuns invalid XML (similar to above, but with
+	# errors in delay="...") when setting the language to dutch/italian.
+	# No, I don't know why.
+
 	if ( $ref->{developer_mode} ) {
 		say $ref->{raw_xml};
 	}
