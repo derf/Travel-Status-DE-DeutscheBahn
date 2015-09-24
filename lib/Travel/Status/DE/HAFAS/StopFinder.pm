@@ -158,6 +158,13 @@ Base I<url> of the stop finder service, without the language and mode
 suffix ("/dn" and similar). Mandatory. See Travel::Status::DE::HAFAS(3pm)'s
 B<get_services> method for a list of URLs.
 
+=item B<language> => I<language>
+
+Set language. Accepted arguments are B<d>eutsch, B<e>nglish, B<i>talian and
+B<n> (dutch), depending on the used service.
+
+It is unknown if this option has any effect.
+
 =item B<lwp_options> => I<\%hashref>
 
 Passed on to C<< LWP::UserAgent->new >>. Defaults to C<< { timeout => 10 } >>,
