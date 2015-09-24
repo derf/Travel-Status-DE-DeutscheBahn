@@ -559,7 +559,7 @@ None.
 
 =head1 BUGS AND LIMITATIONS
 
-Unknown.
+The non-default services (anything other than DB) are not well tested.
 
 =head1 SEE ALSO
 
