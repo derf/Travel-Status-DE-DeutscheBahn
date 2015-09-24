@@ -86,6 +86,11 @@ sub parse_mot_options {
 
 	my $default_yes = 1;
 
+	if ($hafas_url) {
+		say STDERR 'The options -u and -m cannot be combined. Discarding -m';
+		return;
+	}
+
 	for my $type ( split( qr{,}, $types ) ) {
 		if ( $type eq 'help' or $type eq 'list' or $type eq q{?} ) {
 			if ( not $hafas_url ) {
