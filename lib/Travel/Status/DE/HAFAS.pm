@@ -253,9 +253,9 @@ sub similar_stops {
 
 	if ( $service and exists $hafas_instance{$service}{stopfinder} ) {
 		my $sf = Travel::Status::DE::HAFAS::StopFinder->new(
-			url   => $hafas_instance{$service}{stopfinder},
-			input => $self->{station},
-			ua    => $self->{ua},
+			url            => $hafas_instance{$service}{stopfinder},
+			input          => $self->{station},
+			ua             => $self->{ua},
 			developer_mode => $self->{developer_mode},
 		);
 		if ( my $err = $sf->errstr ) {
@@ -307,9 +307,15 @@ sub results {
 
 		substr( $date, 6, 0, '20' );
 
-		# delayReason=" " means no delay reason
-		if ( $info eq q{ } ) {
+		# TODO the first charactor of delayReason is special:
+		# " " -> no additional data, rest (if any) is delay reason
+		# else -> first word is not a delay reason but additional data,
+		# for instance "Zusatzfahrt/Ersatzfahrt" for a replacement train
+		if ( $info and $info eq q{ } ) {
 			$info = undef;
+		}
+		elsif ( substr( $info, 0, 1 ) eq q{ } ) {
+			substr( $info, 0, 1, q{} );
 		}
 
 		$train =~ s{#.*$}{};
