@@ -85,7 +85,7 @@ sub results {
 			push(
 				@{ $self->{results} },
 				{
-					name => decode('iso-8859-15', $result->{value}),
+					name => decode( 'iso-8859-15', $result->{value} ),
 					id   => $result->{extId}
 				}
 			);
