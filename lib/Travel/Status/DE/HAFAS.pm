@@ -311,10 +311,10 @@ sub results {
 		# " " -> no additional data, rest (if any) is delay reason
 		# else -> first word is not a delay reason but additional data,
 		# for instance "Zusatzfahrt/Ersatzfahrt" for a replacement train
-		if ( $info and $info eq q{ } ) {
+		if ( defined $info and $info eq q{ } ) {
 			$info = undef;
 		}
-		elsif ( substr( $info, 0, 1 ) eq q{ } ) {
+		elsif ( defined $info and substr( $info, 0, 1 ) eq q{ } ) {
 			substr( $info, 0, 1, q{} );
 		}
 
