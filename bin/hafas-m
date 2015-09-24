@@ -86,7 +86,7 @@ sub parse_mot_options {
 
 	my $default_yes = 1;
 
-	if ($hafas_url) {
+	if ( $types and $hafas_url ) {
 		say STDERR 'The options -u and -m cannot be combined. Discarding -m';
 		return;
 	}
