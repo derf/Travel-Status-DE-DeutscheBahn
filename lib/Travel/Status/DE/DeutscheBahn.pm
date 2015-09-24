@@ -6,7 +6,7 @@ use 5.010;
 
 use parent 'Travel::Status::DE::HAFAS';
 
-our $VERSION = '1.05';
+our $VERSION = '2.00';
 
 sub new {
 	my ( $class, %opt ) = @_;
@@ -49,7 +49,7 @@ monitor operated by Deutsche Bahn
 
 =head1 VERSION
 
-version 1.05
+version 2.00
 
 =head1 DESCRIPTION
 
