@@ -104,7 +104,7 @@ sub type {
 	my ($self) = @_;
 
 	# $self->{train} is either "TYPE 12345" or "TYPE12345"
-	my ($type) = ( $self->{train} =~ m{ ^ ([[:upper:]]+) }x );
+	my ($type) = ( $self->{train} =~ m{ ^ ([^[:space:]]+) }x );
 
 	return $type;
 }
