@@ -209,6 +209,13 @@ Returns the line name, either in a format like "Bus SB16" (Bus line SB16)
 or "RE 10111" (RegionalExpress train 10111, no line information).
 May contain extraneous whitespace characters.
 
+=item $result->line_no
+
+=item $result->train_no
+
+Returns the line/train number, for instance "SB16" (bus line SB16),
+"11" (Underground train line U 11) or 1011 ("RegionalExpress train 1011").
+
 =item $result->platform
 
 Returns the arrival/departure platform.
