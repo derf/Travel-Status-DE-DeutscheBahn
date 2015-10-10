@@ -1,4 +1,4 @@
-git HEAD
+Travel::Status::DE::DeutscheBahn 2.01 - Sat Oct 10 2015
 
     * Result: Fix ->type accessor (was not working for all backends)
     * Result: Add ->train_no / ->line_no accessor
