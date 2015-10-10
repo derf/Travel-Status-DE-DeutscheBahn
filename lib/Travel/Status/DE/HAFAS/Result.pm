@@ -102,18 +102,30 @@ sub TO_JSON {
 
 sub type {
 	my ($self) = @_;
+	my $type;
 
 	# $self->{train} is either "TYPE 12345" or "TYPE12345"
-	my ($type) = ( $self->{train} =~ m{ ^ ([^[:space:]]+) }x );
+	if ( $self->{train} =~ m{ \s }x ) {
+		($type) = ( $self->{train} =~ m{ ^ ([^[:space:]]+) }x );
+	}
+	else {
+		($type) = ( $self->{train} =~ m{ ^ ([[:alpha:]]+) }x );
+	}
 
 	return $type;
 }
 
 sub line_no {
 	my ($self) = @_;
+	my $line_no;
 
 	# $self->{train} is either "TYPE 12345" or "TYPE12345"
-	my ($line_no) = ( $self->{train} =~ m{ ([^[:space:]]+) $ }x );
+	if ( $self->{train} =~ m{ \s }x ) {
+		($line_no) = ( $self->{train} =~ m{ ([^[:space:]]+) $ }x );
+	}
+	else {
+		($line_no) = ( $self->{train} =~ m{ ([[:digit:]]+) $ }x );
+	}
 
 	return $line_no;
 }
@@ -215,6 +227,8 @@ May contain extraneous whitespace characters.
 
 Returns the line/train number, for instance "SB16" (bus line SB16),
 "11" (Underground train line U 11) or 1011 ("RegionalExpress train 1011").
+Note that this may not be a number at all: Some transport services also
+use single-letter characters or words (e.g. "AIR") as line numbers.
 
 =item $result->platform
 
