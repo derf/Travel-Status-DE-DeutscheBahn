@@ -109,6 +109,21 @@ sub type {
 	return $type;
 }
 
+sub line_no {
+	my ($self) = @_;
+
+	# $self->{train} is either "TYPE 12345" or "TYPE12345"
+	my ($line_no) = ( $self->{train} =~ m{ ([^[:space:]]+) $ }x );
+
+	return $line_no;
+}
+
+sub train_no {
+	my ($self) = @_;
+
+	return $self->line_no;
+}
+
 1;
 
 __END__
