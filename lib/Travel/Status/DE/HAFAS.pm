@@ -569,6 +569,10 @@ None.
 
 =item * Class::Accessor(3pm)
 
+=item * DateTime(3pm)
+
+=item * DateTime::Format::Strptime(3pm)
+
 =item * LWP::UserAgent(3pm)
 
 =item * XML::LibXML(3pm)

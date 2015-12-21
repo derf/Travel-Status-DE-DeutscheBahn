@@ -204,9 +204,23 @@ the platform, time, route and more.
 
 =over
 
+=item $result->countdown
+
+Difference between the time Travel::Status::DE::HAFAS->results
+was called first and the arrival/departure time, in minutes.
+
+=item $result->countdown_sec
+
+Difference between the time Travel::Status::DE::HAFAS->results
+was called first and the arrival/departure time, in seconds.
+
 =item $result->date
 
 Arrival/Departure date in "dd.mm.yyyy" format.
+
+=item $result->datetime
+
+DateTime object holding the arrival/departure date and time.
 
 =item $result->delay
 
