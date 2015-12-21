@@ -8,6 +8,8 @@ use utf8;
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
 use Carp qw(confess);
+use DateTime;
+use DateTime::Format::Strptime;
 use LWP::UserAgent;
 use POSIX qw(strftime);
 use Travel::Status::DE::HAFAS::Result;
@@ -291,6 +293,14 @@ sub results {
 
 	$self->{results} = [];
 
+	$self->{datetime_now} //= DateTime->now(
+		time_zone => 'Europe/Berlin',
+	);
+	$self->{strptime_obj} //= DateTime::Format::Strptime->new(
+		pattern   => '%d.%m.%YT%H:%M',
+		time_zone => 'Europe/Berlin',
+	);
+
 	for my $tr ( @{ $self->{tree}->findnodes($xp_element) } ) {
 
 		my @message_nodes = $tr->findnodes($xp_msg);
@@ -328,10 +338,14 @@ sub results {
 
 		$train =~ s{#.*$}{};
 
+		my $datetime = $self->{strptime_obj}->parse_datetime("${date}T${time}");
+
 		push(
 			@{ $self->{results} },
 			Travel::Status::DE::HAFAS::Result->new(
 				date         => $date,
+				datetime     => $datetime,
+				datetime_now => $self->{datetime_now},
 				raw_delay    => $delay,
 				raw_e_delay  => $e_delay,
 				messages     => \@messages,

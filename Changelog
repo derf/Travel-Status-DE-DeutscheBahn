@@ -1,3 +1,8 @@
+git HEAD
+
+    * New dependencies: DateTime and DateTime::Format::Strptime
+    * Result: New accessors ->datetime, ->countdown and ->countdown_sec
+
 Travel::Status::DE::DeutscheBahn 2.01 - Sat Oct 10 2015
 
     * Result: Fix ->type accessor (was not working for all backends)

@@ -11,7 +11,7 @@ use parent 'Class::Accessor';
 our $VERSION = '2.01';
 
 Travel::Status::DE::HAFAS::Result->mk_ro_accessors(
-	qw(date info raw_e_delay raw_delay time train route_end));
+	qw(date datetime info raw_e_delay raw_delay time train route_end));
 
 sub new {
 	my ( $obj, %conf ) = @_;
@@ -19,6 +19,26 @@ sub new {
 	my $ref = \%conf;
 
 	return bless( $ref, $obj );
+}
+
+sub countdown {
+	my ($self) = @_;
+
+	$self->{countdown}
+	  //= $self->datetime->subtract_datetime( $self->{datetime_now} )
+	  ->in_units('minutes');
+
+	return $self->{countdown};
+}
+
+sub countdown_sec {
+	my ($self) = @_;
+
+	$self->{countdown_sec}
+	  //= $self->datetime->subtract_datetime( $self->{datetime_now} )
+	  ->in_units('seconds');
+
+	return $self->{countdown_sec};
 }
 
 sub delay {

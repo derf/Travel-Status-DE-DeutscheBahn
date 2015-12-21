@@ -20,6 +20,8 @@ Module::Build->new(
 		'perl'            => '5.10.1',
 		'Carp'            => 0,
 		'Class::Accessor' => '0.16',
+		'DateTime'        => 0,
+		'DateTime::Format::Strptime' => 0,
 		'Getopt::Long'    => 0,
 		'JSON'            => 0,
 		'List::MoreUtils' => 0,

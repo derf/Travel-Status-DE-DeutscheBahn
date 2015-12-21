@@ -10,6 +10,8 @@ Dependencies
 
  * perl version 5.10.1 or newer
  * Class::Accessor
+ * DateTime
+ * DateTime::Format::Strptime
  * JSON
  * List::MoreUtils
  * LWP::UserAgent (usually shipped by libwww-perl)
