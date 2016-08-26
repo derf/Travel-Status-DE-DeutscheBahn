@@ -20,8 +20,17 @@ Dependencies
 Installation
 ------------
 
+From a release tarball:
+
 $ perl Build.PL
 $ perl Build
+$ sudo perl Build install
+
+From git:
+
+$ perl Build.PL
+$ perl Build
+$ perl Build manifest
 $ sudo perl Build install
 
 You can then run 'man Travel::Status::DE::HAFAS' for more information.
@@ -32,4 +41,4 @@ Testing
 
 $ perl Build test
 
-This will require the Test::More, Test::Compile and Test::Pod modules.
+This requires the Test::More, Test::Compile and Test::Pod modules.
