@@ -1,4 +1,4 @@
-git HEAD
+Travel::Status::DE::DeutscheBahn 2.02 - Sun Jan 08 2017
 
     * New dependencies: DateTime and DateTime::Format::Strptime
     * Result: New accessors ->datetime, ->countdown and ->countdown_sec

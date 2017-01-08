@@ -8,7 +8,7 @@ no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
 use parent 'Class::Accessor';
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 Travel::Status::DE::HAFAS::Result->mk_ro_accessors(
 	qw(date datetime info raw_e_delay raw_delay time train route_end));
@@ -190,7 +190,7 @@ arrival/departure received by Travel::Status::DE::HAFAS
 
 =head1 VERSION
 
-version 2.01
+version 2.02
 
 =head1 DESCRIPTION
 
@@ -312,7 +312,7 @@ Travel::Status::DE::HAFAS(3pm).
 
 =head1 AUTHOR
 
-Copyright (C) 2015 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2015-2017 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

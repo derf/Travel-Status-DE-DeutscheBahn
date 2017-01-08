@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.014;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 use Encode qw(decode);
 use Getopt::Long qw(:config no_ignore_case);
@@ -212,7 +212,7 @@ B<hafas-m> [B<-d> I<date>] [B<-t> I<time>] [B<-m> I<motlist>]
 
 =head1 VERSION
 
-version 2.01
+version 2.02
 
 =head1 DESCRIPTION
 
@@ -312,7 +312,7 @@ The non-default services (anything other than DB) are not well tested.
 
 =head1 AUTHOR
 
-Copyright (C) 2015 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2015-2017 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 
