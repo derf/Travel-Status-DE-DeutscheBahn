@@ -2,7 +2,7 @@ package Travel::Status::DE::DeutscheBahn;
 
 use strict;
 use warnings;
-use 5.010;
+use 5.014;
 
 use parent 'Travel::Status::DE::HAFAS';
 
