@@ -16,7 +16,7 @@ use Travel::Status::DE::HAFAS::Result;
 use Travel::Status::DE::HAFAS::StopFinder;
 use XML::LibXML;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 my %hafas_instance = (
 	BVG => {
@@ -425,7 +425,7 @@ monitors
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 DESCRIPTION
 
