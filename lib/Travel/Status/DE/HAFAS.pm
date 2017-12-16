@@ -26,8 +26,8 @@ my %hafas_instance = (
 		productbits => [qw[s u tram bus ferry ice regio ondemand]],
 	},
 	DB => {
-		url        => 'http://reiseauskunft.bahn.de/bin/bhftafel.exe',
-		stopfinder => 'http://reiseauskunft.bahn.de/bin/ajax-getstop.exe',
+		url        => 'https://reiseauskunft.bahn.de/bin/bhftafel.exe',
+		stopfinder => 'https://reiseauskunft.bahn.de/bin/ajax-getstop.exe',
 		name       => 'Deutsche Bahn',
 		productbits =>
 		  [qw[ice ic_ec d regio s bus ferry u tram ondemand x x x x]],
