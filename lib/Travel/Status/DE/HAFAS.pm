@@ -154,7 +154,7 @@ sub new {
 		  . '</wrap>';
 	}
 
-	if ( defined $service and $service eq 'NVV' ) {
+	if ( defined $service and $service =~ m{ ^ VBB | NVV $ }x ) {
 
 		# Returns invalid XML with tags inside HIMMessage's lead attribute.
 		# Fix this.
