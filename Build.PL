@@ -32,5 +32,9 @@ Module::Build->new(
 	},
 	script_files => 'bin/',
 	sign         => 1,
-
+	meta_merge   => {
+		resources => {
+			repository => 'https://github.com/derf/Travel-Status-DE-DeutscheBahn'
+		}
+	},
 )->create_build_script();
