@@ -1,3 +1,7 @@
+Travel::Status::DE::DeutscheBahn 2.04 - Sun Dec 30 2018
+
+    * Handle invalid XML when using the VBB backend
+
 Travel::Status::DE::DeutscheBahn 2.03 - Sat Dec 16 2017
 
     * Update DB backend API URL
