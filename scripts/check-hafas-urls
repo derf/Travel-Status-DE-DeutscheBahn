@@ -1,0 +1,20 @@
+#!/usr/bin/env zsh
+
+export PERL5LIB=lib
+
+checks="DB Berlin Jannowitzbrücke
+NAHSH Flensburg Solitüde
+NASA Wernigerode Hbf
+NVV Kassel Hbf
+ÖBB Wien Praterstern
+RSAG Rostock Hbf
+VBB Berlin Jannowitzbrücke
+VBN Diepholz"
+
+echo $checks | while read service stop; do
+        echo -n "${service} ... "
+        if bin/hafas-m -s $service $stop > /dev/null; then
+                echo OK
+        fi
+done
+
