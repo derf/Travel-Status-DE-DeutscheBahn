@@ -1,0 +1,34 @@
+#!/bin/sh
+
+set -e
+
+export DEBIAN_FRONTEND=noninteractive
+export APT_LISTCHANGES_FRONTEND=none
+
+apt-get update
+apt-get -y install \
+	apt-file dh-make-perl libmodule-build-perl \
+	libclass-accessor-perl libdatetime-perl libdatetime-format-strptime-perl \
+	liblwp-protocol-https-perl libjson-perl libjson-xs-perl \
+	liblist-moreutils-perl \
+	libwww-perl libxml-libxml-perl \
+	libtest-compile-perl libtest-pod-perl \
+	libtest-simple-perl
+
+apt-file update
+apt-cache dumpavail | dpkg --merge-avail
+
+mkdir -p /src/app
+cp -a /orig/Build.PL /orig/Changelog /orig/README /src/app
+cp -a /orig/bin /orig/lib /orig/t /src/app
+cd /src/app
+
+sed -i 's/sign *=> *1/sign => 0/' Build.PL
+perl Build.PL
+perl Build
+perl Build manifest
+perl Build dist
+mv Travel-Status-DE-DeutscheBahn-*.tar.gz ../app.tar.gz
+dh-make-perl --build --version "${VERSION}"
+chown ${USER}:${GROUP} ../*.deb
+mv -v ../*.deb /out
