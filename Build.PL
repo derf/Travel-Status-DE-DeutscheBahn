@@ -27,6 +27,7 @@ Module::Build->new(
 		'List::MoreUtils' => 0,
 		'List::Util'      => 0,
 		'LWP::UserAgent'  => 0,
+		'LWP::Protocol::https' => 0,
 		'POSIX'           => 0,
 		'XML::LibXML'     => '1.70',
 	},
