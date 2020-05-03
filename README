@@ -15,6 +15,7 @@ Dependencies
  * JSON
  * List::MoreUtils
  * LWP::UserAgent (usually shipped by libwww-perl)
+ * LWP::Protocol::https
  * XML::LibXML
 
 Installation
