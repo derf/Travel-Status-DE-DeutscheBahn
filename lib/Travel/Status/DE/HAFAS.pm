@@ -19,61 +19,66 @@ use XML::LibXML;
 our $VERSION = '2.04';
 
 my %hafas_instance = (
-	BVG => {
-		url         => 'http://bvg.hafas.de/bin/stboard.exe',
-		stopfinder  => 'http://bvg.hafas.de/bin/ajax-getstop.exe',
-		name        => 'Berliner Verkehrsgesellschaft',
-		productbits => [qw[s u tram bus ferry ice regio ondemand]],
-	},
+
+	#BVG => {
+	#	url         => 'https://bvg.hafas.de/bin/stboard.exe',
+	#	stopfinder  => 'https://bvg.hafas.de/bin/ajax-getstop.exe',
+	#	name        => 'Berliner Verkehrsgesellschaft',
+	#	productbits => [qw[s u tram bus ferry ice regio ondemand]],
+	#},
 	DB => {
-		url        => 'https://reiseauskunft.bahn.de/bin/bhftafel.exe',
-		stopfinder => 'https://reiseauskunft.bahn.de/bin/ajax-getstop.exe',
-		name       => 'Deutsche Bahn',
+		url         => 'https://reiseauskunft.bahn.de/bin/bhftafel.exe',
+		stopfinder  => 'https://reiseauskunft.bahn.de/bin/ajax-getstop.exe',
+		trainsearch => 'https://reiseauskunft.bahn.de/bin/trainsearch.exe',
+		traininfo   => 'https://reiseauskunft.bahn.de/bin/traininfo.exe',
+		name        => 'Deutsche Bahn',
 		productbits =>
 		  [qw[ice ic_ec d regio s bus ferry u tram ondemand x x x x]],
 	},
 	NAHSH => {
-		url         => 'http://nah.sh.hafas.de/bin/stboard.exe',
-		stopfinder  => 'http://nah.sh.hafas.de/bin/ajax-getstop.exe',
+		url         => 'https://nah.sh.hafas.de/bin/stboard.exe',
+		stopfinder  => 'https://nah.sh.hafas.de/bin/ajax-getstop.exe',
 		name        => 'Nahverkehrsverbund Schleswig-Holstein',
 		productbits => [qw[ice ice ice regio s bus ferry u tram ondemand]],
 	},
 	NASA => {
-		url         => 'http://reiseauskunft.insa.de/bin/stboard.exe',
-		stopfinder  => 'http://reiseauskunft.insa.de/bin/ajax-getstop.exe',
+		url         => 'https://reiseauskunft.insa.de/bin/stboard.exe',
+		stopfinder  => 'https://reiseauskunft.insa.de/bin/ajax-getstop.exe',
 		name        => 'Nahverkehrsservice Sachsen-Anhalt',
 		productbits => [qw[ice ice regio regio regio tram bus ondemand]],
 	},
 	NVV => {
-		url        => 'http://auskunft.nvv.de/auskunft/bin/jp/stboard.exe',
-		stopfinder => 'http://auskunft.nvv.de/auskunft/bin/jp/ajax-getstop.exe',
-		name       => 'Nordhessischer VerkehrsVerbund',
+		url => 'https://auskunft.nvv.de/auskunft/bin/jp/stboard.exe',
+		stopfinder =>
+		  'https://auskunft.nvv.de/auskunft/bin/jp/ajax-getstop.exe',
+		name => 'Nordhessischer VerkehrsVerbund',
 		productbits =>
 		  [qw[ice ic_ec regio s u tram bus bus ferry ondemand regio regio]],
 	},
 	'ÖBB' => {
-		url        => 'http://fahrplan.oebb.at/bin/stboard.exe',
-		stopfinder => 'http://fahrplan.oebb.at/bin/ajax-getstop.exe',
+		url        => 'https://fahrplan.oebb.at/bin/stboard.exe',
+		stopfinder => 'https://fahrplan.oebb.at/bin/ajax-getstop.exe',
 		name       => 'Österreichische Bundesbahnen',
 		productbits =>
 		  [qw[ice ice ice regio regio s bus ferry u tram ice ondemand ice]],
 	},
 	RSAG => {
-		url         => 'http://fahrplan.rsag-online.de/hafas/stboard.exe',
-		stopfinder  => 'http://fahrplan.rsag-online.de/hafas/ajax-getstop.exe',
+		url         => 'https://fahrplan.rsag-online.de/hafas/stboard.exe',
+		stopfinder  => 'https://fahrplan.rsag-online.de/hafas/ajax-getstop.exe',
 		name        => 'Rostocker Straßenbahn AG',
 		productbits => [qw[ice ice ice regio s bus ferry u tram ondemand]],
 	},
-	SBB => {
-		url        => 'http://fahrplan.sbb.ch/bin/stboard.exe',
-		stopfinder => 'http://fahrplan.sbb.ch/bin/ajax-getstop.exe',
-		name       => 'Schweizerische Bundesbahnen',
-		productbits =>
-		  [qw[ice ice regio regio ferry s bus cablecar regio tram]],
-	},
+
+	#SBB => {
+	#	url        => 'https://fahrplan.sbb.ch/bin/stboard.exe',
+	#	stopfinder => 'https://fahrplan.sbb.ch/bin/ajax-getstop.exe',
+	#	name       => 'Schweizerische Bundesbahnen',
+	#	productbits =>
+	#	  [qw[ice ice regio regio ferry s bus cablecar regio tram]],
+	#},
 	VBB => {
-		url         => 'http://fahrinfo.vbb.de/bin/stboard.exe',
-		stopfinder  => 'http://fahrinfo.vbb.de/bin/ajax-getstop.exe',
+		url         => 'https://fahrinfo.vbb.de/bin/stboard.exe',
+		stopfinder  => 'https://fahrinfo.vbb.de/bin/ajax-getstop.exe',
 		name        => 'Verkehrsverbund Berlin-Brandenburg',
 		productbits => [qw[s u tram bus ferry ice regio]],
 	},
