@@ -11,14 +11,29 @@ use parent 'Class::Accessor';
 our $VERSION = '2.05';
 
 Travel::Status::DE::HAFAS::Result->mk_ro_accessors(
-	qw(date datetime info raw_e_delay raw_delay time train route_end));
+	qw(sched_date date sched_datetime datetime info raw_e_delay raw_delay
+	  sched_time time train route_end)
+);
 
 sub new {
 	my ( $obj, %conf ) = @_;
 
 	my $ref = \%conf;
+	bless( $ref, $obj );
 
-	return bless( $ref, $obj );
+	if ( my $delay = $ref->delay ) {
+		$ref->{datetime}
+		  = $ref->{sched_datetime}->clone->add( minutes => $delay );
+		$ref->{date} = $ref->{datetime}->strftime('%d.%m.%Y');
+		$ref->{time} = $ref->{datetime}->strftime('%H:%M');
+	}
+	else {
+		$ref->{datetime} = $ref->{sched_datetime};
+		$ref->{date}     = $ref->{sched_date};
+		$ref->{time}     = $ref->{sched_time};
+	}
+
+	return $ref;
 }
 
 sub countdown {

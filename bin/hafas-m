@@ -184,7 +184,7 @@ for my $d ( $status->results() ) {
 	push(
 		@output,
 		[
-			$d->time,
+			$d->sched_time,
 			$d->is_cancelled
 			? 'CANCELED'
 			: ( $d->delay ? sprintf( '%+d', $d->delay ) : q{} ),

@@ -348,18 +348,18 @@ sub results {
 		push(
 			@{ $self->{results} },
 			Travel::Status::DE::HAFAS::Result->new(
-				date         => $date,
-				datetime     => $datetime,
-				datetime_now => $self->{datetime_now},
-				raw_delay    => $delay,
-				raw_e_delay  => $e_delay,
-				messages     => \@messages,
-				time         => $time,
-				train        => $train,
-				route_end    => $dest,
-				platform     => $platform,
-				new_platform => $new_platform,
-				info         => $info,
+				sched_date     => $date,
+				sched_datetime => $datetime,
+				datetime_now   => $self->{datetime_now},
+				raw_delay      => $delay,
+				raw_e_delay    => $e_delay,
+				messages       => \@messages,
+				sched_time     => $time,
+				train          => $train,
+				route_end      => $dest,
+				platform       => $platform,
+				new_platform   => $new_platform,
+				info           => $info,
 			)
 		);
 	}
