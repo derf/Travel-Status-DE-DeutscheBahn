@@ -294,9 +294,21 @@ Returns the last element of the route.  Depending on how you set up
 Travel::Status::DE::HAFAS (arrival or departure listing), this is
 either the result's destination or its origin station.
 
+=item $result->sched_date
+
+Scheduled arrival/departure date in "dd.mm.yyyy" format.
+
+=item $result->sched_datetime
+
+DateTime object holding the scheduled arrival/departure date and time.
+
+=item $result->sched_time
+
+Scheduled arrival/departure time in "hh:mm" format.
+
 =item $result->time
 
-Returns the arrival/departure time as string in "hh:mm" format.
+Arrival/Departure time in "hh:mm" format.
 
 =item $result->type
 
@@ -327,7 +339,7 @@ Travel::Status::DE::HAFAS(3pm).
 
 =head1 AUTHOR
 
-Copyright (C) 2015-2017 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2015-2020 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 
