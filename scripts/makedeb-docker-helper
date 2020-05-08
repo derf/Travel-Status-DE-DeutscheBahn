@@ -19,7 +19,7 @@ apt-file update
 apt-cache dumpavail | dpkg --merge-avail
 
 mkdir -p /src/app
-cp -a /orig/Build.PL /orig/Changelog /orig/README /src/app
+cp -a /orig/Build.PL /orig/Changelog /orig/README.md /src/app
 cp -a /orig/bin /orig/lib /orig/t /src/app
 cd /src/app
 
