@@ -594,7 +594,7 @@ Travel::Status::DE::HAFAS::Result(3pm), Travel::Status::DE::HAFAS::StopFinder(3p
 
 =head1 AUTHOR
 
-Copyright (C) 2015-2017 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2015-2020 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 
