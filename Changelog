@@ -1,3 +1,10 @@
+Travel::Status::DE::DeutscheBahn 3.00 - Sat May 09 2020
+
+    * Result: The date, datetime, and time accessors now report realtime
+      data if available
+    * Result: Add sched_date, sched_datetime, and sched_time accessors for
+      schedule data
+
 Travel::Status::DE::DeutscheBahn 2.05 - Sun May 03 2020
 
     * Document LWP::Protocol::https dependency
