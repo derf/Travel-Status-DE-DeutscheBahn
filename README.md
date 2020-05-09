@@ -1,11 +1,21 @@
 # hafas-m - Commandline Public Transit Departure Monitor
 
 hafas-m is a commandline client and Perl module for HAFAS public transit
-departure interfaces such as
-[bahn.de/ris](https://reiseauskunft.bahn.de//bin/bhftafel.exe/dn).  See the
-[Travel::Status::DE::DeutscheBahn
-homepage](https://finalrewind.org/projects/Travel-Status-DE-DeutscheBahn) for
-details.
+departure interfaces. It provides native support for the following
+interfaces, and can also be pointed to URLs not listed here.
+
+* [Deutsche Bahn](https://reiseauskunft.bahn.de/bin/bhftafel.exe)
+* [Nahverkehrsverbund Schleswig-Holstein](https://nah.sh.hafas.de/bin/stboard.exe)
+* [Nahverkehrsservice Sachsen-Anhalt](https://reiseauskunft.insa.de/bin/stboard.exe)
+* [Nordhessischer VerkehrsVerbund](https://auskunft.nvv.de/auskunft/bin/jp/stboard.exe)
+* [Rostocker Straßenbahn AG](https://fahrplan.rsag-online.de/hafas/stboard.exe)
+* [Verkehrsverbund Berlin-Brandenburg](https://fahrinfo.vbb.de/bin/stboard.exe)
+* [Verkehrsverbund Bremen/Niedersachsen](https://fahrplaner.vbn.de/hafas/stboard.exe)
+* [Österreichische Bundesbahnen](https://fahrplan.oebb.at/bin/stboard.exe)
+
+See the [Travel::Status::DE::DeutscheBahn
+homepage](https://finalrewind.org/projects/Travel-Status-DE-DeutscheBahn) and
+[hafas-m manual](https://man.finalrewind.org/1/hafas-m) for details.
 
 ## Installation
 
