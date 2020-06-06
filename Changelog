@@ -1,3 +1,8 @@
+Travel::Status::DE::DeutscheBahn 3.01 - Sat Jun 06 2020
+
+    * Fix support for ÖBB and other backends which recently switched from
+      two- to four-digit years
+
 Travel::Status::DE::DeutscheBahn 3.00 - Sat May 09 2020
 
     * Result: The date, datetime, and time accessors now report realtime
