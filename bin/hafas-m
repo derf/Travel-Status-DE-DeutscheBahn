@@ -146,10 +146,14 @@ sub display_result {
 
 	for my $line (@lines) {
 
-		my $d = $line->[6];
-		if ( $d->messages ) {
-			print "\n";
-			for my $msg ( $d->messages ) {
+		my $d             = $line->[6];
+		my $first_message = 1;
+		for my $msg ( $d->messages ) {
+			if ( $msg->{ref_count} == 1 ) {
+				if ($first_message) {
+					print "\n";
+					$first_message = 0;
+				}
 				printf( "# %s\n", $msg );
 			}
 		}
@@ -175,10 +179,26 @@ if ( my $err = $status->errstr ) {
 	exit 2;
 }
 
-for my $d ( $status->results() ) {
+my $message_id = 1;
+for my $m ( $status->messages ) {
+	if ( $m->{ref_count} > 1 ) {
+		$m->{id} = $message_id++;
+		printf( "# (%d) %s\n# %s\n\n", $m->{id}, $m->{header}, $m->{lead} );
+	}
+}
+
+for my $d ( $status->results ) {
 
 	if ( $ignore_late and $d->delay ) {
 		next;
+	}
+
+	my $info_line = $d->info // q{};
+
+	for my $message ( $d->messages ) {
+		if ( $message->{ref_count} > 1 ) {
+			$info_line = sprintf( '(%d) %s', $message->{id}, $info_line );
+		}
 	}
 
 	push(
@@ -191,7 +211,7 @@ for my $d ( $status->results() ) {
 			$d->train,
 			$d->route_end,
 			( $d->platform // q{} ) . ( $d->is_changed_platform ? ' !' : q{} ),
-			$d->info,
+			$info_line,
 			$d
 		]
 	);

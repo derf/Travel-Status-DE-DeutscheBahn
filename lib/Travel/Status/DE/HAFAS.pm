@@ -10,6 +10,7 @@ no if $] >= 5.018, warnings => 'experimental::smartmatch';
 use Carp qw(confess);
 use DateTime;
 use DateTime::Format::Strptime;
+use List::Util qw(any);
 use LWP::UserAgent;
 use POSIX qw(strftime);
 use Travel::Status::DE::HAFAS::Result;
@@ -124,6 +125,8 @@ sub new {
 		developer_mode => $conf{developer_mode},
 		exclusive_mots => $conf{exclusive_mots},
 		excluded_mots  => $conf{excluded_mots},
+		messages       => [],
+		results        => [],
 		station        => $conf{station},
 		ua             => $ua,
 		post           => {
@@ -171,10 +174,6 @@ sub new {
 	# errors in delay="...") when setting the language to dutch/italian.
 	# No, I don't know why.
 
-	if ( $ref->{developer_mode} ) {
-		say $ref->{raw_xml};
-	}
-
 	$ref->{tree} = XML::LibXML->load_xml(
 		string => $ref->{raw_xml},
 	);
@@ -184,6 +183,7 @@ sub new {
 	}
 
 	$ref->check_input_error;
+	$ref->prepare_results;
 	return $ref;
 }
 
@@ -282,16 +282,39 @@ sub similar_stops {
 	return;
 }
 
-sub results {
+sub add_message_node {
+	my ( $self, $node ) = @_;
+
+	my $header = $node->getAttribute('header');
+	my $lead   = $node->getAttribute('lead');
+
+	for my $message ( @{ $self->{messages} } ) {
+		if ( $header eq $message->{header} and $lead eq $message->{lead} ) {
+			$message->{ref_count}++;
+			return $message;
+		}
+	}
+	my $message = {
+		header    => $header,
+		lead      => $lead,
+		ref_count => 1,
+	};
+	push( @{ $self->{messages} }, $message );
+	return $message;
+}
+
+sub messages {
+	my ($self) = @_;
+	return @{ $self->{messages} };
+}
+
+sub prepare_results {
 	my ($self) = @_;
 	my $mode = $self->{post}->{boardType};
 
 	my $xp_element = XML::LibXML::XPathExpression->new('//Journey');
 	my $xp_msg     = XML::LibXML::XPathExpression->new('./HIMMessage');
 
-	if ( defined $self->{results} ) {
-		return @{ $self->{results} };
-	}
 	if ( not defined $self->{tree} ) {
 		return;
 	}
@@ -326,7 +349,7 @@ sub results {
 		}
 
 		for my $n (@message_nodes) {
-			push( @messages, $n->getAttribute('header') );
+			push( @messages, $self->add_message_node($n) );
 		}
 
 		# Some backends report dd.mm.yy, some report dd.mm.yyyy
@@ -369,7 +392,10 @@ sub results {
 			)
 		);
 	}
+}
 
+sub results {
+	my ($self) = @_;
 	return @{ $self->{results} };
 }
 
