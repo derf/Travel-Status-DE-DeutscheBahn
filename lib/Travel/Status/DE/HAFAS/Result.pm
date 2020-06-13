@@ -11,8 +11,8 @@ use parent 'Class::Accessor';
 our $VERSION = '3.01';
 
 Travel::Status::DE::HAFAS::Result->mk_ro_accessors(
-	qw(sched_date date sched_datetime datetime info raw_e_delay raw_delay
-	  sched_time time train route_end)
+	qw(sched_date date sched_datetime datetime info operator raw_e_delay
+	  raw_delay sched_time time train route_end)
 );
 
 sub new {
@@ -278,6 +278,13 @@ Returns the line/train number, for instance "SB16" (bus line SB16),
 "11" (Underground train line U 11) or 1011 ("RegionalExpress train 1011").
 Note that this may not be a number at all: Some transport services also
 use single-letter characters or words (e.g. "AIR") as line numbers.
+
+=item $result->operator
+
+Returns the operator responsible for this arrival/departure. Returns undef
+if the backend does not provide an operator.
+
+Note that E<Ouml>BB is the only known backend providing this information.
 
 =item $result->platform
 

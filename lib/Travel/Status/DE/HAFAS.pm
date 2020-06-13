@@ -318,6 +318,7 @@ sub results {
 		my $delay         = $tr->getAttribute('delay');
 		my $e_delay       = $tr->getAttribute('e_delay');
 		my $info          = $tr->getAttribute('delayReason');
+		my $operator      = $tr->getAttribute('operator');
 		my @messages;
 
 		if ( not( $time and $dest ) ) {
@@ -360,6 +361,7 @@ sub results {
 				messages       => \@messages,
 				sched_time     => $time,
 				train          => $train,
+				operator       => $operator,
 				route_end      => $dest,
 				platform       => $platform,
 				new_platform   => $new_platform,
