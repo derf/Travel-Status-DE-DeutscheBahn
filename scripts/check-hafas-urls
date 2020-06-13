@@ -3,9 +3,9 @@
 export PERL5LIB=lib
 
 checks="DB Berlin Jannowitzbrücke
-NAHSH Flensburg Solitüde
+NAHSH Flensburg
 NASA Wernigerode Hbf
-NVV Kassel Hbf
+NVV Kassel Hauptbahnhof
 ÖBB Wien Praterstern
 RSAG Rostock Hbf
 VBB Berlin Jannowitzbrücke
