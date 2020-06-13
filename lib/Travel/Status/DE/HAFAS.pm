@@ -145,14 +145,19 @@ sub new {
 
 	my $url = ( $conf{url} // $hafas_instance{$service}{url} ) . "/${lang}n";
 
-	$reply = $ua->post( $url, $ref->{post} );
-
-	if ( $reply->is_error ) {
-		$ref->{errstr} = $reply->status_line;
-		return $ref;
+	if ( $conf{xml} ) {
+		$ref->{raw_xml} = $conf{xml};
 	}
+	else {
+		$reply = $ua->post( $url, $ref->{post} );
 
-	$ref->{raw_xml} = $reply->content;
+		if ( $reply->is_error ) {
+			$ref->{errstr} = $reply->status_line;
+			return $ref;
+		}
+
+		$ref->{raw_xml} = $reply->content;
+	}
 
 	# the interface often does not return valid XML (but it's close!)
 	if ( substr( $ref->{raw_xml}, 0, 5 ) ne '<?xml' ) {
