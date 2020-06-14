@@ -154,7 +154,10 @@ sub display_result {
 					print "\n";
 					$first_message = 0;
 				}
-				printf( "# %s\n", $msg );
+				printf( "# %s\n", $msg->{header} );
+				if ( $msg->{lead} ) {
+					printf( "# %s\n", $msg->{lead} );
+				}
 			}
 		}
 
