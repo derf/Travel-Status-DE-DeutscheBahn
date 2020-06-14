@@ -6,7 +6,7 @@ use 5.020;
 use utf8;
 
 use File::Slurp qw(read_file);
-use Test::More tests => 46;
+use Test::More tests => 67;
 
 use Travel::Status::DE::HAFAS;
 
@@ -93,7 +93,7 @@ for my $res ( $results[2]->line_no, $results[2]->train_no ) {
 }
 
 is( $results[2]->operator, undef, 'result 2: no operator' );
-is( $results[2]->platform, undef,   'result 2: no platform' );
+is( $results[2]->platform, undef, 'result 2: no platform' );
 
 for my $res ( $results[2]->route_end, $results[2]->destination,
 	$results[2]->origin )
@@ -109,4 +109,44 @@ is(
 );
 is( $results[2]->sched_time, '14:17', 'result 2: sched_time' );
 is( $results[2]->time,       '14:17', 'result 2: time' );
-is( $results[2]->type,       'Bus',     'result 2: type' );
+is( $results[2]->type,       'Bus',   'result 2: type' );
+
+# Result 6: U-Bahn
+
+is( $results[6]->date, '13.06.2020', 'result 6: date' );
+is(
+	$results[6]->datetime->strftime('%Y%m%d %H%M%S'),
+	'20200613 142100',
+	'result 6: datetime'
+);
+is( $results[6]->delay, 1,     'result 6: delay' );
+is( $results[6]->info,  undef, 'result 6: no info' );
+ok( !$results[6]->is_cancelled,        'result 6: not cancelled' );
+ok( !$results[6]->is_changed_platform, 'result 6: platform not changed' );
+is( scalar $results[6]->messages, 0, 'result 6: no messages' );
+
+for my $res ( $results[6]->line, $results[6]->train ) {
+	is( $res, 'U      8', 'result 6: line/train' );
+}
+for my $res ( $results[6]->line_no, $results[6]->train_no ) {
+	is( $res, 8, 'result 6: line/train number' );
+}
+
+is( $results[6]->operator, undef, 'result 6: no operator' );
+is( $results[6]->platform, undef, 'result 6: no platform' );
+
+for my $res ( $results[6]->route_end, $results[6]->destination,
+	$results[6]->origin )
+{
+	is( $res, 'Paracelsus-Bad (U), Berlin', 'result 6: route start/end' );
+}
+
+is( $results[6]->sched_date, '13.06.2020', 'result 6: sched_date' );
+is(
+	$results[6]->sched_datetime->strftime('%Y%m%d %H%M%S'),
+	'20200613 142000',
+	'result 6: sched_datetime'
+);
+is( $results[6]->sched_time, '14:20', 'result 6: sched_time' );
+is( $results[6]->time,       '14:21', 'result 6: time' );
+is( $results[6]->type,       'U',     'result 6: type' );
