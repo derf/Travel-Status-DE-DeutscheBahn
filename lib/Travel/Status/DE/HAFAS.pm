@@ -13,6 +13,7 @@ use DateTime::Format::Strptime;
 use List::Util qw(any);
 use LWP::UserAgent;
 use POSIX qw(strftime);
+use Travel::Status::DE::HAFAS::Message;
 use Travel::Status::DE::HAFAS::Result;
 use Travel::Status::DE::HAFAS::StopFinder;
 use XML::LibXML;
@@ -299,11 +300,11 @@ sub add_message_node {
 			return $message;
 		}
 	}
-	my $message = {
+	my $message = Travel::Status::DE::HAFAS::Message->new(
 		header    => $header,
 		lead      => $lead,
 		ref_count => 1,
-	};
+	);
 	push( @{ $self->{messages} }, $message );
 	return $message;
 }
