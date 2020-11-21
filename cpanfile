@@ -11,6 +11,7 @@ requires 'POSIX';
 requires 'XML::LibXML';
 
 on test => sub {
+	requires 'File::Slurp';
 	requires 'Test::Compile';
 	requires 'Test::More';
 	requires 'Test::Pod';
