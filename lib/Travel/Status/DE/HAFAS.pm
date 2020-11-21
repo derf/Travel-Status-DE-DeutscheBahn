@@ -180,9 +180,15 @@ sub new {
 	# errors in delay="...") when setting the language to dutch/italian.
 	# No, I don't know why.
 
-	$ref->{tree} = XML::LibXML->load_xml(
-		string => $ref->{raw_xml},
-	);
+	eval { $ref->{tree} = XML::LibXML->load_xml( string => $ref->{raw_xml} ) };
+
+	if ( my $err = $@ ) {
+		if ( $ref->{developer_mode} ) {
+			say $ref->{raw_xml};
+		}
+		$ref->{errstr} = "Backend returned invalid XML: $err";
+		return $ref;
+	}
 
 	if ( $ref->{developer_mode} ) {
 		say $ref->{tree}->toString(1);
