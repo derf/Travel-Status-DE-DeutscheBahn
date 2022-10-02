@@ -93,12 +93,28 @@ my %hafas_instance = (
 		},
 	},
 	NVV => {
-		url        => 'https://auskunft.nvv.de/auskunft/bin/jp/stboard.exe',
+		mgate      => 'https://auskunft.nvv.de/auskunft/bin/app/mgate.exe',
 		stopfinder =>
 		  'https://auskunft.nvv.de/auskunft/bin/jp/ajax-getstop.exe',
 		name        => 'Nordhessischer VerkehrsVerbund',
 		productbits =>
 		  [qw[ice ic_ec regio s u tram bus bus ferry ondemand regio regio]],
+		request => {
+			client => {
+				id   => 'NVV',
+				v    => '5000300',
+				type => 'IPH',
+				name => 'NVVMobilPROD_APPSTORE',
+				os   => 'iOS 13.1.2',
+			},
+			ext  => 'NVV.6.0',
+			ver  => '1.18',
+			auth => {
+				type => 'AID',
+				aid  => 'Kt8eNOH7' . 'qjVeSxNA',
+			},
+			lang => 'deu',
+		},
 	},
 	'ÖBB' => {
 		url         => 'https://fahrplan.oebb.at/bin/stboard.exe',
