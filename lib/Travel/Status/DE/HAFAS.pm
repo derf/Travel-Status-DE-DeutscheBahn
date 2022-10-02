@@ -612,6 +612,11 @@ sub parse_mgate {
 		my $train_type = $product->{prodCtx}{catOutS};
 		my $line_no    = $product->{prodCtx}{line};
 
+		my $operator = $opL[ $product->{oprX} ];
+		if ($operator) {
+			$operator = $operator->{name};
+		}
+
 		push(
 			@{ $self->{results} },
 			Travel::Status::DE::HAFAS::Result->new(
@@ -622,6 +627,7 @@ sub parse_mgate {
 				delay          => $delay,
 				is_cancelled   => $is_cancelled,
 				train          => $train,
+				operator       => $operator,
 				route_end      => $destination,
 				platform       => $platform,
 				new_platform   => $new_platform,

@@ -52,8 +52,8 @@ for my $res ( $results[0]->line_no, $results[0]->train_no ) {
 	is( $res, 300, 'result 0: line/train number' );
 }
 
-is( $results[0]->operator, undef, 'result 0: no operator' );
-is( $results[0]->platform, undef, 'result 0: platform' );
+is( $results[0]->operator, 'Nahreisezug', 'result 0: operator' );
+is( $results[0]->platform, undef,         'result 0: platform' );
 
 for my $res ( $results[0]->route_end, $results[0]->destination,
 	$results[0]->origin )
@@ -90,8 +90,8 @@ for my $res ( $results[2]->line_no, $results[2]->train_no ) {
 	is( $res, 8, 'result 2: line/train number' );
 }
 
-is( $results[2]->operator, undef, 'result 2: no operator' );
-is( $results[2]->platform, undef, 'result 2: no platform' );
+is( $results[2]->operator, 'Nahreisezug', 'result 2: operator' );
+is( $results[2]->platform, undef,         'result 2: no platform' );
 
 for my $res ( $results[2]->route_end, $results[2]->destination,
 	$results[2]->origin )
@@ -128,8 +128,8 @@ for my $res ( $results[3]->line_no, $results[3]->train_no ) {
 	is( $res, 3, 'result 3: line/train number' );
 }
 
-is( $results[3]->operator, undef, 'result 3: no operator' );
-is( $results[3]->platform, 4,     'result 3: platform' );
+is( $results[3]->operator, 'S-Bahn Berlin', 'result 3: operator' );
+is( $results[3]->platform, 4,               'result 3: platform' );
 
 for my $res ( $results[3]->route_end, $results[3]->destination,
 	$results[3]->origin )
