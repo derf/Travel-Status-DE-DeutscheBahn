@@ -117,11 +117,25 @@ my %hafas_instance = (
 		},
 	},
 	'ÖBB' => {
-		url         => 'https://fahrplan.oebb.at/bin/stboard.exe',
+		mgate       => 'https://fahrplan.oebb.at/bin/mgate.exe',
 		stopfinder  => 'https://fahrplan.oebb.at/bin/ajax-getstop.exe',
 		name        => 'Österreichische Bundesbahnen',
 		productbits =>
 		  [qw[ice ice ice regio regio s bus ferry u tram ice ondemand ice]],
+		request => {
+			client => {
+				id   => 'OEBB',
+				v    => '6030600',
+				type => 'IPH',
+				name => 'oebbPROD-ADHOC',
+			},
+			ver  => '1.41',
+			auth => {
+				type => 'AID',
+				aid  => 'OWDL4fE4' . 'ixNiPBBm',
+			},
+			lang => 'deu',
+		},
 	},
 	RSAG => {
 		url         => 'https://fahrplan.rsag-online.de/hafas/stboard.exe',
@@ -211,7 +225,7 @@ sub new_mgate {
 		$lid = 'A=1@O=' . $self->{station} . '@';
 	}
 
-	my $mot_mask = 1023;
+	my $mot_mask = 2**@{ $hafas_instance{$service}{productbits} } - 1;
 
 	my %mot_pos;
 	for my $i ( 0 .. $#{ $hafas_instance{$service}{productbits} } ) {
