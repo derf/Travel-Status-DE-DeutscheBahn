@@ -32,10 +32,7 @@ my %hafas_instance = (
 	#	productbits => [qw[s u tram bus ferry ice regio ondemand]],
 	#},
 	DB => {
-		url         => 'https://reiseauskunft.bahn.de/bin/bhftafel.exe',
 		stopfinder  => 'https://reiseauskunft.bahn.de/bin/ajax-getstop.exe',
-		trainsearch => 'https://reiseauskunft.bahn.de/bin/trainsearch.exe',
-		traininfo   => 'https://reiseauskunft.bahn.de/bin/traininfo.exe',
 		mgate       => 'https://reiseauskunft.bahn.de/bin/mgate.exe',
 		name        => 'Deutsche Bahn',
 		productbits => [qw[ice ic_ec d regio s bus ferry u tram ondemand]],
@@ -51,7 +48,7 @@ my %hafas_instance = (
 			ver  => '1.15',
 			auth => {
 				type => 'AID',
-				aid  => 'n91dB8Z77MLdoR0K'
+				aid  => 'n91dB8Z77' . 'MLdoR0K'
 			},
 		},
 	},
@@ -207,18 +204,7 @@ sub new_mgate {
 				meth => 'StationBoard'
 			}
 		],
-		client => {
-			id   => 'DB',
-			v    => '20100000',
-			type => 'IPH',
-			name => 'DB Navigator'
-		},
-		ext  => 'DB.R21.12.a',
-		ver  => '1.15',
-		auth => {
-			type  => 'AID',
-			'aid' => 'n91dB8Z77MLdoR0K'
-		}
+		%{ $hafas_instance{$service}{request} }
 	};
 
 	$req = $json->encode($req);
@@ -403,7 +389,11 @@ sub check_input_error {
 sub check_mgate {
 	my ($self) = @_;
 
-	if ( $self->{raw_json}{cInfo}{code} ne 'OK' ) {
+	if ( $self->{raw_json}{err} ) {
+		$self->{errstr}  = 'error code is ' . $self->{raw_json}{err};
+		$self->{errcode} = $self->{raw_json}{err};
+	}
+	elsif ( $self->{raw_json}{cInfo}{code} ne 'OK' ) {
 		$self->{errstr}  = 'cInfo code is ' . $self->{raw_json}{cInfo}{code};
 		$self->{errcode} = $self->{raw_json}{cInfo}{code};
 	}
@@ -438,9 +428,6 @@ sub similar_stops {
 
 	if ( $service and exists $hafas_instance{$service}{stopfinder} ) {
 
-		# we do not pass our constructor's language argument here,
-		# because most stopfinder services do not return any results
-		# for languages other than german ('d' aka the default)
 		my $sf = Travel::Status::DE::HAFAS::StopFinder->new(
 			url            => $hafas_instance{$service}{stopfinder},
 			input          => $self->{station},
