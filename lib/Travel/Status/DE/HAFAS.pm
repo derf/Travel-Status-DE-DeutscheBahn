@@ -72,10 +72,25 @@ my %hafas_instance = (
 		},
 	},
 	NASA => {
-		url         => 'https://reiseauskunft.insa.de/bin/stboard.exe',
+		mgate       => 'https://reiseauskunft.insa.de/bin/mgate.exe',
 		stopfinder  => 'https://reiseauskunft.insa.de/bin/ajax-getstop.exe',
 		name        => 'Nahverkehrsservice Sachsen-Anhalt',
 		productbits => [qw[ice ice regio regio regio tram bus ondemand]],
+		request     => {
+			client => {
+				id   => 'NASA',
+				v    => '4000200',
+				type => 'IPH',
+				name => 'nasaPROD',
+				os   => 'iPhone OS 13.1.2',
+			},
+			ver  => '1.18',
+			auth => {
+				type => 'AID',
+				aid  => 'nasa-' . 'apps',
+			},
+			lang => 'deu',
+		},
 	},
 	NVV => {
 		url        => 'https://auskunft.nvv.de/auskunft/bin/jp/stboard.exe',
@@ -402,12 +417,14 @@ sub check_input_error {
 sub check_mgate {
 	my ($self) = @_;
 
-	if ( $self->{raw_json}{err} ) {
-		$self->{errstr}  = 'error code is ' . $self->{raw_json}{err};
+	if ( $self->{raw_json}{err} and $self->{raw_json}{err} ne 'OK' ) {
+		$self->{errstr} = $self->{raw_json}{errTxt}
+		  // 'error code is ' . $self->{raw_json}{err};
 		$self->{errcode} = $self->{raw_json}{err};
 	}
 	elsif ( defined $self->{raw_json}{cInfo}{code}
-		and $self->{raw_json}{cInfo}{code} ne 'OK' )
+		and $self->{raw_json}{cInfo}{code} ne 'OK'
+		and $self->{raw_json}{cInfo}{code} ne 'VH' )
 	{
 		$self->{errstr}  = 'cInfo code is ' . $self->{raw_json}{cInfo}{code};
 		$self->{errcode} = $self->{raw_json}{cInfo}{code};
@@ -614,9 +631,11 @@ sub parse_mgate {
 		my $train_type = $product->{prodCtx}{catOutS};
 		my $line_no    = $product->{prodCtx}{line};
 
-		my $operator = $opL[ $product->{oprX} ];
-		if ($operator) {
-			$operator = $operator->{name};
+		my $operator;
+		if ( defined $product->{oprX} ) {
+			if ( my $opref = $opL[ $product->{oprX} ] ) {
+				$operator = $opref->{name};
+			}
 		}
 
 		push(
