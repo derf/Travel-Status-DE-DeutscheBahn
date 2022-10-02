@@ -5,17 +5,16 @@ use 5.014;
 
 our $VERSION = '3.01';
 
-use Encode qw(decode);
-use Getopt::Long qw(:config no_ignore_case);
+use DateTime;
+use Encode          qw(decode);
+use Getopt::Long    qw(:config no_ignore_case);
 use List::MoreUtils qw(uniq);
-use List::Util qw(first max);
+use List::Util      qw(first max);
 use Travel::Status::DE::HAFAS;
 
 my ( $date, $time );
-my $arrivals    = 0;
-my $ignore_late = 0;
-my $types       = q{};
-my $language;
+my $arrivals = 0;
+my $types    = q{};
 my $developer_mode;
 my ( $list_services, $service, $hafas_url );
 my ( @excluded_mots, @exclusive_mots );
@@ -28,18 +27,16 @@ for my $arg (@ARGV) {
 }
 
 GetOptions(
-	'a|arrivals'    => \$arrivals,
-	'd|date=s'      => \$date,
-	'h|help'        => sub { show_help(0) },
-	'l|lang=s'      => \$language,
-	'L|ignore-late' => \$ignore_late,
-	'm|mot=s'       => \$types,
-	's|service=s'   => \$service,
-	't|time=s'      => \$time,
-	'u|url=s'       => \$hafas_url,
-	'V|version'     => \&show_version,
-	'devmode'       => \$developer_mode,
-	'list'          => \$list_services,
+	'a|arrivals'  => \$arrivals,
+	'd|date=s'    => \$date,
+	'h|help'      => sub { show_help(0) },
+	'm|mot=s'     => \$types,
+	's|service=s' => \$service,
+	't|time=s'    => \$time,
+	'u|url=s'     => \$hafas_url,
+	'V|version'   => \&show_version,
+	'devmode'     => \$developer_mode,
+	'list'        => \$list_services,
 
 ) or show_help(1);
 
@@ -53,18 +50,52 @@ if ($list_services) {
 
 parse_mot_options();
 
-my $status = Travel::Status::DE::HAFAS->new(
-	date           => $date,
-	language       => $language,
+my %opt = (
 	excluded_mots  => \@excluded_mots,
 	exclusive_mots => \@exclusive_mots,
 	station        => shift || show_help(1),
-	time           => $time,
-	mode           => $arrivals ? 'arr' : 'dep',
+	arrivals       => $arrivals,
 	developer_mode => $developer_mode,
 	service        => $service,
 	url            => $hafas_url,
 );
+
+if ( $date or $time ) {
+	my $dt = DateTime->now( time_zone => 'Europe/Berlin' );
+	if ($date) {
+		if ( $date
+			=~ m{ ^ (?<day> \d{1,2} ) [.] (?<month> \d{1,2} ) [.] (?<year> \d{4})? $ }x
+		  )
+		{
+			$dt->set(
+				day   => $+{day},
+				month => $+{month}
+			);
+			if ( $+{year} ) {
+				$dt->set( year => $+{year} );
+			}
+		}
+		else {
+			say "--date must be specified as DD.MM.[YYYY]";
+			exit 1;
+		}
+	}
+	if ($time) {
+		if ( $time =~ m{ ^ (?<hour> \d{1,2} ) : (?<minute> \d{1,2} ) $ }x ) {
+			$dt->set(
+				hour   => $+{hour},
+				minute => $+{minute}
+			);
+		}
+		else {
+			say "--time must be specified as HH:MM";
+			exit 1;
+		}
+	}
+	$opt{datetime} = $dt;
+}
+
+my $status = Travel::Status::DE::HAFAS->new(%opt);
 
 sub show_help {
 	my ($code) = @_;
@@ -176,7 +207,9 @@ sub display_result {
 
 if ( my $err = $status->errstr ) {
 	say STDERR "Request error: ${err}";
-	if ( $status->errcode and $status->errcode eq 'H730' ) {
+	if ( $status->errcode
+		and ( $status->errcode eq 'H730' or $status->errcode eq 'LOCATION' ) )
+	{
 		show_similar_stops();
 	}
 	exit 2;
@@ -192,10 +225,6 @@ for my $m ( $status->messages ) {
 
 for my $d ( $status->results ) {
 
-	if ( $ignore_late and $d->delay ) {
-		next;
-	}
-
 	my $info_line = $d->info // q{};
 
 	for my $message ( $d->messages ) {
@@ -207,7 +236,7 @@ for my $d ( $status->results ) {
 	push(
 		@output,
 		[
-			$d->sched_time,
+			$d->sched_datetime->strftime('%H:%M'),
 			$d->is_cancelled
 			? 'CANCELED'
 			: ( $d->delay ? sprintf( '%+d', $d->delay ) : q{} ),
@@ -255,18 +284,9 @@ Show arrivals instead of departures, including trains ending at the specified
 station. Note that this causes the output to display the start instead of
 the end station.
 
-=item B<-d>, B<--date> I<dd>.I<mm>.I<yyyy>
+=item B<-d>, B<--date> I<dd>.I<mm>.[I<yyyy>]
 
 Date to list departures for.  Default: today.
-
-=item B<-l>, B<--lang> B<d>|B<e>|B<i>|B<n>
-
-Set language used for additional information. Supports B<d>eutsch (default),
-B<e>nglish, B<i>talian and dutch (B<n>), depending on the used service.
-
-=item B<-L>, B<--ignore-late>
-
-Do not display delayed trains.
 
 =item B<--list>
 
@@ -300,8 +320,7 @@ Time to list departures for.  Default: now.
 
 =item B<-u>, B<--url> I<url>
 
-Request arrivals/departures using the API entry point at I<url>. Note that the
-language and output selection suffix (e.g. "/dn") must not be included here.
+Request arrivals/departures using the API entry point at I<url>.
 Note that B<--mot> will not work when using this opton.
 
 =item B<-V>, B<--version>

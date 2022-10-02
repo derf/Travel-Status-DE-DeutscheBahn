@@ -10,6 +10,9 @@ no if $] >= 5.018, warnings => 'experimental::smartmatch';
 use Carp qw(confess);
 use DateTime;
 use DateTime::Format::Strptime;
+use Digest::MD5 qw(md5_hex);
+use Encode      qw(decode encode);
+use JSON;
 use List::Util qw(any);
 use LWP::UserAgent;
 use POSIX qw(strftime);
@@ -33,9 +36,24 @@ my %hafas_instance = (
 		stopfinder  => 'https://reiseauskunft.bahn.de/bin/ajax-getstop.exe',
 		trainsearch => 'https://reiseauskunft.bahn.de/bin/trainsearch.exe',
 		traininfo   => 'https://reiseauskunft.bahn.de/bin/traininfo.exe',
+		mgate       => 'https://reiseauskunft.bahn.de/bin/mgate.exe',
 		name        => 'Deutsche Bahn',
-		productbits =>
-		  [qw[ice ic_ec d regio s bus ferry u tram ondemand x x x x]],
+		productbits => [qw[ice ic_ec d regio s bus ferry u tram ondemand]],
+		salt        => 'bdI8UVj4' . '0K5fvxwf',
+		request     => {
+			client => {
+				id   => 'DB',
+				v    => '20100000',
+				type => 'IPH',
+				name => 'DB Navigator',
+			},
+			ext  => 'DB.R21.12.a',
+			ver  => '1.15',
+			auth => {
+				type => 'AID',
+				aid  => 'n91dB8Z77MLdoR0K'
+			},
+		},
 	},
 	NAHSH => {
 		url         => 'https://nah.sh.hafas.de/bin/stboard.exe',
@@ -50,17 +68,17 @@ my %hafas_instance = (
 		productbits => [qw[ice ice regio regio regio tram bus ondemand]],
 	},
 	NVV => {
-		url => 'https://auskunft.nvv.de/auskunft/bin/jp/stboard.exe',
+		url        => 'https://auskunft.nvv.de/auskunft/bin/jp/stboard.exe',
 		stopfinder =>
 		  'https://auskunft.nvv.de/auskunft/bin/jp/ajax-getstop.exe',
-		name => 'Nordhessischer VerkehrsVerbund',
+		name        => 'Nordhessischer VerkehrsVerbund',
 		productbits =>
 		  [qw[ice ic_ec regio s u tram bus bus ferry ondemand regio regio]],
 	},
 	'ÖBB' => {
-		url        => 'https://fahrplan.oebb.at/bin/stboard.exe',
-		stopfinder => 'https://fahrplan.oebb.at/bin/ajax-getstop.exe',
-		name       => 'Österreichische Bundesbahnen',
+		url         => 'https://fahrplan.oebb.at/bin/stboard.exe',
+		stopfinder  => 'https://fahrplan.oebb.at/bin/ajax-getstop.exe',
+		name        => 'Österreichische Bundesbahnen',
 		productbits =>
 		  [qw[ice ice ice regio regio s bus ferry u tram ice ondemand ice]],
 	},
@@ -94,11 +112,6 @@ my %hafas_instance = (
 
 sub new {
 	my ( $obj, %conf ) = @_;
-
-	my $date = $conf{date} // strftime( '%d.%m.%Y', localtime(time) );
-	my $time = $conf{time} // strftime( '%H:%M',    localtime(time) );
-	my $lang = $conf{language} // 'd';
-	my $mode = $conf{mode}     // 'dep';
 	my $service = $conf{service};
 
 	my %lwp_options = %{ $conf{lwp_options} // { timeout => 10 } };
@@ -107,14 +120,12 @@ sub new {
 
 	$ua->env_proxy;
 
-	my $reply;
-
 	if ( not $conf{station} ) {
 		confess('You need to specify a station');
 	}
 
 	if ( not defined $service and not defined $conf{url} ) {
-		$service = 'DB';
+		$service = $conf{service} = 'DB';
 	}
 
 	if ( defined $service and not exists $hafas_instance{$service} ) {
@@ -123,6 +134,7 @@ sub new {
 
 	my $ref = {
 		active_service => $service,
+		arrivals       => $conf{arrivals},
 		developer_mode => $conf{developer_mode},
 		exclusive_mots => $conf{exclusive_mots},
 		excluded_mots  => $conf{excluded_mots},
@@ -130,41 +142,172 @@ sub new {
 		results        => [],
 		station        => $conf{station},
 		ua             => $ua,
-		post           => {
-			input => $conf{station},
-			date  => $date,
-			time  => $time,
-			start => 'yes',         # value doesn't matter, just needs to be set
-			boardType => $mode,
-			L         => 'vs_java3',
-		},
+		now            => DateTime->now( time_zone => 'Europe/Berlin' ),
 	};
 
 	bless( $ref, $obj );
 
-	$ref->set_productfilter;
+	if ( $hafas_instance{$service}{mgate} ) {
+		return $ref->new_mgate(%conf);
+	}
+	return $ref->new_legacy(%conf);
+}
+
+sub new_mgate {
+	my ( $self, %conf ) = @_;
+	my $json    = JSON->new->utf8;
+	my $service = $conf{service};
+
+	my $now  = $self->{now};
+	my $date = ( $conf{datetime} // $now )->strftime('%Y%m%d');
+	my $time = ( $conf{datetime} // $now )->strftime('%H%M%S');
+
+	my $lid;
+	if ( $self->{station} =~ m{ ^ [0-9]+ $ }x ) {
+		$lid = 'A=1@L=' . $self->{station} . '@';
+	}
+	else {
+		$lid = 'A=1@O=' . $self->{station} . '@';
+	}
+
+	my $mot_mask = 1023;
+
+	my %mot_pos;
+	for my $i ( 0 .. $#{ $hafas_instance{$service}{productbits} } ) {
+		$mot_pos{ $hafas_instance{$service}{productbits}[$i] } = $i;
+	}
+
+	if ( my @mots = @{ $self->{exclusive_mots} // [] } ) {
+		$mot_mask = 0;
+		for my $mot (@mots) {
+			$mot_mask |= 1 << $mot_pos{$mot};
+		}
+	}
+
+	if ( my @mots = @{ $self->{excluded_mots} // [] } ) {
+		for my $mot (@mots) {
+			$mot_mask &= ~( 1 << $mot_pos{$mot} );
+		}
+	}
+
+	my $req = {
+		svcReqL => [
+			{
+				req => {
+					type     => ( $conf{arrivals} ? 'ARR' : 'DEP' ),
+					stbLoc   => { lid => $lid },
+					dirLoc   => undef,
+					maxJny   => 30,
+					date     => $date,
+					time     => $time,
+					dur      => -1,
+					jnyFltrL =>
+					  [ { type => "PROD", mode => "INC", value => $mot_mask } ]
+				},
+				meth => 'StationBoard'
+			}
+		],
+		client => {
+			id   => 'DB',
+			v    => '20100000',
+			type => 'IPH',
+			name => 'DB Navigator'
+		},
+		ext  => 'DB.R21.12.a',
+		ver  => '1.15',
+		auth => {
+			type  => 'AID',
+			'aid' => 'n91dB8Z77MLdoR0K'
+		}
+	};
+
+	$req = $json->encode($req);
+	$self->{post} = $req;
+
+	my $url = $conf{url} // $hafas_instance{$service}{mgate};
+
+	if ( my $salt = $hafas_instance{$service}{salt} ) {
+		$url .= '?checksum=' . md5_hex( $self->{post} . $salt );
+	}
+
+	if ( $conf{json} ) {
+		$self->{raw_json} = $conf{json};
+	}
+	else {
+		if ( $self->{developer_mode} ) {
+			say "requesting $req from $url";
+		}
+
+		my $reply = $self->{ua}->post(
+			$url,
+			'Content-Type' => 'application/json',
+			Content        => $self->{post}
+		);
+		if ( $reply->is_error ) {
+			$self->{errstr} = $reply->status_line;
+			return $self;
+		}
+
+		if ( $self->{developer_mode} ) {
+			say decode( 'utf-8', $reply->content );
+		}
+
+		$self->{raw_json} = $json->decode( $reply->content );
+	}
+
+	$self->check_mgate;
+	$self->parse_mgate;
+
+	return $self;
+}
+
+sub new_legacy {
+	my ( $self, %conf ) = @_;
+
+	my $now     = $self->{now};
+	my $date    = ( $conf{datetime} // $now )->strftime('%d.%m.%Y');
+	my $time    = ( $conf{datetime} // $now )->strftime('%H:%M');
+	my $mode    = $conf{arrivals} ? 'arr' : 'dep';
+	my $lang    = 'd';
+	my $service = $conf{service};
+
+	$self->{post} = {
+		input     => $conf{station},
+		date      => $date,
+		time      => $time,
+		start     => 'yes',         # value doesn't matter, just needs to be set
+		boardType => $mode,
+		L         => 'vs_java3',
+	};
+
+	$self->set_productfilter;
 
 	my $url = ( $conf{url} // $hafas_instance{$service}{url} ) . "/${lang}n";
 
 	if ( $conf{xml} ) {
-		$ref->{raw_xml} = $conf{xml};
+
+		# used for testing
+		$self->{raw_xml} = $conf{xml};
 	}
 	else {
-		$reply = $ua->post( $url, $ref->{post} );
+		if ( $self->{developer_mode} ) {
+			say "requesting from $url";
+		}
+		my $reply = $self->{ua}->post( $url, $self->{post} );
 
 		if ( $reply->is_error ) {
-			$ref->{errstr} = $reply->status_line;
-			return $ref;
+			$self->{errstr} = $reply->status_line;
+			return $self;
 		}
 
-		$ref->{raw_xml} = $reply->content;
+		$self->{raw_xml} = $reply->content;
 	}
 
 	# the interface often does not return valid XML (but it's close!)
-	if ( substr( $ref->{raw_xml}, 0, 5 ) ne '<?xml' ) {
-		$ref->{raw_xml}
+	if ( substr( $self->{raw_xml}, 0, 5 ) ne '<?xml' ) {
+		$self->{raw_xml}
 		  = '<?xml version="1.0" encoding="iso-8859-15"?><wrap>'
-		  . $ref->{raw_xml}
+		  . $self->{raw_xml}
 		  . '</wrap>';
 	}
 
@@ -172,7 +315,7 @@ sub new {
 
 		# Returns invalid XML with tags inside HIMMessage's lead attribute.
 		# Fix this.
-		$ref->{raw_xml}
+		$self->{raw_xml}
 		  =~ s{ lead = " \K ( [^"]+ ) }{ $1 =~ s{ < [^>]+ > }{}grx }egx;
 	}
 
@@ -180,23 +323,23 @@ sub new {
 	# errors in delay="...") when setting the language to dutch/italian.
 	# No, I don't know why.
 
-	eval { $ref->{tree} = XML::LibXML->load_xml( string => $ref->{raw_xml} ) };
+	eval { $self->{tree} = XML::LibXML->load_xml( string => $self->{raw_xml} ) };
 
 	if ( my $err = $@ ) {
-		if ( $ref->{developer_mode} ) {
-			say $ref->{raw_xml};
+		if ( $self->{developer_mode} ) {
+			say $self->{raw_xml};
 		}
-		$ref->{errstr} = "Backend returned invalid XML: $err";
-		return $ref;
+		$self->{errstr} = "Backend returned invalid XML: $err";
+		return $self;
 	}
 
-	if ( $ref->{developer_mode} ) {
-		say $ref->{tree}->toString(1);
+	if ( $self->{developer_mode} ) {
+		say $self->{tree}->toString(1);
 	}
 
-	$ref->check_input_error;
-	$ref->prepare_results;
-	return $ref;
+	$self->check_input_error;
+	$self->prepare_results;
+	return $self;
 }
 
 sub set_productfilter {
@@ -254,7 +397,26 @@ sub check_input_error {
 		$self->{errcode} = $err->getAttribute('code');
 	}
 
-	return;
+	return $self;
+}
+
+sub check_mgate {
+	my ($self) = @_;
+
+	if ( $self->{raw_json}{cInfo}{code} ne 'OK' ) {
+		$self->{errstr}  = 'cInfo code is ' . $self->{raw_json}{cInfo}{code};
+		$self->{errcode} = $self->{raw_json}{cInfo}{code};
+	}
+	elsif ( @{ $self->{raw_json}{svcResL} // [] } == 0 ) {
+		$self->{errstr} = 'svcResL is empty';
+	}
+	elsif ( $self->{raw_json}{svcResL}[0]{err} ne 'OK' ) {
+		$self->{errstr}
+		  = 'svcResL[0].err is ' . $self->{raw_json}{svcResL}[0]{err};
+		$self->{errcode} = $self->{raw_json}{svcResL}[0]{err};
+	}
+
+	return $self;
 }
 
 sub errcode {
@@ -289,7 +451,7 @@ sub similar_stops {
 			$self->{errstr} = $err;
 			return;
 		}
-		return $sf->results;
+		return $self->results;
 	}
 	return;
 }
@@ -333,9 +495,6 @@ sub prepare_results {
 
 	$self->{results} = [];
 
-	$self->{datetime_now} //= DateTime->now(
-		time_zone => 'Europe/Berlin',
-	);
 	$self->{strptime_obj} //= DateTime::Format::Strptime->new(
 		pattern   => '%d.%m.%YT%H:%M',
 		time_zone => 'Europe/Berlin',
@@ -388,13 +547,11 @@ sub prepare_results {
 		push(
 			@{ $self->{results} },
 			Travel::Status::DE::HAFAS::Result->new(
-				sched_date     => $date,
 				sched_datetime => $datetime,
-				datetime_now   => $self->{datetime_now},
+				datetime_now   => $self->{now},
 				raw_delay      => $delay,
 				raw_e_delay    => $e_delay,
 				messages       => \@messages,
-				sched_time     => $time,
 				train          => $train,
 				operator       => $operator,
 				route_end      => $dest,
@@ -404,6 +561,74 @@ sub prepare_results {
 			)
 		);
 	}
+	return $self;
+}
+
+sub parse_mgate {
+	my ($self) = @_;
+
+	$self->{results} = [];
+
+	if ( $self->{errstr} ) {
+		return $self;
+	}
+
+	$self->{strptime_obj} //= DateTime::Format::Strptime->new(
+		pattern   => '%Y%m%dT%H%M%S',
+		time_zone => 'Europe/Berlin',
+	);
+
+	my @locL  = @{ $self->{raw_json}{svcResL}[0]{res}{common}{locL}  // [] };
+	my @prodL = @{ $self->{raw_json}{svcResL}[0]{res}{common}{prodL} // [] };
+	my @opL   = @{ $self->{raw_json}{svcResL}[0]{res}{common}{opL}   // [] };
+	my @icoL  = @{ $self->{raw_json}{svcResL}[0]{res}{common}{icoL}  // [] };
+	my @jnyL  = @{ $self->{raw_json}{svcResL}[0]{res}{jnyL}          // [] };
+
+	for my $result (@jnyL) {
+		my $date = $result->{date};
+		my $time_s
+		  = $result->{stbStop}{ $self->{arrivals} ? 'aTimeS' : 'dTimeS' };
+		my $time_r
+		  = $result->{stbStop}{ $self->{arrivals} ? 'aTimeR' : 'dTimeR' };
+		my $datetime_s
+		  = $self->{strptime_obj}->parse_datetime("${date}T${time_s}");
+		my $datetime_r
+		  = $time_r
+		  ? $self->{strptime_obj}->parse_datetime("${date}T${time_r}")
+		  : undef;
+		my $delay
+		  = $datetime_r
+		  ? ( $datetime_r->epoch - $datetime_s->epoch ) / 60
+		  : undef;
+
+		my $destination  = $result->{dirTxt};
+		my $is_cancelled = $result->{isCncl};
+		my $jid          = $result->{jid};
+		my $platform     = $result->{stbStop}{dPlatfS};
+		my $new_platform = $result->{stbStop}{dPlatfR};
+
+		my $product    = $prodL[ $result->{prodX} ];
+		my $train      = $product->{prodCtx}{name};
+		my $train_type = $product->{prodCtx}{catOutS};
+		my $line_no    = $product->{prodCtx}{line};
+
+		push(
+			@{ $self->{results} },
+			Travel::Status::DE::HAFAS::Result->new(
+				sched_datetime => $datetime_s,
+				rt_datetime    => $datetime_r,
+				datetime       => $datetime_r // $datetime_s,
+				datetime_now   => $self->{now},
+				delay          => $delay,
+				is_cancelled   => $is_cancelled,
+				train          => $train,
+				route_end      => $destination,
+				platform       => $platform,
+				new_platform   => $new_platform,
+			)
+		);
+	}
+	return $self;
 }
 
 sub results {
@@ -505,9 +730,9 @@ Supported I<opts> are:
 The station or stop to report for, e.g.  "Essen HBf" or
 "Alfredusbad, Essen (Ruhr)".  Mandatory.
 
-=item B<date> => I<dd>.I<mm>.I<yyyy>
+=item B<datetime> => I<DateTime object>
 
-Date to report for.  Defaults to the current day.
+Date and time to report for.  Defaults to now.
 
 =item B<excluded_mots> => [I<mot1>, I<mot2>, ...]
 
@@ -546,10 +771,6 @@ By default, Travel::Status::DE::HAFAS reports train departures
 Request results from I<service>, defaults to "DB".
 See B<get_services> (and C<< hafas-m --list >>) for a list of supported
 services.
-
-=item B<time> => I<hh>:I<mm>
-
-Time to report for.  Defaults to now.
 
 =item B<url> => I<url>
 

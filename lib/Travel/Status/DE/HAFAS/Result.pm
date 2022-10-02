@@ -11,8 +11,8 @@ use parent 'Class::Accessor';
 our $VERSION = '3.01';
 
 Travel::Status::DE::HAFAS::Result->mk_ro_accessors(
-	qw(sched_date date sched_datetime datetime info operator raw_e_delay
-	  raw_delay sched_time time train route_end)
+	qw(sched_date date sched_datetime datetime info is_cancelled operator delay
+	  sched_time time train route_end)
 );
 
 sub new {
@@ -21,17 +21,16 @@ sub new {
 	my $ref = \%conf;
 	bless( $ref, $obj );
 
-	if ( my $delay = $ref->delay ) {
-		$ref->{datetime}
-		  = $ref->{sched_datetime}->clone->add( minutes => $delay );
-		$ref->{date} = $ref->{datetime}->strftime('%d.%m.%Y');
-		$ref->{time} = $ref->{datetime}->strftime('%H:%M');
+	if ( $ref->{delay} ) {
+		$ref->{datetime} = $ref->{rt_datetime};
 	}
 	else {
 		$ref->{datetime} = $ref->{sched_datetime};
-		$ref->{date}     = $ref->{sched_date};
-		$ref->{time}     = $ref->{sched_time};
 	}
+	$ref->{date}       = $ref->{datetime}->strftime('%d.%m.%Y');
+	$ref->{time}       = $ref->{datetime}->strftime('%H:%M');
+	$ref->{sched_date} = $ref->{sched_datetime}->strftime('%d.%m.%Y');
+	$ref->{sched_time} = $ref->{sched_datetime}->strftime('%H:%M');
 
 	return $ref;
 }
@@ -56,21 +55,6 @@ sub countdown_sec {
 	return $self->{countdown_sec};
 }
 
-sub delay {
-	my ($self) = @_;
-
-	if ( defined $self->{raw_e_delay} ) {
-		return $self->{raw_e_delay};
-	}
-	if (    defined $self->{raw_delay}
-		and $self->{raw_delay} ne q{-}
-		and $self->{raw_delay} ne 'cancel' )
-	{
-		return $self->{raw_delay};
-	}
-	return;
-}
-
 sub destination {
 	my ($self) = @_;
 
@@ -81,15 +65,6 @@ sub line {
 	my ($self) = @_;
 
 	return $self->{train};
-}
-
-sub is_cancelled {
-	my ($self) = @_;
-
-	if ( $self->{raw_delay} and $self->{raw_delay} eq 'cancel' ) {
-		return 1;
-	}
-	return 0;
 }
 
 sub is_changed_platform {

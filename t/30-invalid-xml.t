@@ -13,7 +13,7 @@ use Travel::Status::DE::HAFAS;
 my $xml = 'lol';
 
 my $status = Travel::Status::DE::HAFAS->new(
-	service => 'DB',
+	service => 'NASA',
 	station => 'Berlin Jannowitzbrücke',
 	xml     => $xml
 );
@@ -24,7 +24,7 @@ is( scalar $status->results,
 $xml = 'lol<';
 
 $status = Travel::Status::DE::HAFAS->new(
-	service => 'DB',
+	service => 'NASA',
 	station => 'Berlin Jannowitzbrücke',
 	xml     => $xml
 );
