@@ -53,10 +53,23 @@ my %hafas_instance = (
 		},
 	},
 	NAHSH => {
-		url         => 'https://nah.sh.hafas.de/bin/stboard.exe',
+		mgate       => 'https://nah.sh.hafas.de/bin/mgate.exe',
 		stopfinder  => 'https://nah.sh.hafas.de/bin/ajax-getstop.exe',
 		name        => 'Nahverkehrsverbund Schleswig-Holstein',
 		productbits => [qw[ice ice ice regio s bus ferry u tram ondemand]],
+		request     => {
+			client => {
+				id   => 'NAHSH',
+				v    => '3000700',
+				type => 'IPH',
+				name => 'NAHSHPROD',
+			},
+			ver  => '1.16',
+			auth => {
+				type => 'AID',
+				aid  => 'r0Ot9FLF' . 'NAFxijLW'
+			},
+		},
 	},
 	NASA => {
 		url         => 'https://reiseauskunft.insa.de/bin/stboard.exe',
@@ -393,7 +406,9 @@ sub check_mgate {
 		$self->{errstr}  = 'error code is ' . $self->{raw_json}{err};
 		$self->{errcode} = $self->{raw_json}{err};
 	}
-	elsif ( $self->{raw_json}{cInfo}{code} ne 'OK' ) {
+	elsif ( defined $self->{raw_json}{cInfo}{code}
+		and $self->{raw_json}{cInfo}{code} ne 'OK' )
+	{
 		$self->{errstr}  = 'cInfo code is ' . $self->{raw_json}{cInfo}{code};
 		$self->{errcode} = $self->{raw_json}{cInfo}{code};
 	}
