@@ -143,14 +143,6 @@ my %hafas_instance = (
 		name        => 'Rostocker Straßenbahn AG',
 		productbits => [qw[ice ice ice regio s bus ferry u tram ondemand]],
 	},
-
-	#SBB => {
-	#	url        => 'https://fahrplan.sbb.ch/bin/stboard.exe',
-	#	stopfinder => 'https://fahrplan.sbb.ch/bin/ajax-getstop.exe',
-	#	name       => 'Schweizerische Bundesbahnen',
-	#	productbits =>
-	#	  [qw[ice ice regio regio ferry s bus cablecar regio tram]],
-	#},
 	VBB => {
 		url         => 'https://fahrinfo.vbb.de/bin/stboard.exe',
 		stopfinder  => 'https://fahrinfo.vbb.de/bin/ajax-getstop.exe',
