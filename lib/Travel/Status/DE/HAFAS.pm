@@ -178,11 +178,13 @@ sub new {
 	my ( $obj, %conf ) = @_;
 	my $service = $conf{service};
 
-	my %lwp_options = %{ $conf{lwp_options} // { timeout => 10 } };
+	my $ua = $conf{user_agent};
 
-	my $ua = $conf{user_agent} // LWP::UserAgent->new(%lwp_options);
-
-	$ua->env_proxy;
+	if ( not $ua ) {
+		my %lwp_options = %{ $conf{lwp_options} // { timeout => 10 } };
+		$ua = LWP::UserAgent->new(%lwp_options);
+		$ua->env_proxy;
+	}
 
 	if ( not $conf{station} ) {
 		confess('You need to specify a station');
@@ -264,7 +266,7 @@ sub new {
 		%{ $hafas_instance{$service}{request} }
 	};
 
-	my $json = JSON->new->utf8;
+	my $json = $self->{json} = JSON->new->utf8;
 
 	# The JSON request is the cache key, so if we have a cache we must ensure
 	# that JSON serialization is deterministic.
@@ -286,6 +288,11 @@ sub new {
 		else {
 			$url .= '?checksum=' . md5_hex( $self->{post} . $salt );
 		}
+	}
+
+	if ( $conf{async} ) {
+		$self->{url} = $url;
+		return $self;
 	}
 
 	if ( $conf{json} ) {
@@ -316,12 +323,43 @@ sub new {
 	return $self;
 }
 
+sub new_p {
+	my ( $obj, %conf ) = @_;
+	my $promise = $conf{promise}->new;
+
+	if ( not $conf{station} ) {
+		return $promise->reject('station flag must be passed');
+	}
+
+	my $self = $obj->new( %conf, async => 1 );
+	$self->{promise} = $conf{promise};
+
+	$self->post_with_cache_p( $self->{url} )->then(
+		sub {
+			my ($content) = @_;
+			$self->{raw_json} = $self->{json}->decode($content);
+			$self->check_mgate;
+			$self->parse_mgate;
+			$promise->resolve($self);
+			return;
+		}
+	)->catch(
+		sub {
+			my ($err) = @_;
+			$promise->reject($err);
+			return;
+		}
+	)->wait;
+
+	return $promise;
+}
+
 sub post_with_cache {
 	my ( $self, $url ) = @_;
 	my $cache = $self->{cache};
 
 	if ( $self->{developer_mode} ) {
-		say "GET $url";
+		say "POST $url";
 	}
 
 	if ($cache) {
@@ -356,6 +394,56 @@ sub post_with_cache {
 	}
 
 	return ( $content, undef );
+}
+
+sub post_with_cache_p {
+	my ( $self, $url ) = @_;
+	my $cache = $self->{cache};
+
+	if ( $self->{developer_mode} ) {
+		say "POST $url";
+	}
+
+	my $promise = $self->{promise}->new;
+
+	if ($cache) {
+		my $content = $cache->thaw( $self->{post} );
+		if ($content) {
+			if ( $self->{developer_mode} ) {
+				say '  cache hit';
+			}
+			return $promise->resolve( ${$content} );
+		}
+	}
+
+	if ( $self->{developer_mode} ) {
+		say '  cache miss';
+	}
+
+	$self->{ua}->post_p( $url, $self->{post} )->then(
+		sub {
+			my ($tx) = @_;
+			if ( my $err = $tx->error ) {
+				$promise->reject(
+					"POST $url returned HTTP $err->{code} $err->{message}");
+				return;
+			}
+			my $content = $tx->res->body;
+			if ($cache) {
+				$cache->freeze( $self->{post}, \$content );
+			}
+			$promise->resolve($content);
+			return;
+		}
+	)->catch(
+		sub {
+			my ($err) = @_;
+			$promise->reject($err);
+			return;
+		}
+	)->wait;
+
+	return $promise;
 }
 
 sub check_mgate {
