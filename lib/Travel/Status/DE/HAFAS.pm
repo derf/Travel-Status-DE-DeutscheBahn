@@ -165,10 +165,26 @@ my %hafas_instance = (
 		},
 	},
 	VBN => {
-		url         => 'https://fahrplaner.vbn.de/hafas/stboard.exe',
+		mgate       => 'https://fahrplaner.vbn.de/bin/mgate.exe',
 		stopfinder  => 'https://fahrplaner.vbn.de/hafas/ajax-getstop.exe',
 		name        => 'Verkehrsverbund Bremen/Niedersachsen',
 		productbits => [qw[ice ice regio regio s bus ferry u tram ondemand]],
+		salt        => 'SP31mBu' . 'fSyCLmNxp',
+		micmac      => 1,
+		request     => {
+			client => {
+				id   => 'VBN',
+				v    => '6000000',
+				type => 'IPH',
+				name => 'vbn',
+			},
+			ver  => '1.42',
+			auth => {
+				type => 'AID',
+				aid  => 'kaoxIXLn' . '03zCr2KR',
+			},
+			lang => 'deu',
+		},
 	},
 );
 
@@ -278,7 +294,14 @@ sub new_mgate {
 	my $url = $conf{url} // $hafas_instance{$service}{mgate};
 
 	if ( my $salt = $hafas_instance{$service}{salt} ) {
-		$url .= '?checksum=' . md5_hex( $self->{post} . $salt );
+		if ( $hafas_instance{$service}{micmac} ) {
+			my $mic = md5_hex( $self->{post} );
+			my $mac = md5_hex( $mic . $salt );
+			$url .= "?mic=$mic&mac=$mac";
+		}
+		else {
+			$url .= '?checksum=' . md5_hex( $self->{post} . $salt );
+		}
 	}
 
 	if ( $conf{json} ) {
