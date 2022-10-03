@@ -200,6 +200,7 @@ sub new {
 	my $self = {
 		active_service => $service,
 		arrivals       => $conf{arrivals},
+		cache          => $conf{cache},
 		developer_mode => $conf{developer_mode},
 		exclusive_mots => $conf{exclusive_mots},
 		excluded_mots  => $conf{excluded_mots},
@@ -212,7 +213,6 @@ sub new {
 
 	bless( $self, $obj );
 
-	my $json = JSON->new->utf8;
 	my $date = ( $conf{datetime} // $now )->strftime('%Y%m%d');
 	my $time = ( $conf{datetime} // $now )->strftime('%H%M%S');
 
@@ -264,6 +264,14 @@ sub new {
 		%{ $hafas_instance{$service}{request} }
 	};
 
+	my $json = JSON->new->utf8;
+
+	# The JSON request is the cache key, so if we have a cache we must ensure
+	# that JSON serialization is deterministic.
+	if ( $self->{cache} ) {
+		$json->canonical;
+	}
+
 	$req = $json->encode($req);
 	$self->{post} = $req;
 
@@ -288,27 +296,66 @@ sub new {
 			say "requesting $req from $url";
 		}
 
-		my $reply = $self->{ua}->post(
-			$url,
-			'Content-Type' => 'application/json',
-			Content        => $self->{post}
-		);
-		if ( $reply->is_error ) {
-			$self->{errstr} = $reply->status_line;
+		my ( $content, $error ) = $self->post_with_cache($url);
+
+		if ($error) {
+			$self->{errstr} = $error;
 			return $self;
 		}
 
 		if ( $self->{developer_mode} ) {
-			say decode( 'utf-8', $reply->content );
+			say decode( 'utf-8', $content );
 		}
 
-		$self->{raw_json} = $json->decode( $reply->content );
+		$self->{raw_json} = $json->decode($content);
 	}
 
 	$self->check_mgate;
 	$self->parse_mgate;
 
 	return $self;
+}
+
+sub post_with_cache {
+	my ( $self, $url ) = @_;
+	my $cache = $self->{cache};
+
+	if ( $self->{developer_mode} ) {
+		say "GET $url";
+	}
+
+	if ($cache) {
+		my $content = $cache->thaw( $self->{post} );
+		if ($content) {
+			if ( $self->{developer_mode} ) {
+				say '  cache hit';
+			}
+			return ( ${$content}, undef );
+		}
+	}
+
+	if ( $self->{developer_mode} ) {
+		say '  cache miss';
+	}
+
+	my $ua    = $self->{user_agent};
+	my $reply = $self->{ua}->post(
+		$url,
+		'Content-Type' => 'application/json',
+		Content        => $self->{post}
+	);
+
+	if ( $reply->is_error ) {
+		return ( undef, $reply->status_line );
+	}
+	my $content = $reply->content;
+
+	if ($cache) {
+		say "freeeez";
+		$cache->freeze( $self->{post}, \$content );
+	}
+
+	return ( $content, undef );
 }
 
 sub check_mgate {
