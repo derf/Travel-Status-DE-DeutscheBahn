@@ -7,8 +7,7 @@ NAHSH Flensburg
 NASA Wernigerode Hbf
 NVV Kassel Hauptbahnhof
 ÖBB Wien Meidling
-RSAG Rostock Hbf
-VBB Berlin Jannowitzbrücke
+VBB S+U Jannowitzbrücke (Berlin)
 VBN Diepholz"
 
 echo $checks | while read service stop; do
