@@ -492,7 +492,7 @@ sub similar_stops {
 			$self->{errstr} = $err;
 			return;
 		}
-		return $self->results;
+		return $sf->results;
 	}
 	return;
 }
