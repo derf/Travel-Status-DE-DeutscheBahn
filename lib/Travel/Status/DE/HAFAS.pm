@@ -144,10 +144,25 @@ my %hafas_instance = (
 		productbits => [qw[ice ice ice regio s bus ferry u tram ondemand]],
 	},
 	VBB => {
-		url         => 'https://fahrinfo.vbb.de/bin/stboard.exe',
+		mgate       => 'https://fahrinfo.vbb.de/bin/mgate.exe',
 		stopfinder  => 'https://fahrinfo.vbb.de/bin/ajax-getstop.exe',
 		name        => 'Verkehrsverbund Berlin-Brandenburg',
 		productbits => [qw[s u tram bus ferry ice regio]],
+		request     => {
+			client => {
+				id   => 'VBB',
+				type => 'WEB',
+				name => 'VBB WebApp',
+				l    => 'vs_webapp_vbb',
+			},
+			ext  => 'VBB.1',
+			ver  => '1.33',
+			auth => {
+				type => 'AID',
+				aid  => 'hafas-vb' . 'b-webapp',
+			},
+			lang => 'deu',
+		},
 	},
 	VBN => {
 		url         => 'https://fahrplaner.vbn.de/hafas/stboard.exe',
@@ -498,12 +513,23 @@ sub similar_stops {
 }
 
 sub add_message {
-	my ( $self, $json ) = @_;
+	my ( $self, $json, $is_him ) = @_;
 
 	my $short = $json->{txtS};
 	my $text  = $json->{txtN};
 	my $code  = $json->{code};
 	my $prio  = $json->{prio};
+
+	if ($is_him) {
+		$short = $json->{head};
+		$text  = $json->{text};
+		$code  = $json->{hid};
+	}
+
+	# Some backends use remL for operator information. We don't want that.
+	if ( $code eq 'OPERATOR' ) {
+		return;
+	}
 
 	for my $message ( @{ $self->{messages} } ) {
 		if ( $code eq $message->{code} and $text eq $message->{text} ) {
@@ -650,6 +676,7 @@ sub parse_mgate {
 	my @opL   = @{ $self->{raw_json}{svcResL}[0]{res}{common}{opL}   // [] };
 	my @icoL  = @{ $self->{raw_json}{svcResL}[0]{res}{common}{icoL}  // [] };
 	my @remL  = @{ $self->{raw_json}{svcResL}[0]{res}{common}{remL}  // [] };
+	my @himL  = @{ $self->{raw_json}{svcResL}[0]{res}{common}{himL}  // [] };
 	my @jnyL  = @{ $self->{raw_json}{svcResL}[0]{res}{jnyL}          // [] };
 
 	for my $result (@jnyL) {
@@ -691,6 +718,10 @@ sub parse_mgate {
 		for my $msg ( @{ $result->{msgL} // [] } ) {
 			if ( $msg->{type} eq 'REM' and defined $msg->{remX} ) {
 				push( @messages, $self->add_message( $remL[ $msg->{remX} ] ) );
+			}
+			elsif ( $msg->{type} eq 'HIM' and defined $msg->{himX} ) {
+				push( @messages,
+					$self->add_message( $himL[ $msg->{himX} ], 1 ) );
 			}
 			else {
 				say "Unknown message type $msg->{type}";
