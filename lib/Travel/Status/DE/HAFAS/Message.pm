@@ -8,7 +8,8 @@ use parent 'Class::Accessor';
 
 our $VERSION = '3.01';
 
-Travel::Status::DE::HAFAS::Message->mk_ro_accessors(qw(header lead ref_count));
+Travel::Status::DE::HAFAS::Message->mk_ro_accessors(
+	qw(short text code prio ref_count));
 
 sub new {
 	my ( $obj, %conf ) = @_;

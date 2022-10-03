@@ -185,10 +185,10 @@ sub display_result {
 					print "\n";
 					$first_message = 0;
 				}
-				printf( "# %s\n", $msg->header );
-				if ( $msg->lead ) {
-					printf( "# %s\n", $msg->lead );
+				if ( $msg->short ) {
+					printf( "# %s\n", $msg->short );
 				}
+				printf( "# %s\n", $msg->text );
 			}
 		}
 
@@ -219,7 +219,12 @@ my $message_id = 1;
 for my $m ( $status->messages ) {
 	if ( $m->ref_count > 1 ) {
 		$m->{id} = $message_id++;
-		printf( "# (%d) %s\n# %s\n\n", $m->{id}, $m->header, $m->lead );
+		if ( $m->short ) {
+			printf( "# (%d) %s\n# %s\n\n", $m->{id}, $m->short, $m->text );
+		}
+		else {
+			printf( "# (%d) %s\n\n", $m->{id}, $m->text );
+		}
 	}
 }
 

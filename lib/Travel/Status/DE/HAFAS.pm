@@ -497,6 +497,32 @@ sub similar_stops {
 	return;
 }
 
+sub add_message {
+	my ( $self, $json ) = @_;
+
+	my $short = $json->{txtS};
+	my $text  = $json->{txtN};
+	my $code  = $json->{code};
+	my $prio  = $json->{prio};
+
+	for my $message ( @{ $self->{messages} } ) {
+		if ( $code eq $message->{code} and $text eq $message->{text} ) {
+			$message->{ref_count}++;
+			return $message;
+		}
+	}
+
+	my $message = Travel::Status::DE::HAFAS::Message->new(
+		short     => $short,
+		text      => $text,
+		code      => $code,
+		prio      => $prio,
+		ref_count => 1,
+	);
+	push( @{ $self->{messages} }, $message );
+	return $message;
+}
+
 sub add_message_node {
 	my ( $self, $node ) = @_;
 
@@ -623,6 +649,7 @@ sub parse_mgate {
 	my @prodL = @{ $self->{raw_json}{svcResL}[0]{res}{common}{prodL} // [] };
 	my @opL   = @{ $self->{raw_json}{svcResL}[0]{res}{common}{opL}   // [] };
 	my @icoL  = @{ $self->{raw_json}{svcResL}[0]{res}{common}{icoL}  // [] };
+	my @remL  = @{ $self->{raw_json}{svcResL}[0]{res}{common}{remL}  // [] };
 	my @jnyL  = @{ $self->{raw_json}{svcResL}[0]{res}{jnyL}          // [] };
 
 	for my $result (@jnyL) {
@@ -660,6 +687,16 @@ sub parse_mgate {
 			}
 		}
 
+		my @messages;
+		for my $msg ( @{ $result->{msgL} // [] } ) {
+			if ( $msg->{type} eq 'REM' and defined $msg->{remX} ) {
+				push( @messages, $self->add_message( $remL[ $msg->{remX} ] ) );
+			}
+			else {
+				say "Unknown message type $msg->{type}";
+			}
+		}
+
 		push(
 			@{ $self->{results} },
 			Travel::Status::DE::HAFAS::Result->new(
@@ -674,6 +711,7 @@ sub parse_mgate {
 				route_end      => $destination,
 				platform       => $platform,
 				new_platform   => $new_platform,
+				messages       => \@messages,
 			)
 		);
 	}
