@@ -180,7 +180,7 @@ sub new {
 
 	my %lwp_options = %{ $conf{lwp_options} // { timeout => 10 } };
 
-	my $ua = LWP::UserAgent->new(%lwp_options);
+	my $ua = $conf{user_agent} // LWP::UserAgent->new(%lwp_options);
 
 	$ua->env_proxy;
 
@@ -188,7 +188,7 @@ sub new {
 		confess('You need to specify a station');
 	}
 
-	if ( not defined $service and not defined $conf{url} ) {
+	if ( not defined $service ) {
 		$service = $conf{service} = 'DB';
 	}
 
@@ -196,7 +196,8 @@ sub new {
 		confess("The service '$service' is not supported");
 	}
 
-	my $ref = {
+	my $now  = DateTime->now( time_zone => 'Europe/Berlin' );
+	my $self = {
 		active_service => $service,
 		arrivals       => $conf{arrivals},
 		developer_mode => $conf{developer_mode},
@@ -206,23 +207,12 @@ sub new {
 		results        => [],
 		station        => $conf{station},
 		ua             => $ua,
-		now            => DateTime->now( time_zone => 'Europe/Berlin' ),
+		now            => $now,
 	};
 
-	bless( $ref, $obj );
+	bless( $self, $obj );
 
-	if ( $hafas_instance{$service}{mgate} ) {
-		return $ref->new_mgate(%conf);
-	}
-	return $ref->new_legacy(%conf);
-}
-
-sub new_mgate {
-	my ( $self, %conf ) = @_;
-	my $json    = JSON->new->utf8;
-	my $service = $conf{service};
-
-	my $now  = $self->{now};
+	my $json = JSON->new->utf8;
 	my $date = ( $conf{datetime} // $now )->strftime('%Y%m%d');
 	my $time = ( $conf{datetime} // $now )->strftime('%H%M%S');
 
