@@ -24,13 +24,6 @@ use XML::LibXML;
 our $VERSION = '3.01';
 
 my %hafas_instance = (
-
-	#BVG => {
-	#	url         => 'https://bvg.hafas.de/bin/stboard.exe',
-	#	stopfinder  => 'https://bvg.hafas.de/bin/ajax-getstop.exe',
-	#	name        => 'Berliner Verkehrsgesellschaft',
-	#	productbits => [qw[s u tram bus ferry ice regio ondemand]],
-	#},
 	DB => {
 		stopfinder  => 'https://reiseauskunft.bahn.de/bin/ajax-getstop.exe',
 		mgate       => 'https://reiseauskunft.bahn.de/bin/mgate.exe',
