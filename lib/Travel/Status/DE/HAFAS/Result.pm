@@ -12,7 +12,7 @@ our $VERSION = '3.01';
 
 Travel::Status::DE::HAFAS::Result->mk_ro_accessors(
 	qw(sched_date date sched_datetime datetime info is_cancelled operator delay
-	  sched_time time train route_end)
+	  sched_time time train route route_end)
 );
 
 sub new {

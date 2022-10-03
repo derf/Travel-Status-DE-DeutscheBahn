@@ -495,6 +495,38 @@ sub parse_mgate {
 			}
 		}
 
+		my @stops;
+		for my $stop ( @{ $result->{stopL} // [] } ) {
+			my $loc = $locL[ $stop->{locX} ];
+			my $arr = $stop->{aTimeS};
+			my $arr_dt;
+			if ($arr) {
+				if ( length($arr) == 8 ) {
+
+					# arrival time includes a day offset
+					my $offset_date = $self->{now}->clone;
+					$offset_date->add( days => substr( $arr, 0, 2, q{} ) );
+					$offset_date = $offset_date->strftime('%Y%m%d');
+					$arr_dt      = $self->{strptime_obj}
+					  ->parse_datetime("${offset_date}T${arr}");
+				}
+				else {
+					$arr_dt
+					  = $self->{strptime_obj}->parse_datetime("${date}T${arr}");
+				}
+			}
+			push(
+				@stops,
+				{
+					name    => $loc->{name},
+					eva     => $loc->{extId} + 0,
+					arrival => $arr_dt,
+				}
+			);
+		}
+
+		shift @stops;
+
 		push(
 			@{ $self->{results} },
 			Travel::Status::DE::HAFAS::Result->new(
@@ -510,6 +542,7 @@ sub parse_mgate {
 				platform       => $platform,
 				new_platform   => $new_platform,
 				messages       => \@messages,
+				route          => \@stops,
 			)
 		);
 	}
