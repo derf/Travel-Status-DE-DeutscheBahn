@@ -137,12 +137,6 @@ my %hafas_instance = (
 			lang => 'deu',
 		},
 	},
-	RSAG => {
-		url         => 'https://fahrplan.rsag-online.de/hafas/stboard.exe',
-		stopfinder  => 'https://fahrplan.rsag-online.de/hafas/ajax-getstop.exe',
-		name        => 'Rostocker Straßenbahn AG',
-		productbits => [qw[ice ice ice regio s bus ferry u tram ondemand]],
-	},
 	VBB => {
 		mgate       => 'https://fahrinfo.vbb.de/bin/mgate.exe',
 		stopfinder  => 'https://fahrinfo.vbb.de/bin/ajax-getstop.exe',
