@@ -19,7 +19,6 @@ use POSIX qw(strftime);
 use Travel::Status::DE::HAFAS::Message;
 use Travel::Status::DE::HAFAS::Result;
 use Travel::Status::DE::HAFAS::StopFinder;
-use XML::LibXML;
 
 our $VERSION = '3.01';
 
@@ -322,145 +321,6 @@ sub new_mgate {
 	return $self;
 }
 
-sub new_legacy {
-	my ( $self, %conf ) = @_;
-
-	my $now     = $self->{now};
-	my $date    = ( $conf{datetime} // $now )->strftime('%d.%m.%Y');
-	my $time    = ( $conf{datetime} // $now )->strftime('%H:%M');
-	my $mode    = $conf{arrivals} ? 'arr' : 'dep';
-	my $lang    = 'd';
-	my $service = $conf{service};
-
-	$self->{post} = {
-		input     => $conf{station},
-		date      => $date,
-		time      => $time,
-		start     => 'yes',         # value doesn't matter, just needs to be set
-		boardType => $mode,
-		L         => 'vs_java3',
-	};
-
-	$self->set_productfilter;
-
-	my $url = ( $conf{url} // $hafas_instance{$service}{url} ) . "/${lang}n";
-
-	if ( $conf{xml} ) {
-
-		# used for testing
-		$self->{raw_xml} = $conf{xml};
-	}
-	else {
-		if ( $self->{developer_mode} ) {
-			say "requesting from $url";
-		}
-		my $reply = $self->{ua}->post( $url, $self->{post} );
-
-		if ( $reply->is_error ) {
-			$self->{errstr} = $reply->status_line;
-			return $self;
-		}
-
-		$self->{raw_xml} = $reply->content;
-	}
-
-	# the interface often does not return valid XML (but it's close!)
-	if ( substr( $self->{raw_xml}, 0, 5 ) ne '<?xml' ) {
-		$self->{raw_xml}
-		  = '<?xml version="1.0" encoding="iso-8859-15"?><wrap>'
-		  . $self->{raw_xml}
-		  . '</wrap>';
-	}
-
-	if ( defined $service and $service =~ m{ ^ VBB | NVV $ }x ) {
-
-		# Returns invalid XML with tags inside HIMMessage's lead attribute.
-		# Fix this.
-		$self->{raw_xml}
-		  =~ s{ lead = " \K ( [^"]+ ) }{ $1 =~ s{ < [^>]+ > }{}grx }egx;
-	}
-
-	# TODO the DB backend also retuns invalid XML (similar to above, but with
-	# errors in delay="...") when setting the language to dutch/italian.
-	# No, I don't know why.
-
-	eval { $self->{tree} = XML::LibXML->load_xml( string => $self->{raw_xml} ) };
-
-	if ( my $err = $@ ) {
-		if ( $self->{developer_mode} ) {
-			say $self->{raw_xml};
-		}
-		$self->{errstr} = "Backend returned invalid XML: $err";
-		return $self;
-	}
-
-	if ( $self->{developer_mode} ) {
-		say $self->{tree}->toString(1);
-	}
-
-	$self->check_input_error;
-	$self->prepare_results;
-	return $self;
-}
-
-sub set_productfilter {
-	my ($self) = @_;
-
-	my $service     = $self->{active_service};
-	my $mot_default = '1';
-
-	if ( not $service or not exists $hafas_instance{$service}{productbits} ) {
-		return;
-	}
-
-	my %mot_pos;
-	for my $i ( 0 .. $#{ $hafas_instance{$service}{productbits} } ) {
-		$mot_pos{ $hafas_instance{$service}{productbits}[$i] } = $i;
-	}
-
-	if ( $self->{exclusive_mots} and @{ $self->{exclusive_mots} } ) {
-		$mot_default = '0';
-	}
-
-	$self->{post}{productsFilter}
-	  = $mot_default x ( scalar @{ $hafas_instance{$service}{productbits} } );
-
-	if ( $self->{exclusive_mots} and @{ $self->{exclusive_mots} } ) {
-		for my $mot ( @{ $self->{exclusive_mots} } ) {
-			if ( exists $mot_pos{$mot} ) {
-				substr( $self->{post}{productsFilter}, $mot_pos{$mot}, 1, '1' );
-			}
-		}
-	}
-
-	if ( $self->{excluded_mots} and @{ $self->{excluded_mots} } ) {
-		for my $mot ( @{ $self->{excluded_mots} } ) {
-			if ( exists $mot_pos{$mot} ) {
-				substr( $self->{post}{productsFilter}, $mot_pos{$mot}, 1, '0' );
-			}
-		}
-	}
-
-	return;
-}
-
-sub check_input_error {
-	my ($self) = @_;
-
-	my $xp_err = XML::LibXML::XPathExpression->new('//Err');
-	my $err    = ( $self->{tree}->findnodes($xp_err) )[0];
-
-	if ($err) {
-		$self->{errstr}
-		  = $err->getAttribute('text')
-		  . ' (code '
-		  . $err->getAttribute('code') . ')';
-		$self->{errcode} = $err->getAttribute('code');
-	}
-
-	return $self;
-}
-
 sub check_mgate {
 	my ($self) = @_;
 
@@ -559,112 +419,9 @@ sub add_message {
 	return $message;
 }
 
-sub add_message_node {
-	my ( $self, $node ) = @_;
-
-	my $header = $node->getAttribute('header');
-	my $lead   = $node->getAttribute('lead');
-
-	for my $message ( @{ $self->{messages} } ) {
-		if ( $header eq $message->{header} and $lead eq $message->{lead} ) {
-			$message->{ref_count}++;
-			return $message;
-		}
-	}
-	my $message = Travel::Status::DE::HAFAS::Message->new(
-		header    => $header,
-		lead      => $lead,
-		ref_count => 1,
-	);
-	push( @{ $self->{messages} }, $message );
-	return $message;
-}
-
 sub messages {
 	my ($self) = @_;
 	return @{ $self->{messages} };
-}
-
-sub prepare_results {
-	my ($self) = @_;
-	my $mode = $self->{post}->{boardType};
-
-	my $xp_element = XML::LibXML::XPathExpression->new('//Journey');
-	my $xp_msg     = XML::LibXML::XPathExpression->new('./HIMMessage');
-
-	if ( not defined $self->{tree} ) {
-		return;
-	}
-
-	$self->{results} = [];
-
-	$self->{strptime_obj} //= DateTime::Format::Strptime->new(
-		pattern   => '%d.%m.%YT%H:%M',
-		time_zone => 'Europe/Berlin',
-	);
-
-	for my $tr ( @{ $self->{tree}->findnodes($xp_element) } ) {
-
-		my @message_nodes = $tr->findnodes($xp_msg);
-		my $train         = $tr->getAttribute('prod');
-		my $time          = $tr->getAttribute('fpTime');
-		my $date          = $tr->getAttribute('fpDate');
-		my $dest          = $tr->getAttribute('targetLoc');
-		my $platform      = $tr->getAttribute('platform');
-		my $new_platform  = $tr->getAttribute('newpl');
-		my $delay         = $tr->getAttribute('delay');
-		my $e_delay       = $tr->getAttribute('e_delay');
-		my $info          = $tr->getAttribute('delayReason');
-		my $operator      = $tr->getAttribute('operator');
-		my @messages;
-
-		if ( not( $time and $dest ) ) {
-			next;
-		}
-
-		for my $n (@message_nodes) {
-			push( @messages, $self->add_message_node($n) );
-		}
-
-		# Some backends report dd.mm.yy, some report dd.mm.yyyy
-		# -> map all dates to dd.mm.yyyy
-		if ( length($date) == 8 ) {
-			substr( $date, 6, 0, '20' );
-		}
-
-		# TODO the first charactor of delayReason is special:
-		# " " -> no additional data, rest (if any) is delay reason
-		# else -> first word is not a delay reason but additional data,
-		# for instance "Zusatzfahrt/Ersatzfahrt" for a replacement train
-		if ( defined $info and $info eq q{ } ) {
-			$info = undef;
-		}
-		elsif ( defined $info and substr( $info, 0, 1 ) eq q{ } ) {
-			substr( $info, 0, 1, q{} );
-		}
-
-		$train =~ s{#.*$}{};
-
-		my $datetime = $self->{strptime_obj}->parse_datetime("${date}T${time}");
-
-		push(
-			@{ $self->{results} },
-			Travel::Status::DE::HAFAS::Result->new(
-				sched_datetime => $datetime,
-				datetime_now   => $self->{now},
-				raw_delay      => $delay,
-				raw_e_delay    => $e_delay,
-				messages       => \@messages,
-				train          => $train,
-				operator       => $operator,
-				route_end      => $dest,
-				platform       => $platform,
-				new_platform   => $new_platform,
-				info           => $info,
-			)
-		);
-	}
-	return $self;
 }
 
 sub parse_mgate {
@@ -972,8 +729,6 @@ None.
 =item * DateTime::Format::Strptime(3pm)
 
 =item * LWP::UserAgent(3pm)
-
-=item * XML::LibXML(3pm)
 
 =back
 

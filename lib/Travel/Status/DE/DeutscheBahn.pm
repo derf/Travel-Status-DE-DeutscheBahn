@@ -91,8 +91,6 @@ None.
 
 =item * Travel::Status::DE::HAFAS(3pm)
 
-=item * XML::LibXML(3pm)
-
 =back
 
 =head1 BUGS AND LIMITATIONS

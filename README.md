@@ -8,7 +8,6 @@ interfaces, and can also be pointed to URLs not listed here.
 * [Nahverkehrsverbund Schleswig-Holstein](https://nah.sh.hafas.de/bin/stboard.exe)
 * [Nahverkehrsservice Sachsen-Anhalt](https://reiseauskunft.insa.de/bin/stboard.exe)
 * [Nordhessischer VerkehrsVerbund](https://auskunft.nvv.de/auskunft/bin/jp/stboard.exe)
-* [Rostocker Straßenbahn AG](https://fahrplan.rsag-online.de/hafas/stboard.exe)
 * [Verkehrsverbund Berlin-Brandenburg](https://fahrinfo.vbb.de/bin/stboard.exe)
 * [Verkehrsverbund Bremen/Niedersachsen](https://fahrplaner.vbn.de/hafas/stboard.exe)
 * [Österreichische Bundesbahnen](https://fahrplan.oebb.at/bin/stboard.exe)
@@ -78,7 +77,6 @@ pkg-config and a C compiler) installed. You will also need the following
 libraries with development headers:
 
 * libssl
-* libxml2
 * zlib
 
 Now, use a tool of your choice to install the module. Minimum working example:

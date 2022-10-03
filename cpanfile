@@ -1,6 +1,7 @@
 requires 'Class::Accessor';
 requires 'DateTime';
 requires 'DateTime::Format::Strptime';
+requires 'Digest::MD5';
 requires 'Getopt::Long';
 requires 'JSON';
 requires 'List::MoreUtils';
@@ -8,7 +9,6 @@ requires 'List::Util';
 requires 'LWP::UserAgent';
 requires 'LWP::Protocol::https';
 requires 'POSIX';
-requires 'XML::LibXML';
 
 on test => sub {
 	requires 'File::Slurp';

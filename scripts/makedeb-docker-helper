@@ -11,7 +11,7 @@ apt-get -y install \
 	libclass-accessor-perl libdatetime-perl libdatetime-format-strptime-perl \
 	liblwp-protocol-https-perl libjson-perl libjson-xs-perl \
 	liblist-moreutils-perl \
-	libwww-perl libxml-libxml-perl \
+	libwww-perl \
 	libtest-compile-perl libtest-pod-perl \
 	libtest-simple-perl
 
