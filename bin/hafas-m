@@ -84,7 +84,8 @@ if ( $date or $time ) {
 		if ( $time =~ m{ ^ (?<hour> \d{1,2} ) : (?<minute> \d{1,2} ) $ }x ) {
 			$dt->set(
 				hour   => $+{hour},
-				minute => $+{minute}
+				minute => $+{minute},
+				second => 0,
 			);
 		}
 		else {
