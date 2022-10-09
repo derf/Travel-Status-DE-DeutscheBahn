@@ -17,7 +17,7 @@ use List::Util qw(any);
 use LWP::UserAgent;
 use POSIX qw(strftime);
 use Travel::Status::DE::HAFAS::Message;
-use Travel::Status::DE::HAFAS::Result;
+use Travel::Status::DE::HAFAS::Journey;
 use Travel::Status::DE::HAFAS::StopFinder;
 
 our $VERSION = '3.01';
@@ -568,7 +568,7 @@ sub parse_mgate {
 	for my $result (@jnyL) {
 		push(
 			@{ $self->{results} },
-			Travel::Status::DE::HAFAS::Result->new(
+			Travel::Status::DE::HAFAS::Journey->new(
 				common  => $self->{raw_json}{svcResL}[0]{res}{common},
 				journey => $result,
 				hafas   => $self,
@@ -738,7 +738,7 @@ describing it.  If no error occurred, returns undef.
 =item $status->results
 
 Returns a list of arrivals/departures.  Each list element is a
-Travel::Status::DE::HAFAS::Result(3pm) object.
+Travel::Status::DE::HAFAS::Journey(3pm) object.
 
 If no matching results were found or the parser / http request failed, returns
 undef.
@@ -800,7 +800,7 @@ The non-default services (anything other than DB) are not well tested.
 
 =head1 SEE ALSO
 
-Travel::Status::DE::HAFAS::Result(3pm), Travel::Status::DE::HAFAS::StopFinder(3pm).
+Travel::Status::DE::HAFAS::Journey(3pm), Travel::Status::DE::HAFAS::StopFinder(3pm).
 
 =head1 AUTHOR
 

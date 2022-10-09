@@ -1,4 +1,4 @@
-package Travel::Status::DE::HAFAS::Result;
+package Travel::Status::DE::HAFAS::Journey;
 
 use strict;
 use warnings;
@@ -10,7 +10,7 @@ use parent 'Class::Accessor';
 
 our $VERSION = '3.01';
 
-Travel::Status::DE::HAFAS::Result->mk_ro_accessors(
+Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(sched_date date sched_datetime datetime info is_cancelled operator delay
 	  sched_time time train route route_end)
 );
@@ -256,7 +256,7 @@ __END__
 
 =head1 NAME
 
-Travel::Status::DE::HAFAS::Result - Information about a single
+Travel::Status::DE::HAFAS::Journey - Information about a single
 arrival/departure received by Travel::Status::DE::HAFAS
 
 =head1 SYNOPSIS
@@ -288,7 +288,7 @@ version 3.01
 
 =head1 DESCRIPTION
 
-Travel::Status::DE::HAFAS::Result describes a single arrival/departure
+Travel::Status::DE::HAFAS::Journey describes a single arrival/departure
 as obtained by Travel::Status::DE::HAFAS.  It contains information about
 the platform, time, route and more.
 
