@@ -563,111 +563,15 @@ sub parse_mgate {
 		time_zone => 'Europe/Berlin',
 	);
 
-	my @locL  = @{ $self->{raw_json}{svcResL}[0]{res}{common}{locL}  // [] };
-	my @prodL = @{ $self->{raw_json}{svcResL}[0]{res}{common}{prodL} // [] };
-	my @opL   = @{ $self->{raw_json}{svcResL}[0]{res}{common}{opL}   // [] };
-	my @icoL  = @{ $self->{raw_json}{svcResL}[0]{res}{common}{icoL}  // [] };
-	my @remL  = @{ $self->{raw_json}{svcResL}[0]{res}{common}{remL}  // [] };
-	my @himL  = @{ $self->{raw_json}{svcResL}[0]{res}{common}{himL}  // [] };
-	my @jnyL  = @{ $self->{raw_json}{svcResL}[0]{res}{jnyL}          // [] };
+	my @jnyL = @{ $self->{raw_json}{svcResL}[0]{res}{jnyL} // [] };
 
 	for my $result (@jnyL) {
-		my $date = $result->{date};
-		my $time_s
-		  = $result->{stbStop}{ $self->{arrivals} ? 'aTimeS' : 'dTimeS' };
-		my $time_r
-		  = $result->{stbStop}{ $self->{arrivals} ? 'aTimeR' : 'dTimeR' };
-		my $datetime_s
-		  = $self->{strptime_obj}->parse_datetime("${date}T${time_s}");
-		my $datetime_r
-		  = $time_r
-		  ? $self->{strptime_obj}->parse_datetime("${date}T${time_r}")
-		  : undef;
-		my $delay
-		  = $datetime_r
-		  ? ( $datetime_r->epoch - $datetime_s->epoch ) / 60
-		  : undef;
-
-		my $destination  = $result->{dirTxt};
-		my $is_cancelled = $result->{isCncl};
-		my $jid          = $result->{jid};
-		my $platform     = $result->{stbStop}{dPlatfS};
-		my $new_platform = $result->{stbStop}{dPlatfR};
-
-		my $product    = $prodL[ $result->{prodX} ];
-		my $train      = $product->{prodCtx}{name};
-		my $train_type = $product->{prodCtx}{catOutS};
-		my $line_no    = $product->{prodCtx}{line};
-
-		my $operator;
-		if ( defined $product->{oprX} ) {
-			if ( my $opref = $opL[ $product->{oprX} ] ) {
-				$operator = $opref->{name};
-			}
-		}
-
-		my @messages;
-		for my $msg ( @{ $result->{msgL} // [] } ) {
-			if ( $msg->{type} eq 'REM' and defined $msg->{remX} ) {
-				push( @messages, $self->add_message( $remL[ $msg->{remX} ] ) );
-			}
-			elsif ( $msg->{type} eq 'HIM' and defined $msg->{himX} ) {
-				push( @messages,
-					$self->add_message( $himL[ $msg->{himX} ], 1 ) );
-			}
-			else {
-				say "Unknown message type $msg->{type}";
-			}
-		}
-
-		my @stops;
-		for my $stop ( @{ $result->{stopL} // [] } ) {
-			my $loc = $locL[ $stop->{locX} ];
-			my $arr = $stop->{aTimeS};
-			my $arr_dt;
-			if ($arr) {
-				if ( length($arr) == 8 ) {
-
-					# arrival time includes a day offset
-					my $offset_date = $self->{now}->clone;
-					$offset_date->add( days => substr( $arr, 0, 2, q{} ) );
-					$offset_date = $offset_date->strftime('%Y%m%d');
-					$arr_dt      = $self->{strptime_obj}
-					  ->parse_datetime("${offset_date}T${arr}");
-				}
-				else {
-					$arr_dt
-					  = $self->{strptime_obj}->parse_datetime("${date}T${arr}");
-				}
-			}
-			push(
-				@stops,
-				{
-					name    => $loc->{name},
-					eva     => $loc->{extId} + 0,
-					arrival => $arr_dt,
-				}
-			);
-		}
-
-		shift @stops;
-
 		push(
 			@{ $self->{results} },
 			Travel::Status::DE::HAFAS::Result->new(
-				sched_datetime => $datetime_s,
-				rt_datetime    => $datetime_r,
-				datetime       => $datetime_r // $datetime_s,
-				datetime_now   => $self->{now},
-				delay          => $delay,
-				is_cancelled   => $is_cancelled,
-				train          => $train,
-				operator       => $operator,
-				route_end      => $destination,
-				platform       => $platform,
-				new_platform   => $new_platform,
-				messages       => \@messages,
-				route          => \@stops,
+				common  => $self->{raw_json}{svcResL}[0]{res}{common},
+				journey => $result,
+				hafas   => $self,
 			)
 		);
 	}

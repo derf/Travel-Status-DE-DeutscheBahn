@@ -16,9 +16,113 @@ Travel::Status::DE::HAFAS::Result->mk_ro_accessors(
 );
 
 sub new {
-	my ( $obj, %conf ) = @_;
+	my ( $obj, %opt ) = @_;
 
-	my $ref = \%conf;
+	my @locL  = @{ $opt{common}{locL}  // [] };
+	my @prodL = @{ $opt{common}{prodL} // [] };
+	my @opL   = @{ $opt{common}{opL}   // [] };
+	my @icoL  = @{ $opt{common}{icoL}  // [] };
+	my @remL  = @{ $opt{common}{remL}  // [] };
+	my @himL  = @{ $opt{common}{himL}  // [] };
+
+	my $hafas   = $opt{hafas};
+	my $journey = $opt{journey};
+
+	my $date = $journey->{date};
+	my $time_s
+	  = $journey->{stbStop}{ $hafas->{arrivals} ? 'aTimeS' : 'dTimeS' };
+	my $time_r
+	  = $journey->{stbStop}{ $hafas->{arrivals} ? 'aTimeR' : 'dTimeR' };
+	my $datetime_s
+	  = $hafas->{strptime_obj}->parse_datetime("${date}T${time_s}");
+	my $datetime_r
+	  = $time_r
+	  ? $hafas->{strptime_obj}->parse_datetime("${date}T${time_r}")
+	  : undef;
+	my $delay
+	  = $datetime_r
+	  ? ( $datetime_r->epoch - $datetime_s->epoch ) / 60
+	  : undef;
+
+	my $destination  = $journey->{dirTxt};
+	my $is_cancelled = $journey->{isCncl};
+	my $jid          = $journey->{jid};
+	my $platform     = $journey->{stbStop}{dPlatfS};
+	my $new_platform = $journey->{stbStop}{dPlatfR};
+
+	my $product    = $prodL[ $journey->{prodX} ];
+	my $train      = $product->{prodCtx}{name};
+	my $train_type = $product->{prodCtx}{catOutS};
+	my $line_no    = $product->{prodCtx}{line};
+
+	my $operator;
+	if ( defined $product->{oprX} ) {
+		if ( my $opref = $opL[ $product->{oprX} ] ) {
+			$operator = $opref->{name};
+		}
+	}
+
+	my @messages;
+	for my $msg ( @{ $journey->{msgL} // [] } ) {
+		if ( $msg->{type} eq 'REM' and defined $msg->{remX} ) {
+			push( @messages, $hafas->add_message( $remL[ $msg->{remX} ] ) );
+		}
+		elsif ( $msg->{type} eq 'HIM' and defined $msg->{himX} ) {
+			push( @messages, $hafas->add_message( $himL[ $msg->{himX} ], 1 ) );
+		}
+		else {
+			say "Unknown message type $msg->{type}";
+		}
+	}
+
+	my @stops;
+	for my $stop ( @{ $journey->{stopL} // [] } ) {
+		my $loc = $locL[ $stop->{locX} ];
+		my $arr = $stop->{aTimeS};
+		my $arr_dt;
+		if ($arr) {
+			if ( length($arr) == 8 ) {
+
+				# arrival time includes a day offset
+				my $offset_date = $hafas->{now}->clone;
+				$offset_date->add( days => substr( $arr, 0, 2, q{} ) );
+				$offset_date = $offset_date->strftime('%Y%m%d');
+				$arr_dt      = $hafas->{strptime_obj}
+				  ->parse_datetime("${offset_date}T${arr}");
+			}
+			else {
+				$arr_dt
+				  = $hafas->{strptime_obj}->parse_datetime("${date}T${arr}");
+			}
+		}
+		push(
+			@stops,
+			{
+				name    => $loc->{name},
+				eva     => $loc->{extId} + 0,
+				arrival => $arr_dt,
+			}
+		);
+	}
+
+	shift @stops;
+
+	my $ref = {
+		sched_datetime => $datetime_s,
+		rt_datetime    => $datetime_r,
+		datetime       => $datetime_r // $datetime_s,
+		datetime_now   => $hafas->{now},
+		delay          => $delay,
+		is_cancelled   => $is_cancelled,
+		train          => $train,
+		operator       => $operator,
+		route_end      => $destination,
+		platform       => $platform,
+		new_platform   => $new_platform,
+		messages       => \@messages,
+		route          => \@stops,
+	};
+
 	bless( $ref, $obj );
 
 	if ( $ref->{delay} ) {
