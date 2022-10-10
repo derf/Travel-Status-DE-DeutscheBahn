@@ -17,6 +17,7 @@ use List::Util qw(any);
 use LWP::UserAgent;
 use POSIX qw(strftime);
 use Travel::Status::DE::HAFAS::Message;
+use Travel::Status::DE::HAFAS::Polyline qw(decode_polyline);
 use Travel::Status::DE::HAFAS::Journey;
 use Travel::Status::DE::HAFAS::StopFinder;
 
@@ -186,7 +187,7 @@ sub new {
 		$ua->env_proxy;
 	}
 
-	if ( not $conf{station} ) {
+	if ( not $conf{station} and not $conf{journey} ) {
 		confess('You need to specify a station');
 	}
 
@@ -215,56 +216,80 @@ sub new {
 
 	bless( $self, $obj );
 
-	my $date = ( $conf{datetime} // $now )->strftime('%Y%m%d');
-	my $time = ( $conf{datetime} // $now )->strftime('%H%M%S');
+	my $req;
 
-	my $lid;
-	if ( $self->{station} =~ m{ ^ [0-9]+ $ }x ) {
-		$lid = 'A=1@L=' . $self->{station} . '@';
+	if ( $conf{journey} ) {
+		$req = {
+			svcReqL => [
+				{
+					meth => 'JourneyDetails',
+					req  => {
+						jid         => $conf{journey}{id},
+						name        => $conf{journey}{name} // '0',
+						getPolyline => $conf{with_polyline} ? \1 : \0,
+					},
+				}
+			],
+			%{ $hafas_instance{$service}{request} }
+		};
 	}
 	else {
-		$lid = 'A=1@O=' . $self->{station} . '@';
-	}
+		my $date = ( $conf{datetime} // $now )->strftime('%Y%m%d');
+		my $time = ( $conf{datetime} // $now )->strftime('%H%M%S');
 
-	my $mot_mask = 2**@{ $hafas_instance{$service}{productbits} } - 1;
-
-	my %mot_pos;
-	for my $i ( 0 .. $#{ $hafas_instance{$service}{productbits} } ) {
-		$mot_pos{ $hafas_instance{$service}{productbits}[$i] } = $i;
-	}
-
-	if ( my @mots = @{ $self->{exclusive_mots} // [] } ) {
-		$mot_mask = 0;
-		for my $mot (@mots) {
-			$mot_mask |= 1 << $mot_pos{$mot};
+		my $lid;
+		if ( $self->{station} =~ m{ ^ [0-9]+ $ }x ) {
+			$lid = 'A=1@L=' . $self->{station} . '@';
 		}
-	}
-
-	if ( my @mots = @{ $self->{excluded_mots} // [] } ) {
-		for my $mot (@mots) {
-			$mot_mask &= ~( 1 << $mot_pos{$mot} );
+		else {
+			$lid = 'A=1@O=' . $self->{station} . '@';
 		}
-	}
 
-	my $req = {
-		svcReqL => [
-			{
-				req => {
-					type     => ( $conf{arrivals} ? 'ARR' : 'DEP' ),
-					stbLoc   => { lid => $lid },
-					dirLoc   => undef,
-					maxJny   => 30,
-					date     => $date,
-					time     => $time,
-					dur      => -1,
-					jnyFltrL =>
-					  [ { type => "PROD", mode => "INC", value => $mot_mask } ]
-				},
-				meth => 'StationBoard'
+		my $mot_mask = 2**@{ $hafas_instance{$service}{productbits} } - 1;
+
+		my %mot_pos;
+		for my $i ( 0 .. $#{ $hafas_instance{$service}{productbits} } ) {
+			$mot_pos{ $hafas_instance{$service}{productbits}[$i] } = $i;
+		}
+
+		if ( my @mots = @{ $self->{exclusive_mots} // [] } ) {
+			$mot_mask = 0;
+			for my $mot (@mots) {
+				$mot_mask |= 1 << $mot_pos{$mot};
 			}
-		],
-		%{ $hafas_instance{$service}{request} }
-	};
+		}
+
+		if ( my @mots = @{ $self->{excluded_mots} // [] } ) {
+			for my $mot (@mots) {
+				$mot_mask &= ~( 1 << $mot_pos{$mot} );
+			}
+		}
+
+		$req = {
+			svcReqL => [
+				{
+					meth => 'StationBoard',
+					req  => {
+						type     => ( $conf{arrivals} ? 'ARR' : 'DEP' ),
+						stbLoc   => { lid => $lid },
+						dirLoc   => undef,
+						maxJny   => 30,
+						date     => $date,
+						time     => $time,
+						dur      => -1,
+						jnyFltrL => [
+							{
+								type  => "PROD",
+								mode  => "INC",
+								value => $mot_mask
+							}
+						]
+					},
+				},
+			],
+			%{ $hafas_instance{$service}{request} }
+		};
+	}
 
 	my $json = $self->{json} = JSON->new->utf8;
 
@@ -318,7 +343,18 @@ sub new {
 	}
 
 	$self->check_mgate;
-	$self->parse_mgate;
+
+	$self->{strptime_obj} //= DateTime::Format::Strptime->new(
+		pattern   => '%Y%m%dT%H%M%S',
+		time_zone => 'Europe/Berlin',
+	);
+
+	if ( $conf{journey} ) {
+		$self->parse_journey;
+	}
+	else {
+		$self->parse_board;
+	}
 
 	return $self;
 }
@@ -339,7 +375,7 @@ sub new_p {
 			my ($content) = @_;
 			$self->{raw_json} = $self->{json}->decode($content);
 			$self->check_mgate;
-			$self->parse_mgate;
+			$self->parse_board;
 			$promise->resolve($self);
 			return;
 		}
@@ -549,7 +585,37 @@ sub messages {
 	return @{ $self->{messages} };
 }
 
-sub parse_mgate {
+sub parse_journey {
+	my ($self) = @_;
+
+	if ( $self->{errstr} ) {
+		return $self;
+	}
+
+	my @locL    = @{ $self->{raw_json}{svcResL}[0]{res}{common}{locL} // [] };
+	my $journey = $self->{raw_json}{svcResL}[0]{res}{journey};
+	my @polyline;
+
+	if ( $journey->{poly} ) {
+		@polyline = decode_polyline( $journey->{poly}{crdEncYX} );
+		for my $ref ( @{ $journey->{poly}{ppLocRefL} // [] } ) {
+			my $poly = $polyline[ $ref->{ppIdx} ];
+			my $loc  = $locL[ $ref->{locX} ];
+
+			$poly->{name} = $loc->{name};
+			$poly->{eva}  = $loc->{extId} + 0;
+		}
+	}
+
+	$self->{result} = Travel::Status::DE::HAFAS::Journey->new(
+		common   => $self->{raw_json}{svcResL}[0]{res}{common},
+		journey  => $journey,
+		polyline => \@polyline,
+		hafas    => $self,
+	);
+}
+
+sub parse_board {
 	my ($self) = @_;
 
 	$self->{results} = [];
@@ -557,11 +623,6 @@ sub parse_mgate {
 	if ( $self->{errstr} ) {
 		return $self;
 	}
-
-	$self->{strptime_obj} //= DateTime::Format::Strptime->new(
-		pattern   => '%Y%m%dT%H%M%S',
-		time_zone => 'Europe/Berlin',
-	);
 
 	my @jnyL = @{ $self->{raw_json}{svcResL}[0]{res}{jnyL} // [] };
 
@@ -581,6 +642,11 @@ sub parse_mgate {
 sub results {
 	my ($self) = @_;
 	return @{ $self->{results} };
+}
+
+sub result {
+	my ($self) = @_;
+	return $self->{result};
 }
 
 # static

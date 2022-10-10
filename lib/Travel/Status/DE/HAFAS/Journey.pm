@@ -29,26 +29,10 @@ sub new {
 	my $journey = $opt{journey};
 
 	my $date = $journey->{date};
-	my $time_s
-	  = $journey->{stbStop}{ $hafas->{arrivals} ? 'aTimeS' : 'dTimeS' };
-	my $time_r
-	  = $journey->{stbStop}{ $hafas->{arrivals} ? 'aTimeR' : 'dTimeR' };
-	my $datetime_s
-	  = $hafas->{strptime_obj}->parse_datetime("${date}T${time_s}");
-	my $datetime_r
-	  = $time_r
-	  ? $hafas->{strptime_obj}->parse_datetime("${date}T${time_r}")
-	  : undef;
-	my $delay
-	  = $datetime_r
-	  ? ( $datetime_r->epoch - $datetime_s->epoch ) / 60
-	  : undef;
 
 	my $destination  = $journey->{dirTxt};
 	my $is_cancelled = $journey->{isCncl};
 	my $jid          = $journey->{jid};
-	my $platform     = $journey->{stbStop}{dPlatfS};
-	my $new_platform = $journey->{stbStop}{dPlatfR};
 
 	my $product    = $prodL[ $journey->{prodX} ];
 	my $train      = $product->{prodCtx}{name};
@@ -108,33 +92,58 @@ sub new {
 	shift @stops;
 
 	my $ref = {
-		sched_datetime => $datetime_s,
-		rt_datetime    => $datetime_r,
-		datetime       => $datetime_r // $datetime_s,
-		datetime_now   => $hafas->{now},
-		delay          => $delay,
-		is_cancelled   => $is_cancelled,
-		train          => $train,
-		operator       => $operator,
-		route_end      => $destination,
-		platform       => $platform,
-		new_platform   => $new_platform,
-		messages       => \@messages,
-		route          => \@stops,
+		datetime_now => $hafas->{now},
+		is_cancelled => $is_cancelled,
+		train        => $train,
+		operator     => $operator,
+		route_end    => $destination,
+		messages     => \@messages,
+		route        => \@stops,
 	};
 
 	bless( $ref, $obj );
 
-	if ( $ref->{delay} ) {
-		$ref->{datetime} = $ref->{rt_datetime};
+	if ( $journey->{stbStop} ) {
+		$ref->{platform}     = $journey->{stbStop}{dPlatfS};
+		$ref->{new_platform} = $journey->{stbStop}{dPlatfR};
+
+		my $time_s
+		  = $journey->{stbStop}{ $hafas->{arrivals} ? 'aTimeS' : 'dTimeS' };
+		my $time_r
+		  = $journey->{stbStop}{ $hafas->{arrivals} ? 'aTimeR' : 'dTimeR' };
+
+		my $datetime_s
+		  = $hafas->{strptime_obj}->parse_datetime("${date}T${time_s}");
+		my $datetime_r
+		  = $time_r
+		  ? $hafas->{strptime_obj}->parse_datetime("${date}T${time_r}")
+		  : undef;
+
+		my $delay
+		  = $datetime_r
+		  ? ( $datetime_r->epoch - $datetime_s->epoch ) / 60
+		  : undef;
+
+		$ref->{sched_datetime} = $datetime_s;
+		$ref->{rt_datetime}    = $datetime_r;
+		$ref->{datetime}       = $datetime_r // $datetime_s;
+		$ref->{delay}          = $delay;
+
+		if ( $ref->{delay} ) {
+			$ref->{datetime} = $ref->{rt_datetime};
+		}
+		else {
+			$ref->{datetime} = $ref->{sched_datetime};
+		}
+
+		$ref->{date}       = $ref->{datetime}->strftime('%d.%m.%Y');
+		$ref->{time}       = $ref->{datetime}->strftime('%H:%M');
+		$ref->{sched_date} = $ref->{sched_datetime}->strftime('%d.%m.%Y');
+		$ref->{sched_time} = $ref->{sched_datetime}->strftime('%H:%M');
 	}
-	else {
-		$ref->{datetime} = $ref->{sched_datetime};
+	if ( $opt{polyline} ) {
+		$ref->{polyline} = $opt{polyline};
 	}
-	$ref->{date}       = $ref->{datetime}->strftime('%d.%m.%Y');
-	$ref->{time}       = $ref->{datetime}->strftime('%H:%M');
-	$ref->{sched_date} = $ref->{sched_datetime}->strftime('%d.%m.%Y');
-	$ref->{sched_time} = $ref->{sched_datetime}->strftime('%H:%M');
 
 	return $ref;
 }
