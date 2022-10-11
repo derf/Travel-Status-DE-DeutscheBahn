@@ -217,6 +217,15 @@ sub platform {
 	return $self->{new_platform} // $self->{platform};
 }
 
+sub polyline {
+	my ($self) = @_;
+
+	if ( $self->{polyline} ) {
+		return @{ $self->{polyline} };
+	}
+	return;
+}
+
 sub TO_JSON {
 	my ($self) = @_;
 
