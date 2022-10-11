@@ -188,7 +188,7 @@ sub new {
 	}
 
 	if ( not $conf{station} and not $conf{journey} ) {
-		confess('You need to specify a station');
+		confess('station or journey must be specified');
 	}
 
 	if ( not defined $service ) {
@@ -363,8 +363,8 @@ sub new_p {
 	my ( $obj, %conf ) = @_;
 	my $promise = $conf{promise}->new;
 
-	if ( not $conf{station} ) {
-		return $promise->reject('station flag must be passed');
+	if ( not $conf{station} and not $conf{journey} ) {
+		return $promise->reject('station or journey flag must be passed');
 	}
 
 	my $self = $obj->new( %conf, async => 1 );
@@ -375,8 +375,18 @@ sub new_p {
 			my ($content) = @_;
 			$self->{raw_json} = $self->{json}->decode($content);
 			$self->check_mgate;
-			$self->parse_board;
-			$promise->resolve($self);
+			if ( $conf{journey} ) {
+				$self->parse_journey;
+			}
+			else {
+				$self->parse_board;
+			}
+			if ( $self->errstr ) {
+				$promise->reject( $self->errstr );
+			}
+			else {
+				$promise->resolve($self);
+			}
 			return;
 		}
 	)->catch(
