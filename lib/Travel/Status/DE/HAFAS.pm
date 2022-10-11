@@ -291,6 +291,11 @@ sub new {
 		};
 	}
 
+	$self->{strptime_obj} //= DateTime::Format::Strptime->new(
+		pattern   => '%Y%m%dT%H%M%S',
+		time_zone => 'Europe/Berlin',
+	);
+
 	my $json = $self->{json} = JSON->new->utf8;
 
 	# The JSON request is the cache key, so if we have a cache we must ensure
@@ -343,11 +348,6 @@ sub new {
 	}
 
 	$self->check_mgate;
-
-	$self->{strptime_obj} //= DateTime::Format::Strptime->new(
-		pattern   => '%Y%m%dT%H%M%S',
-		time_zone => 'Europe/Berlin',
-	);
 
 	if ( $conf{journey} ) {
 		$self->parse_journey;
