@@ -126,16 +126,19 @@ sub new {
 		is_cancelled => $is_cancelled,
 		train        => $train,
 		operator     => $operator,
-		route_end    => $destination,
+		destination  => $destination,
+		route_end    => $stops[-1]{name},
 		messages     => \@messages,
 		route        => \@stops,
 	};
 
-	if ( $hafas->{arrivals} ) {
-		$ref->{origin} = $ref->{route_end};
-	}
-	else {
-		$ref->{destination} = $ref->{route_end};
+	if ( $journey->{stbStop} ) {
+		if ( $hafas->{arrivals} ) {
+			$ref->{origin} = $ref->{route_end};
+		}
+		else {
+			$ref->{destination} = $ref->{route_end};
+		}
 	}
 
 	bless( $ref, $obj );
