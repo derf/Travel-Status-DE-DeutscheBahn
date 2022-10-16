@@ -102,6 +102,8 @@ sub new {
 			{
 				name      => $loc->{name},
 				eva       => $loc->{extId} + 0,
+				lon       => $loc->{crd}{x} * 1e-6,
+				lat       => $loc->{crd}{y} * 1e-6,
 				sched_arr => $sched_arr,
 				rt_arr    => $rt_arr,
 				sched_dep => $sched_dep,
