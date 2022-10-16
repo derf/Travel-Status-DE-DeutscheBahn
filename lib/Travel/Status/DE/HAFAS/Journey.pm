@@ -12,7 +12,7 @@ our $VERSION = '3.01';
 
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(sched_date date sched_datetime datetime info is_cancelled operator delay
-	  sched_time time train route route_end)
+	  sched_time time train route route_end origin destination)
 );
 
 sub new {
@@ -61,35 +61,63 @@ sub new {
 
 	my @stops;
 	for my $stop ( @{ $journey->{stopL} // [] } ) {
-		my $loc = $locL[ $stop->{locX} ];
-		my $arr = $stop->{aTimeS};
-		my $arr_dt;
-		if ($arr) {
-			if ( length($arr) == 8 ) {
+		my $loc       = $locL[ $stop->{locX} ];
+		my $sched_arr = $stop->{aTimeS};
+		my $rt_arr    = $stop->{aTimeR};
+		my $sched_dep = $stop->{dTimeS};
+		my $rt_dep    = $stop->{dTimeR};
+
+		for my $timestr ( $sched_arr, $rt_arr, $sched_dep, $rt_dep ) {
+			if ( not defined $timestr ) {
+				next;
+			}
+			if ( length($timestr) == 8 ) {
 
 				# arrival time includes a day offset
 				my $offset_date = $hafas->{now}->clone;
-				$offset_date->add( days => substr( $arr, 0, 2, q{} ) );
+				$offset_date->add( days => substr( $timestr, 0, 2, q{} ) );
 				$offset_date = $offset_date->strftime('%Y%m%d');
-				$arr_dt      = $hafas->{strptime_obj}
-				  ->parse_datetime("${offset_date}T${arr}");
+				$timestr     = $hafas->{strptime_obj}
+				  ->parse_datetime("${offset_date}T${timestr}");
 			}
 			else {
-				$arr_dt
-				  = $hafas->{strptime_obj}->parse_datetime("${date}T${arr}");
+				$timestr
+				  = $hafas->{strptime_obj}
+				  ->parse_datetime("${date}T${timestr}");
 			}
 		}
+
+		my $arr_delay
+		  = ( $sched_arr and $rt_arr )
+		  ? ( $rt_arr->epoch - $sched_arr->epoch ) / 60
+		  : undef;
+
+		my $dep_delay
+		  = ( $sched_dep and $rt_dep )
+		  ? ( $rt_dep->epoch - $sched_dep->epoch ) / 60
+		  : undef;
+
 		push(
 			@stops,
 			{
-				name    => $loc->{name},
-				eva     => $loc->{extId} + 0,
-				arrival => $arr_dt,
+				name      => $loc->{name},
+				eva       => $loc->{extId} + 0,
+				sched_arr => $sched_arr,
+				rt_arr    => $rt_arr,
+				sched_dep => $sched_dep,
+				rt_dep    => $rt_dep,
+				arr       => $rt_arr // $sched_arr,
+				arr_delay => $arr_delay,
+				dep       => $rt_dep // $sched_dep,
+				dep_delay => $dep_delay,
+				delay     => $dep_delay // $arr_delay
 			}
 		);
 	}
 
-	shift @stops;
+	if ( $journey->{stbStop} ) {
+		shift @stops;
+	}
 
 	my $ref = {
 		datetime_now => $hafas->{now},
@@ -100,6 +128,13 @@ sub new {
 		messages     => \@messages,
 		route        => \@stops,
 	};
+
+	if ( $hafas->{arrivals} ) {
+		$ref->{origin} = $ref->{route_end};
+	}
+	else {
+		$ref->{destination} = $ref->{route_end};
+	}
 
 	bless( $ref, $obj );
 
@@ -168,12 +203,6 @@ sub countdown_sec {
 	return $self->{countdown_sec};
 }
 
-sub destination {
-	my ($self) = @_;
-
-	return $self->{route_end};
-}
-
 sub line {
 	my ($self) = @_;
 
@@ -205,12 +234,6 @@ sub messages {
 	return;
 }
 
-sub origin {
-	my ($self) = @_;
-
-	return $self->{route_end};
-}
-
 sub platform {
 	my ($self) = @_;
 
@@ -222,6 +245,15 @@ sub polyline {
 
 	if ( $self->{polyline} ) {
 		return @{ $self->{polyline} };
+	}
+	return;
+}
+
+sub route {
+	my ($self) = @_;
+
+	if ( $self->{route} ) {
+		return @{ $self->{route} };
 	}
 	return;
 }

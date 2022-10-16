@@ -5,6 +5,7 @@ use 5.014;
 
 our $VERSION = '3.01';
 
+use utf8;
 use DateTime;
 use Encode          qw(decode);
 use Getopt::Long    qw(:config no_ignore_case);
@@ -59,6 +60,11 @@ my %opt = (
 	service        => $service,
 	url            => $hafas_url,
 );
+
+if ( $opt{station} =~ m{[|]} ) {
+	$opt{journey} = { id => $opt{station} };
+	delete $opt{station};
+}
 
 if ( $date or $time ) {
 	my $dt = DateTime->now( time_zone => 'Europe/Berlin' );
@@ -214,6 +220,32 @@ if ( my $err = $status->errstr ) {
 		show_similar_stops();
 	}
 	exit 2;
+}
+
+if ( $opt{journey} ) {
+	my $result = $status->result;
+
+	printf( "%s → %s\n", $result->line, $result->destination );
+
+	for my $stop ( $result->route ) {
+		printf(
+			"%5s %s %5s %5s %s\n",
+			$stop->{arr} ? $stop->{arr}->strftime('%H:%M')      : q{},
+			( $stop->{arr} and $stop->{dep} ) ? '→'             : q{ },
+			$stop->{dep}   ? $stop->{dep}->strftime('%H:%M')    : q{},
+			$stop->{delay} ? sprintf( '(%+d)', $stop->{delay} ) : q{},
+			$stop->{name}
+		);
+	}
+
+	for my $msg ( $result->messages ) {
+		say '';
+		if ( $msg->short ) {
+			printf( "%s\n", $msg->short );
+		}
+		printf( "%s\n", $msg->text );
+	}
+	exit 0;
 }
 
 my $message_id = 1;
