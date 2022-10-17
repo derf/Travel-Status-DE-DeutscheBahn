@@ -727,35 +727,55 @@ version 3.01
 =head1 DESCRIPTION
 
 Travel::Status::DE::HAFAS is an interface to HAFAS-based
-arrival/departure monitors, for instance the one available at
-L<http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn>.
+arrival/departure monitors using the mgate.exe interface.
 
-It takes a station name and (optional) date and time and reports all arrivals
-or departures at that station starting at the specified point in time (now if
-unspecified).
+It can report departures/arrivals at a specific station, or provide details
+about a specific journey. It supports non-blocking operation via promises.
 
 =head1 METHODS
 
 =over
 
-=item my $status = Travel::Status::DE::HAFAS->new(I<%opts>)
+=item my $status = Travel::Status::DE::HAFAS->new(I<%opt>)
 
-Requests the departures/arrivals as specified by I<opts> and returns a new
+Requests departures/arrivals/journey as specified by I<opt> and returns a new
 Travel::Status::DE::HAFAS element with the results.  Dies if the wrong
-I<opts> were passed.
+I<opt> were passed.
 
-Supported I<opts> are:
+I<opt> must contain either a B<station> or a B<journey> flag:
 
 =over
 
 =item B<station> => I<station>
 
-The station or stop to report for, e.g.  "Essen HBf" or
-"Alfredusbad, Essen (Ruhr)".  Mandatory.
+Request station board (arrivals or departures) for I<station>, e.g. "Essen HBf" or
+"Alfredusbad, Essen (Ruhr)". Results are available via C<< $status->results >>.
+
+=item B<journey> => B<{> B<id> => I<tripid> [, B<name> => I<line> ] B<}>
+
+Request details about the journey identified by I<tripid> and I<line>.
+The result is available via C<< $status->result >>.
+
+=back
+
+The following optional flags may be set:
+
+=over
+
+=item B<arrivals> => I<bool>
+
+Request arrivals (if I<bool> is true) rather than departures (if I<bool> is
+false or B<arrivals> is not specified).  Only relevant in station board mode.
+
+=item B<cache> => I<Cache::File object>
+
+Store HAFAS replies in the provided cache object.  This module works with
+real-time data, so the object should be configured for an expiry of one to two
+minutes.
 
 =item B<datetime> => I<DateTime object>
 
-Date and time to report for.  Defaults to now.
+Date and time to report for.  Defaults to now.  Only relevant in station board mode.
 
 =item B<excluded_mots> => [I<mot1>, I<mot2>, ...]
 
@@ -763,31 +783,19 @@ By default, all modes of transport (trains, trams, buses etc.) are returned.
 If this option is set, all modes appearing in I<mot1>, I<mot2>, ... will
 be excluded. The supported modes depend on B<service>, use
 B<get_services> or B<get_service> to get the supported values.
-
-Note that this parameter does not work if the B<url> parameter is set.
+Only relevant in station board mode.
 
 =item B<exclusive_mots> => [I<mot1>, I<mot2>, ...]
 
 If this option is set, only the modes of transport appearing in I<mot1>,
 I<mot2>, ...  will be returned.  The supported modes depend on B<service>, use
 B<get_services> or B<get_service> to get the supported values.
-
-Note that this parameter does not work if the B<url> parameter is set.
-
-=item B<language> => I<language>
-
-Set language for additional information. Accepted arguments are B<d>eutsch,
-B<e>nglish, B<i>talian and B<n> (dutch), depending on the used service.
+Only relevant in station board mode.
 
 =item B<lwp_options> => I<\%hashref>
 
 Passed on to C<< LWP::UserAgent->new >>. Defaults to C<< { timeout => 10 } >>,
-you can use an empty hashref to override it.
-
-=item B<mode> => B<arr>|B<dep>
-
-By default, Travel::Status::DE::HAFAS reports train departures
-(B<dep>).  Set this to B<arr> to get arrivals instead.
+pass an empty hashref to call the LWP::UserAgent constructor without arguments.
 
 =item B<service> => I<service>
 
@@ -795,9 +803,31 @@ Request results from I<service>, defaults to "DB".
 See B<get_services> (and C<< hafas-m --list >>) for a list of supported
 services.
 
-=item B<url> => I<url>
+=item B<with_polyline> => I<bool>
 
-Request results from I<url>, defaults to the one belonging to B<service>.
+Request a polyline (series of geo-coordinates) indicating the train's route.
+Only relevant in journey mode.
+
+=back
+
+=item my $status = Travel::Status::DE::HAFAS->new_p(I<%opt>)
+
+Return a promise that resolves into a Travel::Status::DE::HAFAS instance
+($status) on success and rejects with an error message ($status->errstr) on
+failure. In addition to the arguments of B<new>, the following mandatory
+arguments must be set.
+
+=over
+
+=item B<promise> => I<promises module>
+
+Promises implementation to use for internal promises as well as B<new_p> return
+value.  Recommended: Mojo::Promise(3pm).
+
+=item B<user_agent> => I<user agent>
+
+User agent instance to use for asynchronous requests. The object must implement
+a B<post_p> function. Recommended: Mojo::UserAgent(3pm).
 
 =back
 
@@ -814,10 +844,17 @@ describing it.  If no error occurred, returns undef.
 =item $status->results
 
 Returns a list of arrivals/departures.  Each list element is a
-Travel::Status::DE::HAFAS::Journey(3pm) object.
+Travel::Status::DE::HAFAS::Journey(3pm) object. Unavailable in journey mode.
 
 If no matching results were found or the parser / http request failed, returns
 undef.
+
+=item $status->result
+
+Returns a single Travel::Status::DE::HAFAS::Journey(3pm) object that describes
+the requested journey. Unavailable in station board mode.
+
+If no result was found or the parser / http request failed, returns undef.
 
 =item $status->similar_stops
 
@@ -880,7 +917,7 @@ Travel::Status::DE::HAFAS::Journey(3pm), Travel::Status::DE::HAFAS::StopFinder(3
 
 =head1 AUTHOR
 
-Copyright (C) 2015-2020 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2015-2022 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 
