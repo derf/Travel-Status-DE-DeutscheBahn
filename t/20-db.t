@@ -56,7 +56,7 @@ is( $results[0]->operator, 'Nahreisezug', 'result 0: operator' );
 is( $results[0]->platform, undef,         'result 0: platform' );
 
 for my $res ( $results[0]->route_end, $results[0]->destination ) {
-	is( $res, 'Tiergarten, Philharmonie', 'result 0: route start/end' );
+	is( $res, 'Philharmonie Süd, Berlin', 'result 0: route start/end' );
 }
 
 is( $results[0]->sched_date, '02.10.2022', 'result 0: sched_date' );
