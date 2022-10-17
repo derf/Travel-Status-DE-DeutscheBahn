@@ -266,7 +266,23 @@ sub route {
 sub TO_JSON {
 	my ($self) = @_;
 
-	return { %{$self} };
+	my $ret = { %{$self} };
+
+	for my $k ( keys %{$ret} ) {
+		if ( ref( $ret->{$k} ) eq 'DateTime' ) {
+			$ret->{$k} = $ret->{$k}->epoch;
+		}
+	}
+
+	for my $stop ( @{ $ret->{route} } ) {
+		for my $k ( keys %{$stop} ) {
+			if ( ref( $stop->{$k} ) eq 'DateTime' ) {
+				$stop->{$k} = $stop->{$k}->epoch;
+			}
+		}
+	}
+
+	return $ret;
 }
 
 sub type {
