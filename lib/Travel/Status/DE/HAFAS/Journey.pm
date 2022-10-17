@@ -30,7 +30,7 @@ sub new {
 
 	my $date = $journey->{date};
 
-	my $destination  = $journey->{dirTxt};
+	my $direction    = $journey->{dirTxt};
 	my $is_cancelled = $journey->{isCncl};
 	my $jid          = $journey->{jid};
 
@@ -126,7 +126,7 @@ sub new {
 		is_cancelled => $is_cancelled,
 		train        => $train,
 		operator     => $operator,
-		destination  => $destination,
+		direction    => $direction,
 		route_end    => $stops[-1]{name},
 		messages     => \@messages,
 		route        => \@stops,
@@ -139,6 +139,9 @@ sub new {
 		else {
 			$ref->{destination} = $ref->{route_end};
 		}
+	}
+	else {
+		$ref->{route_start} = $stops[0]{name};
 	}
 
 	bless( $ref, $obj );
