@@ -191,26 +191,6 @@ sub new {
 	return $ref;
 }
 
-sub countdown {
-	my ($self) = @_;
-
-	$self->{countdown}
-	  //= $self->datetime->subtract_datetime( $self->{datetime_now} )
-	  ->in_units('minutes');
-
-	return $self->{countdown};
-}
-
-sub countdown_sec {
-	my ($self) = @_;
-
-	$self->{countdown_sec}
-	  //= $self->datetime->subtract_datetime( $self->{datetime_now} )
-	  ->in_units('seconds');
-
-	return $self->{countdown_sec};
-}
-
 sub line {
 	my ($self) = @_;
 
@@ -371,16 +351,6 @@ the platform, time, route and more.
 =head2 ACCESSORS
 
 =over
-
-=item $result->countdown
-
-Difference between the time Travel::Status::DE::HAFAS->results
-was called first and the arrival/departure time, in minutes.
-
-=item $result->countdown_sec
-
-Difference between the time Travel::Status::DE::HAFAS->results
-was called first and the arrival/departure time, in seconds.
 
 =item $result->date
 
