@@ -1,5 +1,7 @@
 package Travel::Status::DE::HAFAS::Journey;
 
+# vim:foldmethod=marker
+
 use strict;
 use warnings;
 use 5.014;
@@ -11,9 +13,12 @@ use parent 'Class::Accessor';
 our $VERSION = '3.01';
 
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
-	qw(sched_date date sched_datetime datetime info is_cancelled operator delay
-	  sched_time time train route route_end origin destination)
+	qw(datetime sched_datetime rt_datetime is_cancelled operator delay
+	  platform sched_platform rt_platform
+	  train route_end route_start origin destination direction)
 );
+
+# {{{ Constructor
 
 sub new {
 	my ( $obj, %opt ) = @_;
@@ -147,8 +152,9 @@ sub new {
 	bless( $ref, $obj );
 
 	if ( $journey->{stbStop} ) {
-		$ref->{platform}     = $journey->{stbStop}{dPlatfS};
-		$ref->{new_platform} = $journey->{stbStop}{dPlatfR};
+		$ref->{sched_platform} = $journey->{stbStop}{dPlatfS};
+		$ref->{rt_platform}    = $journey->{stbStop}{dPlatfR};
+		$ref->{platform}       = $ref->{rt_platform} // $ref->{sched_platform};
 
 		my $time_s
 		  = $journey->{stbStop}{ $hafas->{arrivals} ? 'aTimeS' : 'dTimeS' };
@@ -178,11 +184,6 @@ sub new {
 		else {
 			$ref->{datetime} = $ref->{sched_datetime};
 		}
-
-		$ref->{date}       = $ref->{datetime}->strftime('%d.%m.%Y');
-		$ref->{time}       = $ref->{datetime}->strftime('%H:%M');
-		$ref->{sched_date} = $ref->{sched_datetime}->strftime('%d.%m.%Y');
-		$ref->{sched_time} = $ref->{sched_datetime}->strftime('%H:%M');
 	}
 	if ( $opt{polyline} ) {
 		$ref->{polyline} = $opt{polyline};
@@ -190,6 +191,10 @@ sub new {
 
 	return $ref;
 }
+
+# }}}
+
+# {{{ Accessors
 
 sub line {
 	my ($self) = @_;
@@ -200,13 +205,13 @@ sub line {
 sub is_changed_platform {
 	my ($self) = @_;
 
-	if ( defined $self->{new_platform} and defined $self->{platform} ) {
-		if ( $self->{new_platform} ne $self->{platform} ) {
+	if ( defined $self->{rt_platform} and defined $self->{sched_platform} ) {
+		if ( $self->{rt_platform} ne $self->{sched_platform} ) {
 			return 1;
 		}
 		return 0;
 	}
-	if ( defined $self->{net_platform} ) {
+	if ( defined $self->{rt_platform} ) {
 		return 1;
 	}
 
@@ -220,12 +225,6 @@ sub messages {
 		return @{ $self->{messages} };
 	}
 	return;
-}
-
-sub platform {
-	my ($self) = @_;
-
-	return $self->{new_platform} // $self->{platform};
 }
 
 sub polyline {
@@ -304,6 +303,8 @@ sub train_no {
 	return $self->line_no;
 }
 
+# }}}
+
 1;
 
 __END__
@@ -311,14 +312,14 @@ __END__
 =head1 NAME
 
 Travel::Status::DE::HAFAS::Journey - Information about a single
-arrival/departure received by Travel::Status::DE::HAFAS
+journey received by Travel::Status::DE::HAFAS
 
 =head1 SYNOPSIS
 
 	for my $departure ($status->results) {
 		printf(
 			"At %s: %s to %s from platform %s\n",
-			$departure->time,
+			$departure->datetime->strftime('%H:%M'),
 			$departure->line,
 			$departure->destination,
 			$departure->platform,
@@ -329,7 +330,7 @@ arrival/departure received by Travel::Status::DE::HAFAS
 	for my $arrival ($status->results) {
 		printf(
 			"At %s: %s from %s on platform %s\n",
-			$arrival->time,
+			$arrival->datetime->strftime('%H:%M'),
 			$arrival->line,
 			$arrival->origin,
 			$arrival->platform,
@@ -342,9 +343,12 @@ version 3.01
 
 =head1 DESCRIPTION
 
-Travel::Status::DE::HAFAS::Journey describes a single arrival/departure
-as obtained by Travel::Status::DE::HAFAS.  It contains information about
-the platform, time, route and more.
+Travel::Status::DE::HAFAS::Journey describes a single journey. It is either
+a station-specific arrival/departure obtained by a stationboard query, or a
+train journey that does not belong to a specific station.
+
+stationboard-specific accessors are annotated with "(station only)" and return
+undef for non-station results.
 
 =head1 METHODS
 
@@ -352,32 +356,49 @@ the platform, time, route and more.
 
 =over
 
-=item $result->date
+=item $result->rt_datetime (station only)
 
-Arrival/Departure date in "dd.mm.yyyy" format.
+DateTime object indicating the actual arrival/departure date and time.
+undef if no real-time data is available.
 
-=item $result->datetime
+=item $result->sched_datetime (station only)
 
-DateTime object holding the arrival/departure date and time.
+DateTime object indicating the scheduled arrival/departure date and time.
+undef if no schedule data is available.
 
-=item $result->delay
+=item $result->datetime (station only)
+
+DateTime object indicating the arrival/departure date and time.
+Real-time data if available, schedule data otherwise.
+undef if neither is available.
+
+=item $result->delay (station only)
 
 Returns the delay in minutes, or undef if it is unknown.
 Also returns undef if the arrival/departure has been cancelled.
 
-=item $result->info
-
-Returns additional information, for instance the most recent delay reason.
-undef if no (useful) information is available.
-
 =item $result->is_cancelled
 
-True if the arrival/departure was cancelled, false otherwise.
+True if the journey was cancelled, false otherwise.
 
-=item $result->is_changed_platform
+=item $result->rt_platform (station only)
 
-True if the platform (as returned by the B<platform> accessor) is not the
-scheduled one. Note that the scheduled platform is unknown in this case.
+Actual arrival/departure platform.
+undef if no real-time data is available.
+
+=item $result->sched_platform (station only)
+
+Scheduled arrival/departure platform.
+undef if no scheduled platform is available.
+
+=item $result->platform (station only)
+
+Arrival/Departure platform. Real-time data if available, schedule data
+otherwise. May be undef.
+
+=item $result->is_changed_platform (station only)
+
+True if the real-time platform is known and it is not the scheduled one.
 
 =item $result->messages
 
@@ -393,6 +414,11 @@ Returns the line name, either in a format like "Bus SB16" (Bus line SB16)
 or "RE 10111" (RegionalExpress train 10111, no line information).
 May contain extraneous whitespace characters.
 
+=item $result->type
+
+Returns the type of this result, e.g. "S" for S-Bahn, "RE" for Regional Express
+or "STR" for tram / StraE<szlig>enbahn.
+
 =item $result->line_no
 
 =item $result->train_no
@@ -404,46 +430,88 @@ use single-letter characters or words (e.g. "AIR") as line numbers.
 
 =item $result->operator
 
-Returns the operator responsible for this arrival/departure. Returns undef
+Returns the operator responsible for this journey. Returns undef
 if the backend does not provide an operator.
 
 Note that E<Ouml>BB is the only known backend providing this information.
 
-=item $result->platform
+=item $result->route
 
-Returns the arrival/departure platform.
-Realtime data if available, schedule data otherwise.
+Returns a list of hashes; each hash describes a single journey stop.
+In stationboard mode, it only contains arrivals prior to the requested station
+or departures after the requested station. In journey mode, it contains the
+entire route. Each hash contains the following keys:
+
+=over
+
+=item * name (name
+
+=item * eva (EVA ID)
+
+=item * lon (longitude)
+
+=item * lat (latitude)
+
+=item * rt_arr (DateTime object for actual arrival)
+
+=item * sched_arr (DateTime object for scheduled arrival)
+
+=item * arr (DateTime object for actual or scheduled arrival)
+
+=item * arr_delay (arrival delay in minutes)
+
+=item = rt_dep (DateTime object for actual departure)
+
+=item * sched_dep (DateTime object for scheduled departure)
+
+=item * dep (DateTIme object for actual or scheduled departure)
+
+=item * dep_delay (departure delay in minutes)
+
+=item * delay (departure or arrival delay in minutes)
+
+=back
+
+Individual entries may be undef.
 
 =item $result->route_end
 
+Name of the last route station. In arrival mode, this is where the train
+started; in all other cases, it is the terminus.
+
 =item $result->destination
+
+Alias for route_end; only set when requesting departures in station mode.
 
 =item $result->origin
 
-Returns the last element of the route.  Depending on how you set up
-Travel::Status::DE::HAFAS (arrival or departure listing), this is
-either the result's destination or its origin station.
+Alias for route_end; only set when requesting arrivals in station mode.
 
-=item $result->sched_date
+=item $result->direction
 
-Scheduled arrival/departure date in "dd.mm.yyyy" format.
+Train direction; this is typically the text printed on the train itself.
+May be different from destination / route_end and may change along the route.
 
-=item $result->sched_datetime
+=item $result->polyline (journey only)
 
-DateTime object holding the scheduled arrival/departure date and time.
+List of geocoordinates that describe the train's route. Each list entry is
+a hash with the following keys.
 
-=item $result->sched_time
+=over
 
-Scheduled arrival/departure time in "hh:mm" format.
+=item * lon (longitude)
 
-=item $result->time
+=item * lat (latitude)
 
-Arrival/Departure time in "hh:mm" format.
+=item * name (name of stop at this location, if any. undef otherwise)
 
-=item $result->type
+=item * eva (EVA ID of stop at this location, if any. undef otherwise)
 
-Returns the type of this result, e.g. "S" for S-Bahn, "RE" for Regional Express
-or "STR" for tram / StraE<szlig>enbahn.
+=back
+
+Note that stop locations in B<polyline> may differ from the coordinates
+returned in B<route>. This is a backend issue; Travel::Status::DE::HAFAS
+simply passes the returned coordinates on.
 
 =back
 
