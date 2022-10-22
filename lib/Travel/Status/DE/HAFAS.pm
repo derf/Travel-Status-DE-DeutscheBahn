@@ -1,5 +1,7 @@
 package Travel::Status::DE::HAFAS;
 
+# vim:foldmethod=marker
+
 use strict;
 use warnings;
 use 5.014;
@@ -22,6 +24,8 @@ use Travel::Status::DE::HAFAS::Journey;
 use Travel::Status::DE::HAFAS::StopFinder;
 
 our $VERSION = '3.01';
+
+# {{{ Endpoint Definition
 
 my %hafas_instance = (
 	DB => {
@@ -174,6 +178,9 @@ my %hafas_instance = (
 		},
 	},
 );
+
+# }}}
+# {{{ Constructors
 
 sub new {
 	my ( $obj, %conf ) = @_;
@@ -400,6 +407,9 @@ sub new_p {
 	return $promise;
 }
 
+# }}}
+# {{{ Internal Helpers
+
 sub post_with_cache {
 	my ( $self, $url ) = @_;
 	my $cache = $self->{cache};
@@ -519,40 +529,6 @@ sub check_mgate {
 	return $self;
 }
 
-sub errcode {
-	my ($self) = @_;
-
-	return $self->{errcode};
-}
-
-sub errstr {
-	my ($self) = @_;
-
-	return $self->{errstr};
-}
-
-sub similar_stops {
-	my ($self) = @_;
-
-	my $service = $self->{active_service};
-
-	if ( $service and exists $hafas_instance{$service}{stopfinder} ) {
-
-		my $sf = Travel::Status::DE::HAFAS::StopFinder->new(
-			url            => $hafas_instance{$service}{stopfinder},
-			input          => $self->{station},
-			ua             => $self->{ua},
-			developer_mode => $self->{developer_mode},
-		);
-		if ( my $err = $sf->errstr ) {
-			$self->{errstr} = $err;
-			return;
-		}
-		return $sf->results;
-	}
-	return;
-}
-
 sub add_message {
 	my ( $self, $json, $is_him ) = @_;
 
@@ -588,11 +564,6 @@ sub add_message {
 	);
 	push( @{ $self->{messages} }, $message );
 	return $message;
-}
-
-sub messages {
-	my ($self) = @_;
-	return @{ $self->{messages} };
 }
 
 sub parse_journey {
@@ -649,6 +620,48 @@ sub parse_board {
 	return $self;
 }
 
+# }}}
+# {{{ Public Functions
+
+sub errcode {
+	my ($self) = @_;
+
+	return $self->{errcode};
+}
+
+sub errstr {
+	my ($self) = @_;
+
+	return $self->{errstr};
+}
+
+sub similar_stops {
+	my ($self) = @_;
+
+	my $service = $self->{active_service};
+
+	if ( $service and exists $hafas_instance{$service}{stopfinder} ) {
+
+		my $sf = Travel::Status::DE::HAFAS::StopFinder->new(
+			url            => $hafas_instance{$service}{stopfinder},
+			input          => $self->{station},
+			ua             => $self->{ua},
+			developer_mode => $self->{developer_mode},
+		);
+		if ( my $err = $sf->errstr ) {
+			$self->{errstr} = $err;
+			return;
+		}
+		return $sf->results;
+	}
+	return;
+}
+
+sub messages {
+	my ($self) = @_;
+	return @{ $self->{messages} };
+}
+
 sub results {
 	my ($self) = @_;
 	return @{ $self->{results} };
@@ -688,6 +701,8 @@ sub get_active_service {
 	}
 	return;
 }
+
+# }}}
 
 1;
 
@@ -855,6 +870,11 @@ Returns a single Travel::Status::DE::HAFAS::Journey(3pm) object that describes
 the requested journey. Unavailable in station board mode.
 
 If no result was found or the parser / http request failed, returns undef.
+
+=item $status->messages
+
+Returns a list of Travel::Status::DE::HAFAS::Message(3pm) objects with
+service messages. Each message belongs to at least one arrival/departure.
 
 =item $status->similar_stops
 
