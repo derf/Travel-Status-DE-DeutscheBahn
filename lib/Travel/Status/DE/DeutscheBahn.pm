@@ -40,7 +40,7 @@ monitor operated by Deutsche Bahn
 	for my $departure ($status->results) {
 		printf(
 			"At %s: %s to %s from platform %s\n",
-			$departure->time,
+			$departure->datetime->strftime('%H:%M'),
 			$departure->line,
 			$departure->destination,
 			$departure->platform,
@@ -55,7 +55,7 @@ version 3.01
 
 Travel::Status::DE::DeutscheBahn is an interface to the Deutsche Bahn
 departure monitor available at
-L<http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn>.
+L<https://reiseauskunft.bahn.de/bin/mgate.exe>.
 
 It takes a station name and (optional) date and time and reports all arrivals
 or departures at that station starting at the specified point in time (now if
@@ -79,15 +79,11 @@ and other methdos.
 
 =head1 DIAGNOSTICS
 
-None.
+See Travel::Status::DE::HAFAS(3pm).
 
 =head1 DEPENDENCIES
 
 =over
-
-=item * Class::Accessor(3pm)
-
-=item * LWP::UserAgent(3pm)
 
 =item * Travel::Status::DE::HAFAS(3pm)
 
@@ -95,7 +91,7 @@ None.
 
 =head1 BUGS AND LIMITATIONS
 
-Unknown.
+See Travel::Status::DE::HAFAS(3pm).
 
 =head1 SEE ALSO
 
@@ -103,7 +99,7 @@ Travel::Status::DE::HAFAS(3pm).
 
 =head1 AUTHOR
 
-Copyright (C) 2015-2017 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2015-2022 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 
