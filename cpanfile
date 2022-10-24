@@ -4,8 +4,6 @@ requires 'DateTime::Format::Strptime';
 requires 'Digest::MD5';
 requires 'Getopt::Long';
 requires 'JSON';
-requires 'List::MoreUtils';
-requires 'List::Util';
 requires 'LWP::UserAgent';
 requires 'LWP::Protocol::https';
 

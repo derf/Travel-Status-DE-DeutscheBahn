@@ -15,7 +15,6 @@ use DateTime::Format::Strptime;
 use Digest::MD5 qw(md5_hex);
 use Encode      qw(decode encode);
 use JSON;
-use List::Util qw(any);
 use LWP::UserAgent;
 use Travel::Status::DE::HAFAS::Message;
 use Travel::Status::DE::HAFAS::Polyline qw(decode_polyline);
