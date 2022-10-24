@@ -2,17 +2,17 @@
 
 hafas-m is a commandline client and Perl module for HAFAS public transit
 departure interfaces. It provides native support for the following
-interfaces, and can also be pointed to URLs not listed here.
+services.
 
-* [Deutsche Bahn](https://reiseauskunft.bahn.de/bin/bhftafel.exe)
-* [Nahverkehrsverbund Schleswig-Holstein](https://nah.sh.hafas.de/bin/stboard.exe)
-* [Nahverkehrsservice Sachsen-Anhalt](https://reiseauskunft.insa.de/bin/stboard.exe)
-* [Nordhessischer VerkehrsVerbund](https://auskunft.nvv.de/auskunft/bin/jp/stboard.exe)
-* [Verkehrsverbund Berlin-Brandenburg](https://fahrinfo.vbb.de/bin/stboard.exe)
-* [Verkehrsverbund Bremen/Niedersachsen](https://fahrplaner.vbn.de/hafas/stboard.exe)
-* [Österreichische Bundesbahnen](https://fahrplan.oebb.at/bin/stboard.exe)
+* Deutsche Bahn (DB)
+* Nahverkehrsverbund Schleswig-Holstein (NAHSH)
+* Nahverkehrsservice Sachsen-Anhalt (NASA)
+* Nordhessischer VerkehrsVerbund (NVV)
+* Österreichische Bundesbahnen (ÖBB)
+* Verkehrsverbund Berlin-Brandenburg (VBB)
+* Verkehrsverbund Bremen/Niedersachsen (VBN)
 
-See the [Travel::Status::DE::DeutscheBahn
+See the [Travel::Status::DE::HAFAS
 homepage](https://finalrewind.org/projects/Travel-Status-DE-DeutscheBahn) and
 [hafas-m manual](https://man.finalrewind.org/1/hafas-m) for details.
 
