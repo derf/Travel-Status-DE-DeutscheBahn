@@ -17,7 +17,6 @@ use Encode      qw(decode encode);
 use JSON;
 use List::Util qw(any);
 use LWP::UserAgent;
-use POSIX qw(strftime);
 use Travel::Status::DE::HAFAS::Message;
 use Travel::Status::DE::HAFAS::Polyline qw(decode_polyline);
 use Travel::Status::DE::HAFAS::Journey;
