@@ -98,7 +98,7 @@ Travel::Status::DE::HAFAS(3pm).
 
 =head1 AUTHOR
 
-Copyright (C) 2020 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2020-2022 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 
