@@ -460,7 +460,7 @@ entire route. Each hash contains the following keys:
 
 =item * arr_delay (arrival delay in minutes)
 
-=item = rt_dep (DateTime object for actual departure)
+=item * rt_dep (DateTime object for actual departure)
 
 =item * sched_dep (DateTime object for scheduled departure)
 
