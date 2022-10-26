@@ -329,7 +329,7 @@ a station-specific arrival/departure obtained by a stationboard query, or a
 train journey that does not belong to a specific station.
 
 stationboard-specific accessors are annotated with "(station only)" and return
-undef for non-station results.
+undef for non-station journeys.
 
 =head1 METHODS
 
@@ -337,91 +337,91 @@ undef for non-station results.
 
 =over
 
-=item $result->name
+=item $journey->name
 
 Returns the journey or line name, either in a format like "Bus SB16" (Bus line
 SB16) or "RE 10111" (RegionalExpress train 10111, no line information).  May
 contain extraneous whitespace characters.
 
-=item $result->type
+=item $journey->type
 
-Returns the type of this result, e.g. "S" for S-Bahn, "RE" for Regional Express
+Returns the type of this journey, e.g. "S" for S-Bahn, "RE" for Regional Express
 or "STR" for tram / StraE<szlig>enbahn.
 
-=item $result->type_long
+=item $journey->type_long
 
-Returns the long type of this result, e.g. "S-Bahn" or "Regional-Express".
+Returns the long type of this journey, e.g. "S-Bahn" or "Regional-Express".
 
-=item $result->line
+=item $journey->line
 
 Returns the line identifier, or undef if it is unknown.
 The line identifier may be a single number such as "11" (underground train
 line U 11), a single word (e.g. "AIR") or a combination (e.g. "SB16").
 
-=item $result->number
+=item $journey->number
 
 Returns the journey number (e.g. train number), or undef if it is unknown.
 
-=item $result->id
+=item $journey->id
 
 Returns tha HAFAS-internal journey ID.
 
-=item $result->rt_datetime (station only)
+=item $journey->rt_datetime (station only)
 
 DateTime object indicating the actual arrival/departure date and time.
 undef if no real-time data is available.
 
-=item $result->sched_datetime (station only)
+=item $journey->sched_datetime (station only)
 
 DateTime object indicating the scheduled arrival/departure date and time.
 undef if no schedule data is available.
 
-=item $result->datetime (station only)
+=item $journey->datetime (station only)
 
 DateTime object indicating the arrival/departure date and time.
 Real-time data if available, schedule data otherwise.
 undef if neither is available.
 
-=item $result->delay (station only)
+=item $journey->delay (station only)
 
 Returns the delay in minutes, or undef if it is unknown.
 Also returns undef if the arrival/departure has been cancelled.
 
-=item $result->is_cancelled
+=item $journey->is_cancelled
 
 True if the journey was cancelled, false otherwise.
 
-=item $result->rt_platform (station only)
+=item $journey->rt_platform (station only)
 
 Actual arrival/departure platform.
 undef if no real-time data is available.
 
-=item $result->sched_platform (station only)
+=item $journey->sched_platform (station only)
 
 Scheduled arrival/departure platform.
 undef if no scheduled platform is available.
 
-=item $result->platform (station only)
+=item $journey->platform (station only)
 
 Arrival/Departure platform. Real-time data if available, schedule data
 otherwise. May be undef.
 
-=item $result->is_changed_platform (station only)
+=item $journey->is_changed_platform (station only)
 
 True if the real-time platform is known and it is not the scheduled one.
 
-=item $result->messages
+=item $journey->messages
 
-Returns a list of message strings related to this result. Messages usually are
+Returns a list of message strings related to this journey. Messages usually are
 service notices (e.g. "missing carriage") or detailed delay reasons
 (e.g. "switch damage between X and Y, expect delays").
 
-=item $result->operator
+=item $journey->operator
 
 Returns the operator responsible for this journey. Returns undef
 if the backend does not provide an operator.
 
-=item $result->route
+=item $journey->route
 
 Returns a list of hashes; each hash describes a single journey stop.
 In stationboard mode, it only contains arrivals prior to the requested station
@@ -460,25 +460,25 @@ entire route. Each hash contains the following keys:
 
 Individual entries may be undef.
 
-=item $result->route_end
+=item $journey->route_end
 
 Name of the last route station. In arrival mode, this is where the train
 started; in all other cases, it is the terminus.
 
-=item $result->destination
+=item $journey->destination
 
 Alias for route_end; only set when requesting departures in station mode.
 
-=item $result->origin
+=item $journey->origin
 
 Alias for route_end; only set when requesting arrivals in station mode.
 
-=item $result->direction
+=item $journey->direction
 
 Train direction; this is typically the text printed on the train itself.
 May be different from destination / route_end and may change along the route.
 
-=item $result->polyline (journey only)
+=item $journey->polyline (journey only)
 
 List of geocoordinates that describe the train's route. Each list entry is
 a hash with the following keys.
