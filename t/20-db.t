@@ -44,12 +44,11 @@ is( $results[0]->delay, 10, 'result 0: delay' );
 ok( !$results[0]->is_cancelled,        'result 0: not cancelled' );
 ok( !$results[0]->is_changed_platform, 'result 0: platform not changed' );
 
-for my $res ( $results[0]->line, $results[0]->train ) {
-	is( $res, 'Bus  300', 'result 0: line/train' );
-}
-for my $res ( $results[0]->line_no, $results[0]->train_no ) {
-	is( $res, 300, 'result 0: line/train number' );
-}
+is( $results[0]->name,      'Bus 300', 'result 0: name' );
+is( $results[0]->type,      'Bus',     'result 0: type' );
+is( $results[0]->type_long, 'Bus',     'result 0: type_long' );
+is( $results[0]->line,      '300',     'result 0: line' );
+is( $results[0]->number,    '50833',   'result 0: number' );
 
 is( $results[0]->operator, 'Nahreisezug', 'result 0: operator' );
 is( $results[0]->platform, undef,         'result 0: platform' );
@@ -63,7 +62,6 @@ is(
 	'20221002 165500',
 	'result 0: sched_datetime'
 );
-is( $results[0]->type,       'Bus',   'result 0: type' );
 
 # Result 2: U-Bahn
 
@@ -76,12 +74,11 @@ is( $results[2]->delay, 0, 'result 2: delay' );
 ok( !$results[2]->is_cancelled,        'result 2: not cancelled' );
 ok( !$results[2]->is_changed_platform, 'result 2: platform not changed' );
 
-for my $res ( $results[2]->line, $results[2]->train ) {
-	is( $res, 'U      8', 'result 2: line/train' );
-}
-for my $res ( $results[2]->line_no, $results[2]->train_no ) {
-	is( $res, 8, 'result 2: line/train number' );
-}
+is( $results[2]->name,      'U 8',    'result 2: name' );
+is( $results[2]->type,      'U',      'result 2: type' );
+is( $results[2]->type_long, 'U-Bahn', 'result 2: type_long' );
+is( $results[2]->line,      '8',      'result 2: line' );
+is( $results[2]->number,    '20024',  'result 2: number' );
 
 is( $results[2]->operator, 'Nahreisezug', 'result 2: operator' );
 is( $results[2]->platform, undef,         'result 2: no platform' );
@@ -95,7 +92,6 @@ is(
 	'20221002 170000',
 	'result 2: sched_datetime'
 );
-is( $results[2]->type,       'U',     'result 2: type' );
 
 # Result 3: S-Bahn
 
@@ -108,12 +104,11 @@ is( $results[3]->delay, 0, 'result 3: delay' );
 ok( !$results[3]->is_cancelled,        'result 3: not cancelled' );
 ok( !$results[3]->is_changed_platform, 'result 3: platform not changed' );
 
-for my $res ( $results[3]->line, $results[3]->train ) {
-	is( $res, 'S      3', 'result 3: line/train' );
-}
-for my $res ( $results[3]->line_no, $results[3]->train_no ) {
-	is( $res, 3, 'result 3: line/train number' );
-}
+is( $results[3]->name,      'S 3',    'result 3: name' );
+is( $results[3]->type,      'S',      'result 3: type' );
+is( $results[3]->type_long, 'S-Bahn', 'result 3: type_long' );
+is( $results[3]->line,      '3',      'result 3: line' );
+is( $results[3]->number,    '3122',   'result 3: number' );
 
 is( $results[3]->operator, 'S-Bahn Berlin', 'result 3: operator' );
 is( $results[3]->platform, 4,               'result 3: platform' );
@@ -127,4 +122,3 @@ is(
 	'20221002 170100',
 	'result 3: sched_datetime'
 );
-is( $results[3]->type,       'S',     'result 3: type' );
