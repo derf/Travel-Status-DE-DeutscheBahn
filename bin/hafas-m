@@ -269,7 +269,7 @@ for my $d ( $status->results ) {
 			$d->is_cancelled
 			? 'CANCELED'
 			: ( $d->delay ? sprintf( '%+d', $d->delay ) : q{} ),
-			$d->train,
+			$d->name,
 			$d->route_end,
 			( $d->platform // q{} ) . ( $d->is_changed_platform ? ' !' : q{} ),
 			$info_line,

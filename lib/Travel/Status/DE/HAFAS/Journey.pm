@@ -15,7 +15,8 @@ our $VERSION = '3.01';
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(datetime sched_datetime rt_datetime is_cancelled operator delay
 	  platform sched_platform rt_platform
-	  train route_end route_start origin destination direction)
+	  id name type type_long number line
+	  route_end route_start origin destination direction)
 );
 
 # {{{ Constructor
@@ -39,10 +40,27 @@ sub new {
 	my $is_cancelled = $journey->{isCncl};
 	my $jid          = $journey->{jid};
 
-	my $product    = $prodL[ $journey->{prodX} ];
-	my $train      = $product->{prodCtx}{name};
-	my $train_type = $product->{prodCtx}{catOutS};
-	my $line_no    = $product->{prodCtx}{line};
+	my $product  = $prodL[ $journey->{prodX} ];
+	my $name     = $product->{addName} // $product->{name};
+	my $line_no  = $product->{prodCtx}{line};
+	my $train_no = $product->{prodCtx}{num};
+	my $cat      = $product->{prodCtx}{catOut};
+	my $catlong  = $product->{prodCtx}{catOutL};
+	if ( $name eq $cat ) {
+		$name .= ' ' . $product->{nameS};
+	}
+	if ( defined $train_no and not $train_no ) {
+		$train_no = undef;
+	}
+	if (
+		    not defined $line_no
+		and defined $product->{prodCtx}{matchId}
+		and
+		( not defined $train_no or $product->{prodCtx}{matchId} ne $train_no )
+	  )
+	{
+		$line_no = $product->{prodCtx}{matchId};
+	}
 
 	my $operator;
 	if ( defined $product->{oprX} ) {
@@ -128,10 +146,15 @@ sub new {
 
 	my $ref = {
 		datetime_now => $hafas->{now},
-		is_cancelled => $is_cancelled,
-		train        => $train,
+		id           => $jid,
+		name         => $name,
+		number       => $train_no,
+		line         => $line_no,
+		type         => $cat,
+		type_long    => $catlong,
 		operator     => $operator,
 		direction    => $direction,
+		is_cancelled => $is_cancelled,
 		route_end    => $stops[-1]{name},
 		messages     => \@messages,
 		route        => \@stops,
@@ -195,12 +218,6 @@ sub new {
 # }}}
 
 # {{{ Accessors
-
-sub line {
-	my ($self) = @_;
-
-	return $self->{train};
-}
 
 sub is_changed_platform {
 	my ($self) = @_;
@@ -267,42 +284,6 @@ sub TO_JSON {
 	return $ret;
 }
 
-sub type {
-	my ($self) = @_;
-	my $type;
-
-	# $self->{train} is either "TYPE 12345" or "TYPE12345"
-	if ( $self->{train} =~ m{ \s }x ) {
-		($type) = ( $self->{train} =~ m{ ^ ([^[:space:]]+) }x );
-	}
-	else {
-		($type) = ( $self->{train} =~ m{ ^ ([[:alpha:]]+) }x );
-	}
-
-	return $type;
-}
-
-sub line_no {
-	my ($self) = @_;
-	my $line_no;
-
-	# $self->{train} is either "TYPE 12345" or "TYPE12345"
-	if ( $self->{train} =~ m{ \s }x ) {
-		($line_no) = ( $self->{train} =~ m{ ([^[:space:]]+) $ }x );
-	}
-	else {
-		($line_no) = ( $self->{train} =~ m{ ([[:digit:]]+) $ }x );
-	}
-
-	return $line_no;
-}
-
-sub train_no {
-	my ($self) = @_;
-
-	return $self->line_no;
-}
-
 # }}}
 
 1;
@@ -356,6 +337,35 @@ undef for non-station results.
 
 =over
 
+=item $result->name
+
+Returns the journey or line name, either in a format like "Bus SB16" (Bus line
+SB16) or "RE 10111" (RegionalExpress train 10111, no line information).  May
+contain extraneous whitespace characters.
+
+=item $result->type
+
+Returns the type of this result, e.g. "S" for S-Bahn, "RE" for Regional Express
+or "STR" for tram / StraE<szlig>enbahn.
+
+=item $result->type_long
+
+Returns the long type of this result, e.g. "S-Bahn" or "Regional-Express".
+
+=item $result->line
+
+Returns the line identifier, or undef if it is unknown.
+The line identifier may be a single number such as "11" (underground train
+line U 11), a single word (e.g. "AIR") or a combination (e.g. "SB16").
+
+=item $result->number
+
+Returns the journey number (e.g. train number), or undef if it is unknown.
+
+=item $result->id
+
+Returns tha HAFAS-internal journey ID.
+
 =item $result->rt_datetime (station only)
 
 DateTime object indicating the actual arrival/departure date and time.
@@ -406,34 +416,10 @@ Returns a list of message strings related to this result. Messages usually are
 service notices (e.g. "missing carriage") or detailed delay reasons
 (e.g. "switch damage between X and Y, expect delays").
 
-=item $result->line
-
-=item $result->train
-
-Returns the line name, either in a format like "Bus SB16" (Bus line SB16)
-or "RE 10111" (RegionalExpress train 10111, no line information).
-May contain extraneous whitespace characters.
-
-=item $result->type
-
-Returns the type of this result, e.g. "S" for S-Bahn, "RE" for Regional Express
-or "STR" for tram / StraE<szlig>enbahn.
-
-=item $result->line_no
-
-=item $result->train_no
-
-Returns the line/train number, for instance "SB16" (bus line SB16),
-"11" (Underground train line U 11) or 1011 ("RegionalExpress train 1011").
-Note that this may not be a number at all: Some transport services also
-use single-letter characters or words (e.g. "AIR") as line numbers.
-
 =item $result->operator
 
 Returns the operator responsible for this journey. Returns undef
 if the backend does not provide an operator.
-
-Note that E<Ouml>BB is the only known backend providing this information.
 
 =item $result->route
 

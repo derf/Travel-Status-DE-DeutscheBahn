@@ -20,8 +20,9 @@ git HEAD
     * Travel::Status::DE::HAFAS: Add "result" and "messages" accessors.
     * Rename Travel::Status::DE::HAFAS::Result to ...::Journey. The accessors
       "sched_date", "date", "info", "countdown", "countdown_sec",
-      "raw_e_delay", "raw_delay", "sched_time" and "time" are no longer
-      supported. Introduces several new accessors instead.
+      "raw_e_delay", "raw_delay", "sched_time", "time", "train", "train_no"
+      and "line_no" are no longer supported. Introduces several new 
+      instead.
     * The module no longer depends on XML::LibXML
     * New dependency: Digest::MD5
 
