@@ -254,7 +254,7 @@ for my $m ( $status->messages ) {
 
 for my $d ( $status->results ) {
 
-	my $info_line = $d->info // q{};
+	my $info_line = q{};
 
 	for my $message ( $d->messages ) {
 		if ( $message->ref_count > 1 ) {
