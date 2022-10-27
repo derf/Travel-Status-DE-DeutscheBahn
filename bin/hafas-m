@@ -203,6 +203,27 @@ sub display_result {
 	return;
 }
 
+sub display_occupancy {
+	my ($occupancy) = @_;
+
+	if ( not $occupancy ) {
+		return q{ };
+	}
+	if ( $occupancy == 1 ) {
+		return q{.};
+	}
+	if ( $occupancy == 2 ) {
+		return q{o};
+	}
+	if ( $occupancy == 3 ) {
+		return q{*};
+	}
+	if ( $occupancy == 4 ) {
+		return q{!};
+	}
+	return q{?};
+}
+
 if ( my $err = $status->errstr ) {
 	say STDERR "Request error: ${err}";
 	if ( $status->errcode
@@ -216,16 +237,26 @@ if ( my $err = $status->errstr ) {
 if ( $opt{journey} ) {
 	my $result = $status->result;
 
-	printf( "%s → %s\n", $result->line, $result->destination );
+	printf( "%s → %s", $result->name, $result->route_end );
+	if ( $result->number ) {
+		printf( "  |  Zug  %s", $result->number );
+	}
+	if ( $result->line ) {
+		printf( "  |  Linie %s", $result->line );
+	}
+	say q{};
 
 	for my $stop ( $result->route ) {
 		printf(
-			"%5s %s %5s %5s %s\n",
+			"%5s %s %5s %5s %1s%1s %s%s\n",
 			$stop->{arr} ? $stop->{arr}->strftime('%H:%M')      : q{},
 			( $stop->{arr} and $stop->{dep} ) ? '→'             : q{ },
 			$stop->{dep}   ? $stop->{dep}->strftime('%H:%M')    : q{},
 			$stop->{delay} ? sprintf( '(%+d)', $stop->{delay} ) : q{},
-			$stop->{name}
+			display_occupancy( $stop->{load}{FIRST} ),
+			display_occupancy( $stop->{load}{SECOND} ),
+			$stop->{name},
+			$stop->{direction} ? sprintf( '  → %s', $stop->{direction} ) : q{}
 		);
 	}
 

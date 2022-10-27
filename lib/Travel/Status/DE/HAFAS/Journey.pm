@@ -28,6 +28,7 @@ sub new {
 	my @prodL = @{ $opt{common}{prodL} // [] };
 	my @opL   = @{ $opt{common}{opL}   // [] };
 	my @icoL  = @{ $opt{common}{icoL}  // [] };
+	my @tcocL = @{ $opt{common}{tcocL} // [] };
 	my @remL  = @{ $opt{common}{remL}  // [] };
 	my @himL  = @{ $opt{common}{himL}  // [] };
 
@@ -120,6 +121,12 @@ sub new {
 		  ? ( $rt_dep->epoch - $sched_dep->epoch ) / 60
 		  : undef;
 
+		my $tco = {};
+		for my $tco_id ( @{ $stop->{dTrnCmpSX}{tcocX} // [] } ) {
+			my $tco_kv = $tcocL[$tco_id];
+			$tco->{ $tco_kv->{c} } = $tco_kv->{r};
+		}
+
 		push(
 			@stops,
 			{
@@ -137,6 +144,7 @@ sub new {
 				dep_delay => $dep_delay,
 				delay     => $dep_delay // $arr_delay,
 				direction => $stop->{dDirTxt},
+				load      => $tco,
 			}
 		);
 	}
