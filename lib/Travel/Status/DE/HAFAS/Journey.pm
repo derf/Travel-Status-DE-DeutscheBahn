@@ -135,7 +135,8 @@ sub new {
 				arr_delay => $arr_delay,
 				dep       => $rt_dep // $sched_dep,
 				dep_delay => $dep_delay,
-				delay     => $dep_delay // $arr_delay
+				delay     => $dep_delay // $arr_delay,
+				direction => $stop->{dDirTxt},
 			}
 		);
 	}
@@ -456,6 +457,8 @@ entire route. Each hash contains the following keys:
 
 =item * delay (departure or arrival delay in minutes)
 
+=item * direction (direction signage from this stop on, undef if unchanged)
+
 =back
 
 Individual entries may be undef.
@@ -476,7 +479,8 @@ Alias for route_end; only set when requesting arrivals in station mode.
 =item $journey->direction
 
 Train direction; this is typically the text printed on the train itself.
-May be different from destination / route_end and may change along the route.
+May be different from destination / route_end and may change along the route,
+see above.
 
 =item $journey->polyline (journey only)
 
