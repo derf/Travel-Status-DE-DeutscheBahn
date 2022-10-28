@@ -428,6 +428,14 @@ otherwise. May be undef.
 
 True if the real-time platform is known and it is not the scheduled one.
 
+=item $journey->load (station only)
+
+Expected passenger load (i.e., how full the vehicle is) at the requested stop.
+If known, returns a hashref that maps classes (typically FIRST/SECOND) to
+load estimation numbers. The DB backend uses 1 (low to medium), 2 (high),
+3 (very high), and 4 (exceptionally high, train is booked out).
+Undef if unknown.
+
 =item $journey->messages
 
 Returns a list of message strings related to this journey. Messages usually are
@@ -475,6 +483,8 @@ entire route. Each hash contains the following keys:
 =item * delay (departure or arrival delay in minutes)
 
 =item * direction (direction signage from this stop on, undef if unchanged)
+
+=item * load (expected utilization / passenger load from this stop on)
 
 =back
 
