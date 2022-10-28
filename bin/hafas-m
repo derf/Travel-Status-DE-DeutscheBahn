@@ -249,9 +249,11 @@ if ( $opt{journey} ) {
 	for my $stop ( $result->route ) {
 		printf(
 			"%5s %s %5s %5s %1s%1s %s%s\n",
-			$stop->{arr} ? $stop->{arr}->strftime('%H:%M')      : q{},
-			( $stop->{arr} and $stop->{dep} ) ? '→'             : q{ },
-			$stop->{dep}   ? $stop->{dep}->strftime('%H:%M')    : q{},
+			$stop->{arr_cancelled} ? '--:--'
+			: ( $stop->{arr} ? $stop->{arr}->strftime('%H:%M') : q{} ),
+			( $stop->{arr} and $stop->{dep} ) ? '→' : q{ },
+			$stop->{dep_cancelled}            ? '--:--'
+			: ( $stop->{dep} ? $stop->{dep}->strftime('%H:%M') : q{} ),
 			$stop->{delay} ? sprintf( '(%+d)', $stop->{delay} ) : q{},
 			display_occupancy( $stop->{load}{FIRST} ),
 			display_occupancy( $stop->{load}{SECOND} ),

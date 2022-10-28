@@ -13,9 +13,10 @@ use parent 'Class::Accessor';
 our $VERSION = '3.01';
 
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
-	qw(datetime sched_datetime rt_datetime is_cancelled operator delay
-	  platform sched_platform rt_platform
-	  id name type type_long number line load
+	qw(datetime sched_datetime rt_datetime
+	  is_cancelled is_partially_cancelled
+	  platform sched_platform rt_platform operator
+	  id name type type_long number line load delay
 	  route_end route_start origin destination direction)
 );
 
@@ -37,9 +38,11 @@ sub new {
 
 	my $date = $journey->{date};
 
-	my $direction    = $journey->{dirTxt};
-	my $is_cancelled = $journey->{isCncl};
-	my $jid          = $journey->{jid};
+	my $direction = $journey->{dirTxt};
+	my $jid       = $journey->{jid};
+
+	my $is_cancelled        = $journey->{isCncl};
+	my $partially_cancelled = $journey->{isPartCncl};
 
 	my $product  = $prodL[ $journey->{prodX} ];
 	my $name     = $product->{addName} // $product->{name};
@@ -121,6 +124,9 @@ sub new {
 		  ? ( $rt_dep->epoch - $sched_dep->epoch ) / 60
 		  : undef;
 
+		my $arr_cancelled = $stop->{aCncl};
+		my $dep_cancelled = $stop->{dCncl};
+
 		my $tco = {};
 		for my $tco_id ( @{ $stop->{dTrnCmpSX}{tcocX} // [] } ) {
 			my $tco_kv = $tcocL[$tco_id];
@@ -130,21 +136,23 @@ sub new {
 		push(
 			@stops,
 			{
-				name      => $loc->{name},
-				eva       => $loc->{extId} + 0,
-				lon       => $loc->{crd}{x} * 1e-6,
-				lat       => $loc->{crd}{y} * 1e-6,
-				sched_arr => $sched_arr,
-				rt_arr    => $rt_arr,
-				sched_dep => $sched_dep,
-				rt_dep    => $rt_dep,
-				arr       => $rt_arr // $sched_arr,
-				arr_delay => $arr_delay,
-				dep       => $rt_dep // $sched_dep,
-				dep_delay => $dep_delay,
-				delay     => $dep_delay // $arr_delay,
-				direction => $stop->{dDirTxt},
-				load      => $tco,
+				name          => $loc->{name},
+				eva           => $loc->{extId} + 0,
+				lon           => $loc->{crd}{x} * 1e-6,
+				lat           => $loc->{crd}{y} * 1e-6,
+				sched_arr     => $sched_arr,
+				rt_arr        => $rt_arr,
+				arr           => $rt_arr // $sched_arr,
+				arr_delay     => $arr_delay,
+				arr_cancelled => $arr_cancelled,
+				sched_dep     => $sched_dep,
+				rt_dep        => $rt_dep,
+				dep           => $rt_dep // $sched_dep,
+				dep_delay     => $dep_delay,
+				dep_cancelled => $dep_cancelled,
+				delay         => $dep_delay // $arr_delay,
+				direction     => $stop->{dDirTxt},
+				load          => $tco,
 			}
 		);
 	}
@@ -154,19 +162,20 @@ sub new {
 	}
 
 	my $ref = {
-		datetime_now => $hafas->{now},
-		id           => $jid,
-		name         => $name,
-		number       => $train_no,
-		line         => $line_no,
-		type         => $cat,
-		type_long    => $catlong,
-		operator     => $operator,
-		direction    => $direction,
-		is_cancelled => $is_cancelled,
-		route_end    => $stops[-1]{name},
-		messages     => \@messages,
-		route        => \@stops,
+		datetime_now           => $hafas->{now},
+		id                     => $jid,
+		name                   => $name,
+		number                 => $train_no,
+		line                   => $line_no,
+		type                   => $cat,
+		type_long              => $catlong,
+		operator               => $operator,
+		direction              => $direction,
+		is_cancelled           => $is_cancelled,
+		is_partially_cancelled => $partially_cancelled,
+		route_end              => $stops[-1]{name},
+		messages               => \@messages,
+		route                  => \@stops,
 	};
 
 	if ( $journey->{stbStop} ) {
@@ -409,6 +418,10 @@ Also returns undef if the arrival/departure has been cancelled.
 
 True if the journey was cancelled, false otherwise.
 
+=item $journey->is_partially_cancelled
+
+True if part of the journey was cancelled, false otherwise.
+
 =item $journey->rt_platform (station only)
 
 Actual arrival/departure platform.
@@ -472,6 +485,8 @@ entire route. Each hash contains the following keys:
 
 =item * arr_delay (arrival delay in minutes)
 
+=item * arr_cancelled (arrival is cancelled)
+
 =item * rt_dep (DateTime object for actual departure)
 
 =item * sched_dep (DateTime object for scheduled departure)
@@ -479,6 +494,8 @@ entire route. Each hash contains the following keys:
 =item * dep (DateTIme object for actual or scheduled departure)
 
 =item * dep_delay (departure delay in minutes)
+
+=item * dep_cancelled (departure is cancelled)
 
 =item * delay (departure or arrival delay in minutes)
 
