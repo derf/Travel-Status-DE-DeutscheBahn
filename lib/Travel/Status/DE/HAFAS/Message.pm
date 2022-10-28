@@ -6,7 +6,7 @@ use 5.014;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '3.01';
+our $VERSION = '4.00';
 
 Travel::Status::DE::HAFAS::Message->mk_ro_accessors(
 	qw(short text code prio ref_count));
@@ -45,7 +45,7 @@ Travel::Status::DE::HAFAS::Message - An arrival/departure-related message.
 
 =head1 VERSION
 
-version 3.01
+version 4.00
 
 =head1 DESCRIPTION
 

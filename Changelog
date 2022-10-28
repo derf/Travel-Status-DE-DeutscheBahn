@@ -1,4 +1,4 @@
-git HEAD
+Travel::Status::DE::DeutscheBahn 4.00 - Fri Oct 28 2022
 
     * Use mgate.exe HAFAS interface instead of stboard.exe/bhftafel.exe.
       This introduces several breaking changes in hafas-m,
@@ -21,7 +21,7 @@ git HEAD
     * Rename Travel::Status::DE::HAFAS::Result to ...::Journey. The accessors
       "sched_date", "date", "info", "countdown", "countdown_sec",
       "raw_e_delay", "raw_delay", "sched_time", "time", "train", "train_no"
-      and "line_no" are no longer supported. Introduces several new 
+      and "line_no" are no longer supported. Introduces several new ones
       instead.
     * The module no longer depends on XML::LibXML
     * New dependency: Digest::MD5
