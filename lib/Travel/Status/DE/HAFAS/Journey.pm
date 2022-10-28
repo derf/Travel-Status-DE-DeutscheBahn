@@ -15,7 +15,7 @@ our $VERSION = '3.01';
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(datetime sched_datetime rt_datetime is_cancelled operator delay
 	  platform sched_platform rt_platform
-	  id name type type_long number line
+	  id name type type_long number line load
 	  route_end route_start origin destination direction)
 );
 
@@ -215,6 +215,15 @@ sub new {
 		}
 		else {
 			$ref->{datetime} = $ref->{sched_datetime};
+		}
+
+		my %tco;
+		for my $tco_id ( @{ $journey->{stbStop}{dTrnCmpSX}{tcocX} // [] } ) {
+			my $tco_kv = $tcocL[$tco_id];
+			$tco{ $tco_kv->{c} } = $tco_kv->{r};
+		}
+		if (%tco) {
+			$ref->{load} = \%tco;
 		}
 	}
 	if ( $opt{polyline} ) {

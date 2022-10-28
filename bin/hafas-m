@@ -293,6 +293,13 @@ for my $d ( $status->results ) {
 		}
 	}
 
+	if ( $d->load ) {
+		$info_line
+		  = display_occupancy( $d->load->{FIRST} )
+		  . display_occupancy( $d->load->{SECOND} ) . '  '
+		  . $info_line;
+	}
+
 	push(
 		@output,
 		[
