@@ -25,6 +25,8 @@ Module::Build->new(
 		'Digest::MD5'     => 0,
 		'Getopt::Long'    => 0,
 		'JSON'            => 0,
+		'List::MoreUtils' => 0,
+		'List::Util'      => 0,
 		'LWP::UserAgent'  => 0,
 		'LWP::Protocol::https' => 0,
 	},
