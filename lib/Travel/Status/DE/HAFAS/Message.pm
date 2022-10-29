@@ -9,7 +9,7 @@ use parent 'Class::Accessor';
 our $VERSION = '4.00';
 
 Travel::Status::DE::HAFAS::Message->mk_ro_accessors(
-	qw(short text code prio ref_count));
+	qw(short text code prio is_him ref_count));
 
 sub new {
 	my ( $obj, %conf ) = @_;
@@ -36,11 +36,11 @@ Travel::Status::DE::HAFAS::Message - An arrival/departure-related message.
 
 =head1 SYNOPSIS
 
-	if ($message->lead) {
-		printf("%s: %s\n", $message->header, $message->lead);
+	if ($message->text) {
+		printf("%s: %s\n", $message->short, $message->text);
 	}
 	else {
-		say $message->header;
+		say $message->short;
 	}
 
 =head1 VERSION
@@ -59,12 +59,12 @@ construction work, the expected passenger volume, or similar.
 
 =over
 
-=item $message->header
+=item $message->short
 
 Message header. May be a concise single-sentence summary or a mostly useless
 string such as "Information". Does not contain newlines.
 
-=item $message->lead
+=item $message->text
 
 Detailed message content. Does not contain newlines.
 
@@ -73,6 +73,12 @@ Detailed message content. Does not contain newlines.
 Counter indicating how often this message is used by the requested
 arrivals/departures. ref_count is an integer between 1 and the number of
 results.  If ref_count is 1, it is referenced by a single result only.
+
+=item $message->is_him
+
+True if it is a HIM message (typically used for service information), false
+if not (message may be a REM instead, indicating e.g. presence of a bicycle
+carriage or WiFi).
 
 =back
 

@@ -558,6 +558,7 @@ sub add_message {
 		text      => $text,
 		code      => $code,
 		prio      => $prio,
+		is_him    => $is_him,
 		ref_count => 1,
 	);
 	push( @{ $self->{messages} }, $message );
