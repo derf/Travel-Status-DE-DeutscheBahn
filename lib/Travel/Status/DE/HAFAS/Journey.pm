@@ -16,7 +16,7 @@ Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(datetime sched_datetime rt_datetime
 	  is_cancelled is_partially_cancelled
 	  platform sched_platform rt_platform operator
-	  id name type type_long number line load delay
+	  id name type type_long class number line load delay
 	  route_end route_start origin destination direction)
 );
 
@@ -85,6 +85,8 @@ sub new {
 			say "Unknown message type $msg->{type}";
 		}
 	}
+
+	my $class = $product->{cls};
 
 	my @stops;
 	for my $stop ( @{ $journey->{stopL} // [] } ) {
@@ -169,6 +171,7 @@ sub new {
 		line                   => $line_no,
 		type                   => $cat,
 		type_long              => $catlong,
+		class                  => $class,
 		operator               => $operator,
 		direction              => $direction,
 		is_cancelled           => $is_cancelled,
@@ -378,6 +381,12 @@ or "STR" for tram / StraE<szlig>enbahn.
 =item $journey->type_long
 
 Returns the long type of this journey, e.g. "S-Bahn" or "Regional-Express".
+
+=item $journey->class
+
+Returns an integer identifying the the mode of transport class.
+Semantics depend on backend, e.g. "1" and "2" for long-distance trains and
+"4" and "8" for region trains.
 
 =item $journey->line
 

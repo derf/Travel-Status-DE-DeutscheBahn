@@ -7,7 +7,7 @@ use utf8;
 
 use File::Slurp qw(read_file);
 use JSON;
-use Test::More tests => 46;
+use Test::More tests => 49;
 
 use Travel::Status::DE::HAFAS;
 
@@ -47,6 +47,7 @@ ok( !$results[0]->is_changed_platform, 'result 0: platform not changed' );
 is( $results[0]->name,      'Bus 300', 'result 0: name' );
 is( $results[0]->type,      'Bus',     'result 0: type' );
 is( $results[0]->type_long, 'Bus',     'result 0: type_long' );
+is( $results[0]->class,     32,        'result 0: class' );
 is( $results[0]->line,      '300',     'result 0: line' );
 is( $results[0]->number,    '50833',   'result 0: number' );
 
@@ -77,6 +78,7 @@ ok( !$results[2]->is_changed_platform, 'result 2: platform not changed' );
 is( $results[2]->name,      'U 8',    'result 2: name' );
 is( $results[2]->type,      'U',      'result 2: type' );
 is( $results[2]->type_long, 'U-Bahn', 'result 2: type_long' );
+is( $results[2]->class,     128,      'result 2: class' );
 is( $results[2]->line,      '8',      'result 2: line' );
 is( $results[2]->number,    '20024',  'result 2: number' );
 
@@ -107,6 +109,7 @@ ok( !$results[3]->is_changed_platform, 'result 3: platform not changed' );
 is( $results[3]->name,      'S 3',    'result 3: name' );
 is( $results[3]->type,      'S',      'result 3: type' );
 is( $results[3]->type_long, 'S-Bahn', 'result 3: type_long' );
+is( $results[0]->class,     32,       'result 3: class' );
 is( $results[3]->line,      '3',      'result 3: line' );
 is( $results[3]->number,    '3122',   'result 3: number' );
 
