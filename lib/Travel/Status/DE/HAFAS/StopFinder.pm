@@ -12,7 +12,7 @@ use Encode qw(decode);
 use JSON;
 use LWP::UserAgent;
 
-our $VERSION = '4.00';
+our $VERSION = '4.01';
 
 sub new {
 	my ( $obj, %conf ) = @_;
@@ -123,7 +123,7 @@ finder services
 
 =head1 VERSION
 
-version 4.00
+version 4.01
 
 =head1 DESCRIPTION
 
