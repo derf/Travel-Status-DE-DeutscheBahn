@@ -1,3 +1,10 @@
+Travel::Status::DE::DeutscheBahn 4.01 - Sat Oct 29 2022
+
+    * Journey: Add "class" accessor
+    * Message: Correctly document "short" and "text" accessors
+      ("header" and "lead" were not supported), add "is_him" accessor
+    * Specify List::MoreUtils and List::Util dependencies for bin/hafas-m
+
 Travel::Status::DE::DeutscheBahn 4.00 - Fri Oct 28 2022
 
     * Use mgate.exe HAFAS interface instead of stboard.exe/bhftafel.exe.
