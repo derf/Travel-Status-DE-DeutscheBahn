@@ -17,24 +17,26 @@ Module::Build->new(
 	module_name => 'Travel::Status::DE::DeutscheBahn',
 	license     => 'perl',
 	requires    => {
-		'perl'            => '5.14.0',
-		'Carp'            => 0,
-		'Class::Accessor' => '0.16',
-		'DateTime'        => 0,
+		'perl'                       => '5.14.0',
+		'Carp'                       => 0,
+		'Class::Accessor'            => '0.16',
+		'DateTime'                   => 0,
 		'DateTime::Format::Strptime' => 0,
-		'Digest::MD5'     => 0,
-		'Getopt::Long'    => 0,
-		'JSON'            => 0,
-		'List::MoreUtils' => 0,
-		'List::Util'      => 0,
-		'LWP::UserAgent'  => 0,
-		'LWP::Protocol::https' => 0,
+		'Digest::MD5'                => 0,
+		'Getopt::Long'               => 0,
+		'JSON'                       => 0,
+		'List::MoreUtils'            => 0,
+		'List::Util'                 => 0,
+		'LWP::UserAgent'             => 0,
+		'LWP::Protocol::https'       => 0,
 	},
-	script_files => 'bin/',
-	sign         => 1,
-	meta_merge   => {
+	script_files  => 'bin/',
+	sign          => 1,
+	test_requires => { 'File::Slurp' => 0 },
+	meta_merge    => {
 		resources => {
-			repository => 'https://github.com/derf/Travel-Status-DE-DeutscheBahn'
+			repository =>
+			  'https://github.com/derf/Travel-Status-DE-DeutscheBahn'
 		}
 	},
 )->create_build_script();
