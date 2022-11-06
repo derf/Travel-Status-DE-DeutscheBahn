@@ -1,3 +1,8 @@
+Travel::Status::DE::DeutscheBahn 4.02 - Sun Nov 06 2022
+
+    * HAFAS->new: Add "results" and "lookahead" options
+    * Build.PL: Specify File::Slurp test dependency
+
 Travel::Status::DE::DeutscheBahn 4.01 - Sat Oct 29 2022
 
     * Journey: Add "class" accessor
