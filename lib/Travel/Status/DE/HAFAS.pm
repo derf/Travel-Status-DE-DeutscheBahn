@@ -270,6 +270,9 @@ sub new {
 			}
 		}
 
+		my $maxjny   = $conf{results}   // 30;
+		my $duration = $conf{lookahead} // -1;
+
 		$req = {
 			svcReqL => [
 				{
@@ -278,10 +281,10 @@ sub new {
 						type     => ( $conf{arrivals} ? 'ARR' : 'DEP' ),
 						stbLoc   => { lid => $lid },
 						dirLoc   => undef,
-						maxJny   => 30,
+						maxJny   => $maxjny,
 						date     => $date,
 						time     => $time,
-						dur      => -1,
+						dur      => $duration,
 						jnyFltrL => [
 							{
 								type  => "PROD",
@@ -808,10 +811,22 @@ I<mot2>, ...  will be returned.  The supported modes depend on B<service>, use
 B<get_services> or B<get_service> to get the supported values.
 Only relevant in station board mode.
 
+=item B<lookahead> => I<int>
+
+Request arrivals/departures that occur up to I<int> minutes after the specified datetime.
+Default: -1 (do not limit results by time).
+Only relevant in station board mode.
+
 =item B<lwp_options> => I<\%hashref>
 
 Passed on to C<< LWP::UserAgent->new >>. Defaults to C<< { timeout => 10 } >>,
 pass an empty hashref to call the LWP::UserAgent constructor without arguments.
+
+=item B<results> => I<count>
+
+Request up to I<count> results.
+Default: 30.
+Only relevant in station board mode.
 
 =item B<service> => I<service>
 
