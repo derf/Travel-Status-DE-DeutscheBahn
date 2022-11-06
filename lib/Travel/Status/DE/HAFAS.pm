@@ -763,7 +763,9 @@ I<opt> must contain either a B<station> or a B<journey> flag:
 =item B<station> => I<station>
 
 Request station board (arrivals or departures) for I<station>, e.g. "Essen HBf" or
-"Alfredusbad, Essen (Ruhr)". Results are available via C<< $status->results >>.
+"Alfredusbad, Essen (Ruhr)". The station must be specified either by name or by
+EVA ID (e.g. 8000080 for Dortmund Hbf).
+Results are available via C<< $status->results >>.
 
 =item B<journey> => B<{> B<id> => I<tripid> [, B<name> => I<line> ] B<}>
 
