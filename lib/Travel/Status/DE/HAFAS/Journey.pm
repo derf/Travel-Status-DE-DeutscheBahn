@@ -15,7 +15,7 @@ our $VERSION = '4.02';
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(datetime sched_datetime rt_datetime
 	  is_cancelled is_partially_cancelled
-	  platform sched_platform rt_platform operator
+	  station platform sched_platform rt_platform operator
 	  id name type type_long class number line load delay
 	  route_end route_start origin destination direction)
 );
@@ -160,7 +160,7 @@ sub new {
 	}
 
 	if ( $journey->{stbStop} ) {
-		shift @stops;
+		shift(@stops);
 	}
 
 	my $ref = {
@@ -196,6 +196,7 @@ sub new {
 	bless( $ref, $obj );
 
 	if ( $journey->{stbStop} ) {
+		$ref->{station}        = $locL[ $journey->{stbStop}{locX} ]->{name};
 		$ref->{sched_platform} = $journey->{stbStop}{dPlatfS};
 		$ref->{rt_platform}    = $journey->{stbStop}{dPlatfR};
 		$ref->{platform}       = $ref->{rt_platform} // $ref->{sched_platform};
@@ -386,7 +387,7 @@ Returns the long type of this journey, e.g. "S-Bahn" or "Regional-Express".
 
 Returns an integer identifying the the mode of transport class.
 Semantics depend on backend, e.g. "1" and "2" for long-distance trains and
-"4" and "8" for region trains.
+"4" and "8" for regional trains.
 
 =item $journey->line
 
