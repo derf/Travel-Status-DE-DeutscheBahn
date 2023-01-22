@@ -7,7 +7,7 @@ use utf8;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-use Carp qw(confess);
+use Carp   qw(confess);
 use Encode qw(decode);
 use JSON;
 use LWP::UserAgent;
@@ -18,7 +18,7 @@ sub new {
 	my ( $obj, %conf ) = @_;
 
 	my $lang = $conf{language} // 'd';
-	my $ua = $conf{ua};
+	my $ua   = $conf{ua};
 
 	if ( not $ua ) {
 		my %lwp_options = %{ $conf{lwp_options} // { timeout => 10 } };
