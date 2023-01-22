@@ -659,6 +659,42 @@ sub similar_stops {
 	return;
 }
 
+sub station {
+	my ($self) = @_;
+
+	if ( $self->{station_info} ) {
+		return $self->{station_info};
+	}
+
+	my @locL = @{ $self->{raw_json}{svcResL}[0]{res}{common}{locL} // [] };
+
+	my %prefc_by_loc;
+
+	for my $i ( 0 .. $#locL ) {
+		my $loc = $locL[$i];
+		if ( $loc->{pRefL} ) {
+			$prefc_by_loc{$i} = $#{ $loc->{pRefL} };
+		}
+	}
+
+	my @prefcounts = sort { $b->[0] <=> $a->[0] }
+	  map { [ $_, $prefc_by_loc{$_} ] } keys %prefc_by_loc;
+
+	my $loc = $locL[ $prefcounts[0][0] ];
+
+	if ($loc) {
+		$self->{station_info} = {
+			name => $loc->{name},
+			uic  => $loc->{extId},
+		};
+	}
+	else {
+		$self->{station_info} = {};
+	}
+
+	return $self->{station_info};
+}
+
 sub messages {
 	my ($self) = @_;
 	return @{ $self->{messages} };
