@@ -109,7 +109,7 @@ finder services
 	use Travel::Status::DE::HAFAS::StopFinder;
 
 	my $sf = Travel::Status::DE::HAFAS::StopFinder->new(
-		url => 'http://reiseauskunft.bahn.de/bin/ajax-getstop.exe',
+		url => 'https://reiseauskunft.bahn.de/bin/ajax-getstop.exe',
 		input => 'Borbeck',
 	);
 
@@ -129,7 +129,7 @@ version 4.02
 
 Travel::Status::DE::HAFAS::StopFinder is an interface to the stop finder
 service of HAFAS based arrival/departure monitors, for instance the one
-available at L<http://reiseauskunft.bahn.de/bin/ajax-getstop.exe/dn>.
+available at L<https://reiseauskunft.bahn.de/bin/ajax-getstop.exe/dn>.
 
 It takes a string (usually a location or station name) and reports all
 stations and stops which are lexically similar to it.
