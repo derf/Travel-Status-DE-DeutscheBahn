@@ -293,6 +293,65 @@ sub route {
 	return;
 }
 
+sub route_interesting {
+	my ( $self, $max_parts ) = @_;
+
+	my @via = $self->route;
+	my ( @via_main, @via_show, $last_stop );
+	$max_parts //= 3;
+
+	# Centraal: dutch main station (Hbf in .nl)
+	# HB:  swiss main station (Hbf in .ch)
+	# hl.n.: czech main station (Hbf in .cz)
+	for my $stop (@via) {
+		if ( $stop->{name}
+			=~ m{ HB $ | hl\.n\. $ | Hbf | Hauptbahnhof | Bf | Bahnhof | Centraal | Flughafen }x
+		  )
+		{
+			push( @via_main, $stop );
+		}
+	}
+	$last_stop = pop(@via);
+
+	if ( @via_main and $via_main[-1]{name} eq $last_stop->{name} ) {
+		pop(@via_main);
+	}
+	if ( @via and $via[-1]{name} eq $last_stop->{name} ) {
+		pop(@via);
+	}
+
+	if ( @via_main and @via and $via[0]{name} eq $via_main[0]{name} ) {
+		shift(@via_main);
+	}
+
+	if ( @via < $max_parts ) {
+		@via_show = @via;
+	}
+	else {
+		if ( @via_main >= $max_parts ) {
+			@via_show = ( $via[0] );
+		}
+		else {
+			@via_show = splice( @via, 0, $max_parts - @via_main );
+		}
+
+		while ( @via_show < $max_parts and @via_main ) {
+			my $stop = shift(@via_main);
+			if ( $stop ~~ \@via_show or $stop->{name} eq $last_stop->{name} ) {
+				next;
+			}
+			push( @via_show, $stop );
+		}
+	}
+
+	for my $stop (@via_show) {
+		$stop->{name} =~ s{ \s? Hbf .* }{}x;
+	}
+
+	return @via_show;
+
+}
+
 sub TO_JSON {
 	my ($self) = @_;
 
