@@ -530,6 +530,14 @@ service notices (e.g. "missing carriage") or detailed delay reasons
 Returns the operator responsible for this journey. Returns undef
 if the backend does not provide an operator.
 
+=item $journey->station (station only)
+
+Name of the station at which this journey was requested.
+
+=item $journey->station_uic (station only)
+
+UIC/EVA ID of the station at which this journey was requested.
+
 =item $journey->route
 
 Returns a list of hashes; each hash describes a single journey stop.
@@ -576,6 +584,12 @@ entire route. Each hash contains the following keys:
 =back
 
 Individual entries may be undef.
+
+=item $journey->route_interesting([I<count>])
+
+Return up to I<count> (default: B<3>) parts of C<< $journey->route >> that may
+be particularly helpful, e.g. main stations or airports.
+Returns a list of hashes, see above for the layout.
 
 =item $journey->route_end
 
