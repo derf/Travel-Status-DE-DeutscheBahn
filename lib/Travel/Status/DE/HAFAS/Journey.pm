@@ -15,7 +15,7 @@ our $VERSION = '4.02';
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(datetime sched_datetime rt_datetime
 	  is_cancelled is_partially_cancelled
-	  station platform sched_platform rt_platform operator
+	  station station_uic platform sched_platform rt_platform operator
 	  id name type type_long class number line load delay
 	  route_end route_start origin destination direction)
 );
@@ -196,7 +196,8 @@ sub new {
 	bless( $ref, $obj );
 
 	if ( $journey->{stbStop} ) {
-		$ref->{station}        = $locL[ $journey->{stbStop}{locX} ]->{name};
+		$ref->{station}     = $locL[ $journey->{stbStop}{locX} ]->{name};
+		$ref->{station_uic} = 0 + $locL[ $journey->{stbStop}{locX} ]->{extId};
 		$ref->{sched_platform} = $journey->{stbStop}{dPlatfS};
 		$ref->{rt_platform}    = $journey->{stbStop}{dPlatfR};
 		$ref->{platform}       = $ref->{rt_platform} // $ref->{sched_platform};
