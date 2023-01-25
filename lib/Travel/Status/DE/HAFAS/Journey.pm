@@ -16,7 +16,7 @@ Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(datetime sched_datetime rt_datetime
 	  is_cancelled is_partially_cancelled
 	  station station_uic platform sched_platform rt_platform operator
-	  id name type type_long class number line load delay
+	  id name type type_long class number line line_no load delay
 	  route_end route_start origin destination direction)
 );
 
@@ -168,7 +168,8 @@ sub new {
 		id                     => $jid,
 		name                   => $name,
 		number                 => $train_no,
-		line                   => $line_no,
+		line                   => $name,
+		line_no                => $line_no,
 		type                   => $cat,
 		type_long              => $catlong,
 		class                  => $class,
@@ -451,9 +452,18 @@ Semantics depend on backend, e.g. "1" and "2" for long-distance trains and
 
 =item $journey->line
 
+Returns the journey or line name, either in a format like "Bus SB16" (Bus line
+SB16), "RE 42" (RegionalExpress train 42) or "IC 2901" (InterCity train 2901,
+no line information).  May contain extraneous whitespace characters.  Note that
+this accessor does not return line informatikn for IC/ICE/EC services, even if
+it is available. Use B<line_no> for those.
+
+=item $journey->line_no
+
 Returns the line identifier, or undef if it is unknown.
 The line identifier may be a single number such as "11" (underground train
 line U 11), a single word (e.g. "AIR") or a combination (e.g. "SB16").
+May also provide line numbers of IC/ICE services.
 
 =item $journey->number
 

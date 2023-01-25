@@ -7,7 +7,7 @@ use utf8;
 
 use File::Slurp qw(read_file);
 use JSON;
-use Test::More tests => 49;
+use Test::More tests => 52;
 
 use Travel::Status::DE::HAFAS;
 
@@ -48,7 +48,8 @@ is( $results[0]->name,      'Bus 300', 'result 0: name' );
 is( $results[0]->type,      'Bus',     'result 0: type' );
 is( $results[0]->type_long, 'Bus',     'result 0: type_long' );
 is( $results[0]->class,     32,        'result 0: class' );
-is( $results[0]->line,      '300',     'result 0: line' );
+is( $results[0]->line,      'Bus 300', 'result 0: line' );
+is( $results[0]->line_no,   '300',     'result 0: line' );
 is( $results[0]->number,    '50833',   'result 0: number' );
 
 is( $results[0]->operator, 'Nahreisezug', 'result 0: operator' );
@@ -79,7 +80,8 @@ is( $results[2]->name,      'U 8',    'result 2: name' );
 is( $results[2]->type,      'U',      'result 2: type' );
 is( $results[2]->type_long, 'U-Bahn', 'result 2: type_long' );
 is( $results[2]->class,     128,      'result 2: class' );
-is( $results[2]->line,      '8',      'result 2: line' );
+is( $results[2]->line,      'U 8',    'result 2: line' );
+is( $results[2]->line_no,   '8',      'result 2: line' );
 is( $results[2]->number,    '20024',  'result 2: number' );
 
 is( $results[2]->operator, 'Nahreisezug', 'result 2: operator' );
@@ -110,7 +112,8 @@ is( $results[3]->name,      'S 3',    'result 3: name' );
 is( $results[3]->type,      'S',      'result 3: type' );
 is( $results[3]->type_long, 'S-Bahn', 'result 3: type_long' );
 is( $results[0]->class,     32,       'result 3: class' );
-is( $results[3]->line,      '3',      'result 3: line' );
+is( $results[3]->line,      'S 3',    'result 3: line' );
+is( $results[3]->line_no,   '3',      'result 3: line' );
 is( $results[3]->number,    '3122',   'result 3: number' );
 
 is( $results[3]->operator, 'S-Bahn Berlin', 'result 3: operator' );
