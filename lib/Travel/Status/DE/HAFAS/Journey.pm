@@ -547,6 +547,7 @@ Name of the station at which this journey was requested.
 =item $journey->station_uic (station only)
 
 UIC/EVA ID of the station at which this journey was requested.
+May be renamed in future releases.
 
 =item $journey->route
 

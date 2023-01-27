@@ -928,6 +928,18 @@ If no result was found or the parser / http request failed, returns undef.
 Returns a list of Travel::Status::DE::HAFAS::Message(3pm) objects with
 service messages. Each message belongs to at least one arrival/departure.
 
+=item $status->station
+
+Returns a hashref describing the most common departure station in all requested
+journeys. Note that this may be different from the station for which departures
+were requested, as HAFAS uses different identifiers for train stations, bus
+stops, and other modes of transit even if they are interlinked.
+
+The hashref contains two entries: B<name> (station name) and B<uic> (UIC / EVA
+ID). These are subject to change.
+
+Not available in journey mode.
+
 =item $status->similar_stops
 
 Returns a list of hashrefs describing stops whose name is similar to the one
