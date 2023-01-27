@@ -1,3 +1,11 @@
+git HEAD
+
+    * HAFAS: Add "station" accessor
+    * Journey: Add "station", "station_uic" and "line_no" accessors
+    * Journey->line now returns journey type as well as line number
+    * Journey->line_no provides the old Journey->line behaviour
+    * Journey: Add "route_interesting" accessor
+
 Travel::Status::DE::DeutscheBahn 4.02 - Sun Nov 06 2022
 
     * HAFAS->new: Add "results" and "lookahead" options
