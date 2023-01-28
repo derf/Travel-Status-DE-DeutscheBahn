@@ -1,4 +1,4 @@
-git HEAD
+Travel::Status::DE::DeutscheBahn 4.03 - Sat Jan 28 2023
 
     * HAFAS: Add "station" accessor
     * Journey: Add "station", "station_uic" and "line_no" accessors
