@@ -185,9 +185,11 @@ sub new {
 	if ( $journey->{stbStop} ) {
 		if ( $hafas->{arrivals} ) {
 			$ref->{origin} = $ref->{route_end};
+			$ref->{is_cancelled} ||= $journey->{stbStop}{aCncl};
 		}
 		else {
 			$ref->{destination} = $ref->{route_end};
+			$ref->{is_cancelled} ||= $journey->{stbStop}{dCncl};
 		}
 	}
 	else {
