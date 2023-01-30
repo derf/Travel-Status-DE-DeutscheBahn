@@ -1,3 +1,8 @@
+Travel::Status::DE::DeutscheBahn 4.04 - Mon Jan 30 2023
+
+    * Journey->is_cancelled: correctly report cancellations in station board
+      mode
+
 Travel::Status::DE::DeutscheBahn 4.03 - Sat Jan 28 2023
 
     * HAFAS: Add "station" accessor
