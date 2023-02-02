@@ -93,7 +93,6 @@ sub new_p {
 	my $url  = $conf{url} . "/${lang}n";
 	$conf{user_agent}->post_p( $url, form => $self->{post} )->then(
 		sub {
-			say "then";
 			my ($tx) = @_;
 			if ( my $err = $tx->error ) {
 				$promise->reject(
@@ -102,7 +101,6 @@ sub new_p {
 			}
 			my $content = $tx->res->body;
 
-			say $content;
 			$self->{raw_reply} = $content;
 
 			$self->{raw_reply} =~ s{ ^ SLs [.] sls = }{}x;
@@ -119,7 +117,6 @@ sub new_p {
 		}
 	)->catch(
 		sub {
-			say "catch";
 			my ($err) = @_;
 			$promise->reject($err);
 			return;
