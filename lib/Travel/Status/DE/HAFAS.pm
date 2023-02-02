@@ -659,6 +659,25 @@ sub similar_stops {
 	return;
 }
 
+sub similar_stops_p {
+	my ( $self, %opt ) = @_;
+
+	my $service = $self->{active_service};
+
+	if ( $service and exists $hafas_instance{$service}{stopfinder} ) {
+		$opt{user_agent} //= $self->{ua};
+		return Travel::Status::DE::HAFAS::StopFinder->new_p(
+			url            => $hafas_instance{$service}{stopfinder},
+			input          => $self->{station},
+			ua             => $opt{user_agent},
+			developer_mode => $self->{developer_mode},
+			promise        => $opt{promise},
+		);
+	}
+	return $opt{promise}
+	  ->reject("stopfinder not available for backend '$service'");
+}
+
 sub station {
 	my ($self) = @_;
 
@@ -877,7 +896,7 @@ Only relevant in journey mode.
 
 =back
 
-=item my $status = Travel::Status::DE::HAFAS->new_p(I<%opt>)
+=item my $status_p = Travel::Status::DE::HAFAS->new_p(I<%opt>)
 
 Return a promise that resolves into a Travel::Status::DE::HAFAS instance
 ($status) on success and rejects with an error message ($status->errstr) on
