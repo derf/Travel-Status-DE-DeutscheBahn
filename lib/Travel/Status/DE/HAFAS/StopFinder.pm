@@ -114,7 +114,7 @@ sub new_p {
 
 			$self->{json} = from_json( $self->{raw_reply} );
 
-			$promise->resolve($self);
+			$promise->resolve( $self->results );
 			return;
 		}
 	)->catch(
@@ -236,10 +236,10 @@ you can use an empty hashref to override it.
 
 =item my $stopfinder_p = Travel::Status::DE::HAFAS::StopFinder->new_p(I<%opt>)
 
-Return a promise that resolves into a Travel::Status::DE::HAFAS::StopFinder instance
-($stopfinder) on success and rejects with an error message ($stopfinder->errstr) on
-failure. In addition to the arguments of B<new>, the following mandatory
-arguments must be set.
+Return a promise that resolves into a list of
+Travel::Status::DE::HAFAS::StopFinder results ($stopfinder->results) on success
+and rejects with an error message ($stopfinder->errstr) on failure. In addition
+to the arguments of B<new>, the following mandatory arguments must be set.
 
 =over
 
