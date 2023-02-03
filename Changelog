@@ -1,3 +1,7 @@
+Travel::Status::DE::DeutscheBahn 4.05 - Fri Feb 03 2023
+
+    * StopFinder: add new_p constructor for async requests via promises
+
 Travel::Status::DE::DeutscheBahn 4.04 - Mon Jan 30 2023
 
     * Journey->is_cancelled: correctly report cancellations in station board
