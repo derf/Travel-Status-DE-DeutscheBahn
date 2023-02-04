@@ -1,3 +1,8 @@
+Travel::Status::DE::DeutscheBahn 4.06 - Sat Feb 04 2023
+
+    * HAFAS->station: rename "uic" to "eva"; add "names" and "evas" keys
+    * Rename Journey->uic to Journey->eva
+
 Travel::Status::DE::DeutscheBahn 4.05 - Fri Feb 03 2023
 
     * StopFinder: add new_p constructor for async requests via promises
