@@ -704,9 +704,9 @@ sub station {
 	if ($loc) {
 		$self->{station_info} = {
 			name  => $loc->{name},
-			uic   => $loc->{extId},
+			eva   => $loc->{extId},
 			names => [ map { $locL[ $_->[0] ]{name} } @prefcounts ],
-			uics  => [ map { $locL[ $_->[0] ]{extId} } @prefcounts ],
+			evas  => [ map { $locL[ $_->[0] ]{extId} } @prefcounts ],
 		};
 	}
 	else {
@@ -953,7 +953,7 @@ service messages. Each message belongs to at least one arrival/departure.
 
 Returns a hashref describing the departure stations in all requested journeys.
 The hashref contains four entries: B<names> (station names), B<name> (most
-common name), B<uics> (UIC / EVA IDs), and B<uic> (most common UIC / EVA ID).
+common name), B<evas> (UIC / EVA IDs), and B<eva> (most common UIC / EVA ID).
 These are subject to change.
 
 Note that the most common name and ID may be different from the station for
