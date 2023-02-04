@@ -15,7 +15,7 @@ our $VERSION = '4.05';
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(datetime sched_datetime rt_datetime
 	  is_cancelled is_partially_cancelled
-	  station station_uic platform sched_platform rt_platform operator
+	  station station_eva platform sched_platform rt_platform operator
 	  id name type type_long class number line line_no load delay
 	  route_end route_start origin destination direction)
 );
@@ -200,7 +200,7 @@ sub new {
 
 	if ( $journey->{stbStop} ) {
 		$ref->{station}     = $locL[ $journey->{stbStop}{locX} ]->{name};
-		$ref->{station_uic} = 0 + $locL[ $journey->{stbStop}{locX} ]->{extId};
+		$ref->{station_eva} = 0 + $locL[ $journey->{stbStop}{locX} ]->{extId};
 		$ref->{sched_platform} = $journey->{stbStop}{dPlatfS};
 		$ref->{rt_platform}    = $journey->{stbStop}{dPlatfR};
 		$ref->{platform}       = $ref->{rt_platform} // $ref->{sched_platform};
@@ -253,6 +253,12 @@ sub new {
 # }}}
 
 # {{{ Accessors
+
+# Legacy
+sub station_uic {
+	my ($self) = @_;
+	return $self->{station_eva};
+}
 
 sub is_changed_platform {
 	my ($self) = @_;
@@ -546,10 +552,9 @@ if the backend does not provide an operator.
 
 Name of the station at which this journey was requested.
 
-=item $journey->station_uic (station only)
+=item $journey->station_eva (station only)
 
 UIC/EVA ID of the station at which this journey was requested.
-May be renamed in future releases.
 
 =item $journey->route
 
