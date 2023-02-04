@@ -100,20 +100,14 @@ sub new {
 			if ( not defined $timestr ) {
 				next;
 			}
-			if ( length($timestr) == 8 ) {
 
-				# arrival time includes a day offset
-				my $offset_date = $hafas->{now}->clone;
-				$offset_date->add( days => substr( $timestr, 0, 2, q{} ) );
-				$offset_date = $offset_date->strftime('%Y%m%d');
-				$timestr     = $hafas->{strptime_obj}
-				  ->parse_datetime("${offset_date}T${timestr}");
-			}
-			else {
-				$timestr
-				  = $hafas->{strptime_obj}
-				  ->parse_datetime("${date}T${timestr}");
-			}
+			$timestr = handle_day_change(
+				input    => $timestr,
+				date     => $date,
+				strp_obj => $hafas->{strptime_obj},
+				now      => $hafas->{now}
+			);
+
 		}
 
 		my $arr_delay
@@ -214,20 +208,14 @@ sub new {
 			if ( not defined $timestr ) {
 				next;
 			}
-			if ( length($timestr) == 8 ) {
 
-				# arrival time includes a day offset
-				my $offset_date = $hafas->{now}->clone;
-				$offset_date->add( days => substr( $timestr, 0, 2, q{} ) );
-				$offset_date = $offset_date->strftime('%Y%m%d');
-				$timestr     = $hafas->{strptime_obj}
-				  ->parse_datetime("${offset_date}T${timestr}");
-			}
-			else {
-				$timestr
-				  = $hafas->{strptime_obj}
-				  ->parse_datetime("${date}T${timestr}");
-			}
+			$timestr = handle_day_change(
+				input    => $timestr,
+				date     => $date,
+				strp_obj => $hafas->{strptime_obj},
+				now      => $hafas->{now}
+			);
+
 		}
 
 		my $datetime_s = $time_s;
@@ -267,6 +255,24 @@ sub new {
 }
 
 # }}}
+
+sub handle_day_change {
+	my (%opt)   = @_;
+	my $date    = $opt{date};
+	my $timestr = $opt{input};
+	if ( length($timestr) == 8 ) {
+
+		# arrival time includes a day offset
+		my $offset_date = $opt{now}->clone;
+		$offset_date->add( days => substr( $timestr, 0, 2, q{} ) );
+		$offset_date = $offset_date->strftime('%Y%m%d');
+		$timestr = $opt{strp_obj}->parse_datetime("${offset_date}T${timestr}");
+	}
+	else {
+		$timestr = $opt{strp_obj}->parse_datetime("${date}T${timestr}");
+	}
+	return $timestr;
+}
 
 # {{{ Accessors
 
