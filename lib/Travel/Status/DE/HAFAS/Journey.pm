@@ -210,12 +210,28 @@ sub new {
 		my $time_r
 		  = $journey->{stbStop}{ $hafas->{arrivals} ? 'aTimeR' : 'dTimeR' };
 
-		my $datetime_s
-		  = $hafas->{strptime_obj}->parse_datetime("${date}T${time_s}");
-		my $datetime_r
-		  = $time_r
-		  ? $hafas->{strptime_obj}->parse_datetime("${date}T${time_r}")
-		  : undef;
+		for my $timestr ( $time_s, $time_r ) {
+			if ( not defined $timestr ) {
+				next;
+			}
+			if ( length($timestr) == 8 ) {
+
+				# arrival time includes a day offset
+				my $offset_date = $hafas->{now}->clone;
+				$offset_date->add( days => substr( $timestr, 0, 2, q{} ) );
+				$offset_date = $offset_date->strftime('%Y%m%d');
+				$timestr     = $hafas->{strptime_obj}
+				  ->parse_datetime("${offset_date}T${timestr}");
+			}
+			else {
+				$timestr
+				  = $hafas->{strptime_obj}
+				  ->parse_datetime("${date}T${timestr}");
+			}
+		}
+
+		my $datetime_s = $time_s;
+		my $datetime_r = $time_r;
 
 		my $delay
 		  = $datetime_r
