@@ -703,8 +703,10 @@ sub station {
 
 	if ($loc) {
 		$self->{station_info} = {
-			name => $loc->{name},
-			uic  => $loc->{extId},
+			name  => $loc->{name},
+			uic   => $loc->{extId},
+			names => [ map { $locL[ $_->[0] ]{name} } @prefcounts ],
+			uics  => [ map { $locL[ $_->[0] ]{extId} } @prefcounts ],
 		};
 	}
 	else {
@@ -949,13 +951,14 @@ service messages. Each message belongs to at least one arrival/departure.
 
 =item $status->station
 
-Returns a hashref describing the most common departure station in all requested
-journeys. Note that this may be different from the station for which departures
-were requested, as HAFAS uses different identifiers for train stations, bus
-stops, and other modes of transit even if they are interlinked.
+Returns a hashref describing the departure stations in all requested journeys.
+The hashref contains four entries: B<names> (station names), B<name> (most
+common name), B<uics> (UIC / EVA IDs), and B<uic> (most common UIC / EVA ID).
+These are subject to change.
 
-The hashref contains two entries: B<name> (station name) and B<uic> (UIC / EVA
-ID). These are subject to change.
+Note that the most common name and ID may be different from the station for
+which departures were requested, as HAFAS uses different identifiers for train
+stations, bus stops, and other modes of transit even if they are interlinked.
 
 Not available in journey mode.
 
