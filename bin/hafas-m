@@ -41,9 +41,9 @@ GetOptions(
 ) or show_help(1);
 
 if ($list_services) {
-	printf( "%-40s %-14s %s\n\n", 'operator', 'abbr. (-s)', 'url (-u)' );
+	printf( "%-40s %-14s\n\n", 'operator', 'abbr. (-s)' );
 	for my $service ( Travel::Status::DE::HAFAS::get_services() ) {
-		printf( "%-40s %-14s %s\n", @{$service}{qw(name shortname url)} );
+		printf( "%-40s %-14s\n", @{$service}{qw(name shortname)} );
 	}
 	exit 0;
 }
@@ -329,7 +329,7 @@ hafas-m - Interface to the DeutscheBahn/HAFAS online departure monitor
 =head1 SYNOPSIS
 
 B<hafas-m> [B<-d> I<date>] [B<-t> I<time>] [B<-m> I<motlist>]
-[B<-s> I<service> | B<-u> I<url>] I<station>
+[B<-s> I<service>] I<station>
 
 =head1 VERSION
 
