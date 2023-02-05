@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.014;
 
-our $VERSION = '4.06';
+our $VERSION = '4.07';
 
 use utf8;
 use DateTime;
@@ -333,7 +333,7 @@ B<hafas-m> [B<-d> I<date>] [B<-t> I<time>] [B<-m> I<motlist>]
 
 =head1 VERSION
 
-version 4.06
+version 4.07
 
 =head1 DESCRIPTION
 

@@ -1,3 +1,11 @@
+Travel::Status::DE::DeutscheBahn 4.07 - Sun Feb 05 2023
+
+    * hafas-m: Fix uninitialized value warnings in "--list" output
+    * Improve support for non-DB HAFAS instances
+    * Fix day change handling in departure board mode.
+      Previously, journeys arriving / departing after midnight had wrong
+      timestamps in some cases.
+
 Travel::Status::DE::DeutscheBahn 4.06 - Sat Feb 04 2023
 
     * HAFAS->station: rename "uic" to "eva"; add "names" and "evas" keys
