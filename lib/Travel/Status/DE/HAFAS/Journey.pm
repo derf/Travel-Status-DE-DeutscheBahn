@@ -89,6 +89,7 @@ sub new {
 	my $class = $product->{cls};
 
 	my @stops;
+	my $route_end;
 	for my $stop ( @{ $journey->{stopL} // [] } ) {
 		my $loc       = $locL[ $stop->{locX} ];
 		my $sched_arr = $stop->{aTimeS};
@@ -151,6 +152,7 @@ sub new {
 				load          => $tco,
 			}
 		);
+		$route_end = $loc->{name};
 	}
 
 	if ( $journey->{stbStop} ) {
@@ -171,7 +173,7 @@ sub new {
 		direction              => $direction,
 		is_cancelled           => $is_cancelled,
 		is_partially_cancelled => $partially_cancelled,
-		route_end              => $stops[-1]{name},
+		route_end              => $route_end // $direction,
 		messages               => \@messages,
 		route                  => \@stops,
 	};
