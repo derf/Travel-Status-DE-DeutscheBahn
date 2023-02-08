@@ -97,6 +97,12 @@ sub new {
 		my $sched_dep = $stop->{dTimeS};
 		my $rt_dep    = $stop->{dTimeR};
 
+		# dIn. / aOut. -> may passengers enter / exit the train?
+
+		my $sched_platform   = $stop->{aPlatfS}  // $stop->{dPlatfS};
+		my $rt_platform      = $stop->{aPlatfR}  // $stop->{dPlatfR};
+		my $changed_platform = $stop->{aPlatfCh} // $stop->{dPlatfCh};
+
 		for my $timestr ( $sched_arr, $rt_arr, $sched_dep, $rt_dep ) {
 			if ( not defined $timestr ) {
 				next;
@@ -133,23 +139,27 @@ sub new {
 		push(
 			@stops,
 			{
-				name          => $loc->{name},
-				eva           => $loc->{extId} + 0,
-				lon           => $loc->{crd}{x} * 1e-6,
-				lat           => $loc->{crd}{y} * 1e-6,
-				sched_arr     => $sched_arr,
-				rt_arr        => $rt_arr,
-				arr           => $rt_arr // $sched_arr,
-				arr_delay     => $arr_delay,
-				arr_cancelled => $arr_cancelled,
-				sched_dep     => $sched_dep,
-				rt_dep        => $rt_dep,
-				dep           => $rt_dep // $sched_dep,
-				dep_delay     => $dep_delay,
-				dep_cancelled => $dep_cancelled,
-				delay         => $dep_delay // $arr_delay,
-				direction     => $stop->{dDirTxt},
-				load          => $tco,
+				name                => $loc->{name},
+				eva                 => $loc->{extId} + 0,
+				lon                 => $loc->{crd}{x} * 1e-6,
+				lat                 => $loc->{crd}{y} * 1e-6,
+				sched_arr           => $sched_arr,
+				rt_arr              => $rt_arr,
+				arr                 => $rt_arr // $sched_arr,
+				arr_delay           => $arr_delay,
+				arr_cancelled       => $arr_cancelled,
+				sched_dep           => $sched_dep,
+				rt_dep              => $rt_dep,
+				dep                 => $rt_dep // $sched_dep,
+				dep_delay           => $dep_delay,
+				dep_cancelled       => $dep_cancelled,
+				delay               => $dep_delay // $arr_delay,
+				direction           => $stop->{dDirTxt},
+				sched_platform      => $sched_platform,
+				rt_platform         => $rt_platform,
+				is_changed_platform => $changed_platform,
+				platform            => $rt_platform // $sched_platform,
+				load                => $tco,
 			}
 		);
 		$route_end = $loc->{name};
@@ -620,6 +630,14 @@ entire route. Each hash contains the following keys:
 =item * delay (departure or arrival delay in minutes)
 
 =item * direction (direction signage from this stop on, undef if unchanged)
+
+=item * rt_platform (actual platform)
+
+=item * sched_platform (scheduled platform)
+
+=item * platform (actual or scheduled platform)
+
+=item * is_changed_platform (true if real-time and scheduled platform disagree)
 
 =item * load (expected utilization / passenger load from this stop on)
 
