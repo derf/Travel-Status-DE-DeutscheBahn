@@ -166,7 +166,13 @@ sub new {
 	}
 
 	if ( $journey->{stbStop} ) {
-		shift(@stops);
+		if ( $hafas->{arrivals} ) {
+			$route_end = $stops[0]->{name};
+			pop(@stops);
+		}
+		else {
+			shift(@stops);
+		}
 	}
 
 	my $ref = {
