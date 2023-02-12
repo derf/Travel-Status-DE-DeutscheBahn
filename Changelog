@@ -1,3 +1,9 @@
+Travel::Status::DE::DeutscheBahn 4.08 - Sun Feb 12 2023
+
+    * Journey: Correctly report route_end / origin in arrivals mode
+    * Journey->route: Add platform, sched_platform, rt_platform, and
+      is_changed_platform accessors
+
 Travel::Status::DE::DeutscheBahn 4.07 - Sun Feb 05 2023
 
     * hafas-m: Fix uninitialized value warnings in "--list" output
