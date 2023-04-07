@@ -605,7 +605,7 @@ entire route. Each hash contains the following keys:
 
 =over
 
-=item * name (name
+=item * name (name)
 
 =item * eva (EVA ID)
 
