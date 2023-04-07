@@ -250,26 +250,6 @@ sub new {
 			$lid = 'A=1@O=' . $self->{station} . '@';
 		}
 
-		my $mot_mask = 2**@{ $hafas_instance{$service}{productbits} } - 1;
-
-		my %mot_pos;
-		for my $i ( 0 .. $#{ $hafas_instance{$service}{productbits} } ) {
-			$mot_pos{ $hafas_instance{$service}{productbits}[$i] } = $i;
-		}
-
-		if ( my @mots = @{ $self->{exclusive_mots} // [] } ) {
-			$mot_mask = 0;
-			for my $mot (@mots) {
-				$mot_mask |= 1 << $mot_pos{$mot};
-			}
-		}
-
-		if ( my @mots = @{ $self->{excluded_mots} // [] } ) {
-			for my $mot (@mots) {
-				$mot_mask &= ~( 1 << $mot_pos{$mot} );
-			}
-		}
-
 		my $maxjny   = $conf{results}   // 30;
 		my $duration = $conf{lookahead} // -1;
 
@@ -289,7 +269,7 @@ sub new {
 							{
 								type  => "PROD",
 								mode  => "INC",
-								value => $mot_mask
+								value => $self->mot_mask
 							}
 						]
 					},
@@ -410,6 +390,33 @@ sub new_p {
 
 # }}}
 # {{{ Internal Helpers
+
+sub mot_mask {
+	my ($self) = @_;
+
+	my $service  = $self->{active_service};
+	my $mot_mask = 2**@{ $hafas_instance{$service}{productbits} } - 1;
+
+	my %mot_pos;
+	for my $i ( 0 .. $#{ $hafas_instance{$service}{productbits} } ) {
+		$mot_pos{ $hafas_instance{$service}{productbits}[$i] } = $i;
+	}
+
+	if ( my @mots = @{ $self->{exclusive_mots} // [] } ) {
+		$mot_mask = 0;
+		for my $mot (@mots) {
+			$mot_mask |= 1 << $mot_pos{$mot};
+		}
+	}
+
+	if ( my @mots = @{ $self->{excluded_mots} // [] } ) {
+		for my $mot (@mots) {
+			$mot_mask &= ~( 1 << $mot_pos{$mot} );
+		}
+	}
+
+	return $mot_mask;
+}
 
 sub post_with_cache {
 	my ( $self, $url ) = @_;
