@@ -59,7 +59,14 @@ my %opt = (
 	service        => $service,
 );
 
-if ( $opt{station} =~ m{[|]} ) {
+if ( $opt{station} =~ m{ ^ (?<lat> [0-9.]+ ) : (?<lon> [0-9].+ ) $ }x ) {
+	$opt{geoSearch} = {
+		lat => $+{lat},
+		lon => $+{lon},
+	};
+	delete $opt{station};
+}
+elsif ( $opt{station} =~ m{[|]} ) {
 	$opt{journey} = { id => $opt{station} };
 	delete $opt{station};
 }
@@ -234,7 +241,17 @@ if ( my $err = $status->errstr ) {
 	exit 2;
 }
 
-if ( $opt{journey} ) {
+if ( $opt{geoSearch} ) {
+	for my $result ( $status->results ) {
+		printf(
+			"%5.1f km  %8d  %s\n",
+			$result->{distance_m} * 1e-3,
+			$result->{eva}, $result->{name}
+		);
+	}
+	exit 0;
+}
+elsif ( $opt{journey} ) {
 	my $result = $status->result;
 
 	printf( "%s → %s", $result->name, $result->route_end );

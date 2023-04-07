@@ -192,8 +192,8 @@ sub new {
 		$ua->env_proxy;
 	}
 
-	if ( not $conf{station} and not $conf{journey} ) {
-		confess('station or journey must be specified');
+	if ( not( $conf{station} or $conf{journey} or $conf{geoSearch} ) ) {
+		confess('station / journey / geoSearch must be specified');
 	}
 
 	if ( not defined $service ) {
@@ -233,6 +233,37 @@ sub new {
 						name        => $conf{journey}{name} // '0',
 						getPolyline => $conf{with_polyline} ? \1 : \0,
 					},
+				}
+			],
+			%{ $hafas_instance{$service}{request} }
+		};
+	}
+	elsif ( $conf{geoSearch} ) {
+		$req = {
+			svcReqL => [
+				{
+					cfg  => { polyEnc => 'GPA' },
+					meth => 'LocGeoPos',
+					req  => {
+						ring => {
+							cCrd => {
+								x => int( $conf{geoSearch}{lon} * 1e6 ),
+								y => int( $conf{geoSearch}{lat} * 1e6 ),
+							},
+							maxDist => -1,
+							minDist => 0,
+						},
+						locFltrL => [
+							{
+								type  => "PROD",
+								mode  => "INC",
+								value => $self->mot_mask
+							}
+						],
+						getPOIs  => \0,
+						getStops => \1,
+						maxLoc   => 10,
+					}
 				}
 			],
 			%{ $hafas_instance{$service}{request} }
@@ -340,6 +371,9 @@ sub new {
 	if ( $conf{journey} ) {
 		$self->parse_journey;
 	}
+	elsif ( $conf{geoSearch} ) {
+		$self->parse_geosearch;
+	}
 	else {
 		$self->parse_board;
 	}
@@ -365,6 +399,9 @@ sub new_p {
 			$self->check_mgate;
 			if ( $conf{journey} ) {
 				$self->parse_journey;
+			}
+			elsif ( $conf{geoSearch} ) {
+				$self->parse_geosearch;
 			}
 			else {
 				$self->parse_board;
@@ -575,6 +612,35 @@ sub add_message {
 	return $message;
 }
 
+sub parse_geosearch {
+	my ($self) = @_;
+
+	$self->{results} = [];
+
+	if ( $self->{errstr} ) {
+		return $self;
+	}
+
+	my @refLocL = @{ $self->{raw_json}{svcResL}[0]{res}{common}{locL} // [] };
+	my @locL    = @{ $self->{raw_json}{svcResL}[0]{res}{locL}         // [] };
+
+	for my $loc (@locL) {
+		push(
+			@{ $self->{results} },
+			{
+				eva        => 0 + $loc->{extId},
+				name       => $loc->{name},
+				lat        => $loc->{crd}{x} * 1e-6,
+				lon        => $loc->{crd}{y} * 1e-6,
+				weight     => $loc->{wt},
+				distance_m => $loc->{dist},
+			}
+		);
+	}
+
+	return $self;
+}
+
 sub parse_journey {
 	my ($self) = @_;
 
@@ -603,6 +669,8 @@ sub parse_journey {
 		polyline => \@polyline,
 		hafas    => $self,
 	);
+
+	return $self;
 }
 
 sub parse_board {
@@ -810,8 +878,9 @@ version 4.08
 Travel::Status::DE::HAFAS is an interface to HAFAS-based
 arrival/departure monitors using the mgate.exe interface.
 
-It can report departures/arrivals at a specific station, or provide details
-about a specific journey. It supports non-blocking operation via promises.
+It can report departures/arrivals at a specific station, search for stations,
+or provide details about a specific journey. It supports non-blocking operation
+via promises.
 
 =head1 METHODS
 
@@ -819,11 +888,11 @@ about a specific journey. It supports non-blocking operation via promises.
 
 =item my $status = Travel::Status::DE::HAFAS->new(I<%opt>)
 
-Requests departures/arrivals/journey as specified by I<opt> and returns a new
+Requests item(s) as specified by I<opt> and returns a new
 Travel::Status::DE::HAFAS element with the results.  Dies if the wrong
 I<opt> were passed.
 
-I<opt> must contain either a B<station> or a B<journey> flag:
+I<opt> must contain either a B<station>, a B<geoSearch>, or a B<journey> flag:
 
 =over
 
@@ -834,6 +903,11 @@ Request station board (arrivals or departures) for I<station>, e.g. "Essen HBf" 
 EVA ID (e.g. 8000080 for Dortmund Hbf).
 Results are available via C<< $status->results >>.
 
+=item B<geoSearch> => B<{> B<lat> => I<latitude>, B<lon> => I<longitude> B<}>
+
+Search for stations near I<latitude>, I<longitude>.
+Results are available via C<< $status->results >>.
+
 =item B<journey> => B<{> B<id> => I<tripid> [, B<name> => I<line> ] B<}>
 
 Request details about the journey identified by I<tripid> and I<line>.
@@ -841,14 +915,16 @@ The result is available via C<< $status->result >>.
 
 =back
 
-The following optional flags may be set:
+The following optional flags may be set.
+Values in brackets indicate flags that are only relevant in certain request
+modes, e.g. geoSearch or journey.
 
 =over
 
-=item B<arrivals> => I<bool>
+=item B<arrivals> => I<bool> (station)
 
 Request arrivals (if I<bool> is true) rather than departures (if I<bool> is
-false or B<arrivals> is not specified).  Only relevant in station board mode.
+false or B<arrivals> is not specified).
 
 =item B<cache> => I<Cache::File object>
 
@@ -856,41 +932,37 @@ Store HAFAS replies in the provided cache object.  This module works with
 real-time data, so the object should be configured for an expiry of one to two
 minutes.
 
-=item B<datetime> => I<DateTime object>
+=item B<datetime> => I<DateTime object> (station)
 
-Date and time to report for.  Defaults to now.  Only relevant in station board mode.
+Date and time to report for.  Defaults to now.
 
-=item B<excluded_mots> => [I<mot1>, I<mot2>, ...]
+=item B<excluded_mots> => [I<mot1>, I<mot2>, ...] (geoSearch, station)
 
 By default, all modes of transport (trains, trams, buses etc.) are returned.
 If this option is set, all modes appearing in I<mot1>, I<mot2>, ... will
 be excluded. The supported modes depend on B<service>, use
 B<get_services> or B<get_service> to get the supported values.
-Only relevant in station board mode.
 
-=item B<exclusive_mots> => [I<mot1>, I<mot2>, ...]
+=item B<exclusive_mots> => [I<mot1>, I<mot2>, ...] (geoSearch, station)
 
 If this option is set, only the modes of transport appearing in I<mot1>,
 I<mot2>, ...  will be returned.  The supported modes depend on B<service>, use
 B<get_services> or B<get_service> to get the supported values.
-Only relevant in station board mode.
 
-=item B<lookahead> => I<int>
+=item B<lookahead> => I<int> (station)
 
 Request arrivals/departures that occur up to I<int> minutes after the specified datetime.
 Default: -1 (do not limit results by time).
-Only relevant in station board mode.
 
 =item B<lwp_options> => I<\%hashref>
 
 Passed on to C<< LWP::UserAgent->new >>. Defaults to C<< { timeout => 10 } >>,
 pass an empty hashref to call the LWP::UserAgent constructor without arguments.
 
-=item B<results> => I<count>
+=item B<results> => I<count> (geoSearch, station)
 
 Request up to I<count> results.
 Default: 30.
-Only relevant in station board mode.
 
 =item B<service> => I<service>
 
@@ -898,10 +970,9 @@ Request results from I<service>, defaults to "DB".
 See B<get_services> (and C<< hafas-m --list >>) for a list of supported
 services.
 
-=item B<with_polyline> => I<bool>
+=item B<with_polyline> => I<bool> (journey)
 
 Request a polyline (series of geo-coordinates) indicating the train's route.
-Only relevant in journey mode.
 
 =back
 
@@ -936,18 +1007,42 @@ as string. If no backend error occurred, returns undef.
 In case of an error in the HTTP request or HAFAS backend, returns a string
 describing it.  If no error occurred, returns undef.
 
-=item $status->results
+=item $status->results (geoSearch)
+
+Returns a list of stations. Each list element is a hash ref with the following
+keys.
+
+=over
+
+=item * eva (identifier / EVA code)
+
+=item * name
+
+=item * lat (latitude)
+
+=item * lon (longitude)
+
+=item * distance_m (distance from requested coordinates, in meters)
+
+=item * weight (relevance / importance of result, unknown metric)
+
+=back
+
+If no matching results were found or the parser / http request failed, returns
+an empty list.
+
+=item $status->results (station)
 
 Returns a list of arrivals/departures.  Each list element is a
-Travel::Status::DE::HAFAS::Journey(3pm) object. Unavailable in journey mode.
+Travel::Status::DE::HAFAS::Journey(3pm) object.
 
 If no matching results were found or the parser / http request failed, returns
 undef.
 
-=item $status->result
+=item $status->result (journey)
 
 Returns a single Travel::Status::DE::HAFAS::Journey(3pm) object that describes
-the requested journey. Unavailable in station board mode.
+the requested journey.
 
 If no result was found or the parser / http request failed, returns undef.
 
