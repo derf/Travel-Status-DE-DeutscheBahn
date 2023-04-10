@@ -61,10 +61,10 @@ version 4.09
 =head1 DESCRIPTION
 
 Travel::Status::DE::HAFAS::Stop describes a HAFAS stop. It may be part of a
-journey or part of a geoSearch request.
+journey or part of a geoSearch / locationSearch request.
 
-geoSearch-specific accessors are annotated with "(geoSearch)" and return
-undef for non-geoSearch stops.
+geoSearch- and locationSearch-specific accessors are annotated accordingly and
+return undef for non-geoSearch / non-locationSearch stops.
 
 =head1 METHODS
 

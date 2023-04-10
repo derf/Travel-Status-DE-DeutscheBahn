@@ -66,6 +66,10 @@ if ( $opt{station} =~ m{ ^ (?<lat> [0-9.]+ ) : (?<lon> [0-9].+ ) $ }x ) {
 	};
 	delete $opt{station};
 }
+elsif ( $opt{station} =~ m{ ^ [?] (?<query> .*) $ }x ) {
+	$opt{locationSearch} = $+{query};
+	delete $opt{station};
+}
 elsif ( $opt{station} =~ m{[|]} ) {
 	$opt{journey} = { id => $opt{station} };
 	delete $opt{station};
@@ -248,6 +252,12 @@ if ( $opt{geoSearch} ) {
 			$result->distance_m * 1e-3,
 			$result->eva, $result->name
 		);
+	}
+	exit 0;
+}
+elsif ( $opt{locationSearch} ) {
+	for my $result ( $status->results ) {
+		printf( "%8d  %s\n", $result->eva, $result->name );
 	}
 	exit 0;
 }
