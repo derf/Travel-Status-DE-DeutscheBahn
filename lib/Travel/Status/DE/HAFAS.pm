@@ -20,6 +20,7 @@ use Travel::Status::DE::HAFAS::Message;
 use Travel::Status::DE::HAFAS::Polyline qw(decode_polyline);
 use Travel::Status::DE::HAFAS::Journey;
 use Travel::Status::DE::HAFAS::StopFinder;
+use Travel::Status::DE::HAFAS::Stop;
 
 our $VERSION = '4.08';
 
@@ -627,14 +628,7 @@ sub parse_geosearch {
 	for my $loc (@locL) {
 		push(
 			@{ $self->{results} },
-			{
-				eva        => 0 + $loc->{extId},
-				name       => $loc->{name},
-				lat        => $loc->{crd}{x} * 1e-6,
-				lon        => $loc->{crd}{y} * 1e-6,
-				weight     => $loc->{wt},
-				distance_m => $loc->{dist},
-			}
+			Travel::Status::DE::HAFAS::Stop->new( loc => $loc )
 		);
 	}
 
@@ -1009,24 +1003,8 @@ describing it.  If no error occurred, returns undef.
 
 =item $status->results (geoSearch)
 
-Returns a list of stations. Each list element is a hash ref with the following
-keys.
-
-=over
-
-=item * eva (identifier / EVA code)
-
-=item * name
-
-=item * lat (latitude)
-
-=item * lon (longitude)
-
-=item * distance_m (distance from requested coordinates, in meters)
-
-=item * weight (relevance / importance of result, unknown metric)
-
-=back
+Returns a list of stations. Each list element is a
+Travel::Status::DE::HAFAS::Stop(3pm) object.
 
 If no matching results were found or the parser / http request failed, returns
 an empty list.

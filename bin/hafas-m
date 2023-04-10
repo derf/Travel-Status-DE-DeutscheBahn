@@ -245,8 +245,8 @@ if ( $opt{geoSearch} ) {
 	for my $result ( $status->results ) {
 		printf(
 			"%5.1f km  %8d  %s\n",
-			$result->{distance_m} * 1e-3,
-			$result->{eva}, $result->{name}
+			$result->distance_m * 1e-3,
+			$result->eva, $result->name
 		);
 	}
 	exit 0;
