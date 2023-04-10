@@ -8,7 +8,7 @@ use 5.014;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '4.08';
+our $VERSION = '4.09';
 
 Travel::Status::DE::HAFAS::Stop->mk_ro_accessors(
 	qw(eva name lat lon distance_m weight));
@@ -56,7 +56,7 @@ Travel::Status::DE::HAFAS::Stop - Information about a HAFAS stop.
 
 =head1 VERSION
 
-version 4.08
+version 4.09
 
 =head1 DESCRIPTION
 

@@ -1,3 +1,7 @@
+Travel::Status::DE::DeutscheBahn 4.09 - Mon Apr 10 2023
+
+    * HAFAS->new: Add geoSearch option (search stops by coordinates)
+
 Travel::Status::DE::DeutscheBahn 4.08 - Sun Feb 12 2023
 
     * Journey: Correctly report route_end / origin in arrivals mode
