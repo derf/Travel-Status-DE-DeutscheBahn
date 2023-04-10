@@ -270,7 +270,7 @@ sub new {
 						],
 						getPOIs  => \0,
 						getStops => \1,
-						maxLoc   => 10,
+						maxLoc   => $conf{results} // 30,
 					}
 				}
 			],
@@ -289,7 +289,7 @@ sub new {
 								type => 'S',
 								name => $conf{locationSearch},
 							},
-							maxLoc => 10,
+							maxLoc => $conf{results} // 30,
 							field  => 'S',
 						},
 					}
