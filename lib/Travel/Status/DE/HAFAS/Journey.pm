@@ -9,6 +9,7 @@ use 5.014;
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
 use parent 'Class::Accessor';
+use Travel::Status::DE::HAFAS::Stop;
 
 our $VERSION = '4.09';
 
@@ -139,27 +140,26 @@ sub new {
 		push(
 			@stops,
 			{
-				name                => $loc->{name},
-				eva                 => $loc->{extId} + 0,
-				lon                 => $loc->{crd}{x} * 1e-6,
-				lat                 => $loc->{crd}{y} * 1e-6,
-				sched_arr           => $sched_arr,
-				rt_arr              => $rt_arr,
-				arr                 => $rt_arr // $sched_arr,
-				arr_delay           => $arr_delay,
-				arr_cancelled       => $arr_cancelled,
-				sched_dep           => $sched_dep,
-				rt_dep              => $rt_dep,
-				dep                 => $rt_dep // $sched_dep,
-				dep_delay           => $dep_delay,
-				dep_cancelled       => $dep_cancelled,
-				delay               => $dep_delay // $arr_delay,
-				direction           => $stop->{dDirTxt},
-				sched_platform      => $sched_platform,
-				rt_platform         => $rt_platform,
-				is_changed_platform => $changed_platform,
-				platform            => $rt_platform // $sched_platform,
-				load                => $tco,
+				loc   => $loc,
+				extra => {
+					sched_arr           => $sched_arr,
+					rt_arr              => $rt_arr,
+					arr                 => $rt_arr // $sched_arr,
+					arr_delay           => $arr_delay,
+					arr_cancelled       => $arr_cancelled,
+					sched_dep           => $sched_dep,
+					rt_dep              => $rt_dep,
+					dep                 => $rt_dep // $sched_dep,
+					dep_delay           => $dep_delay,
+					dep_cancelled       => $dep_cancelled,
+					delay               => $dep_delay // $arr_delay,
+					direction           => $stop->{dDirTxt},
+					sched_platform      => $sched_platform,
+					rt_platform         => $rt_platform,
+					is_changed_platform => $changed_platform,
+					platform            => $rt_platform // $sched_platform,
+					load                => $tco,
+				}
 			}
 		);
 		$route_end = $loc->{name};
@@ -338,6 +338,11 @@ sub route {
 	my ($self) = @_;
 
 	if ( $self->{route} ) {
+		if ( $self->{route}[0] and $self->{route}[0]{extra} ) {
+			$self->{route}
+			  = [ map { Travel::Status::DE::HAFAS::Stop->new( %{$_} ) }
+				  @{ $self->{route} } ];
+		}
 		return @{ $self->{route} };
 	}
 	return;
@@ -410,14 +415,6 @@ sub TO_JSON {
 	for my $k ( keys %{$ret} ) {
 		if ( ref( $ret->{$k} ) eq 'DateTime' ) {
 			$ret->{$k} = $ret->{$k}->epoch;
-		}
-	}
-
-	for my $stop ( @{ $ret->{route} } ) {
-		for my $k ( keys %{$stop} ) {
-			if ( ref( $stop->{$k} ) eq 'DateTime' ) {
-				$stop->{$k} = $stop->{$k}->epoch;
-			}
 		}
 	}
 
@@ -598,58 +595,10 @@ UIC/EVA ID of the station at which this journey was requested.
 
 =item $journey->route
 
-Returns a list of hashes; each hash describes a single journey stop.
-In stationboard mode, it only contains arrivals prior to the requested station
-or departures after the requested station. In journey mode, it contains the
-entire route. Each hash contains the following keys:
-
-=over
-
-=item * name (name)
-
-=item * eva (EVA ID)
-
-=item * lon (longitude)
-
-=item * lat (latitude)
-
-=item * rt_arr (DateTime object for actual arrival)
-
-=item * sched_arr (DateTime object for scheduled arrival)
-
-=item * arr (DateTime object for actual or scheduled arrival)
-
-=item * arr_delay (arrival delay in minutes)
-
-=item * arr_cancelled (arrival is cancelled)
-
-=item * rt_dep (DateTime object for actual departure)
-
-=item * sched_dep (DateTime object for scheduled departure)
-
-=item * dep (DateTIme object for actual or scheduled departure)
-
-=item * dep_delay (departure delay in minutes)
-
-=item * dep_cancelled (departure is cancelled)
-
-=item * delay (departure or arrival delay in minutes)
-
-=item * direction (direction signage from this stop on, undef if unchanged)
-
-=item * rt_platform (actual platform)
-
-=item * sched_platform (scheduled platform)
-
-=item * platform (actual or scheduled platform)
-
-=item * is_changed_platform (true if real-time and scheduled platform disagree)
-
-=item * load (expected utilization / passenger load from this stop on)
-
-=back
-
-Individual entries may be undef.
+Returns a list of Travel::Status::DE::HAFAS::Stop(3pm) objects that describe
+individual stops along the journey. In stationboard mode, the list only
+contains arrivals prior to the requested station or departures after the
+requested station. In journey mode, it contains the entire route.
 
 =item $journey->route_interesting([I<count>])
 

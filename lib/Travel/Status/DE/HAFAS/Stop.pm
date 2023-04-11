@@ -20,7 +20,7 @@ sub new {
 
 	my $loc = $opt{loc};
 	my $ref = {
-		eva        => 0 + $loc->{extId},
+		eva        => $loc->{extId} + 0,
 		name       => $loc->{name},
 		lat        => $loc->{crd}{x} * 1e-6,
 		lon        => $loc->{crd}{y} * 1e-6,
@@ -28,12 +28,32 @@ sub new {
 		distance_m => $loc->{dist},
 	};
 
+	if ( $opt{extra} ) {
+		while ( my ( $k, $v ) = each %{ $opt{extra} } ) {
+			$ref->{$k} = $v;
+		}
+	}
+
 	bless( $ref, $obj );
 
 	return $ref;
 }
 
 # }}}
+
+sub TO_JSON {
+	my ($self) = @_;
+
+	my $ret = { %{$self} };
+
+	for my $k ( keys %{$ret} ) {
+		if ( ref( $ret->{$k} ) eq 'DateTime' ) {
+			$ret->{$k} = $ret->{$k}->epoch;
+		}
+	}
+
+	return $ret;
+}
 
 1;
 
@@ -63,8 +83,8 @@ version 4.09
 Travel::Status::DE::HAFAS::Stop describes a HAFAS stop. It may be part of a
 journey or part of a geoSearch / locationSearch request.
 
-geoSearch- and locationSearch-specific accessors are annotated accordingly and
-return undef for non-geoSearch / non-locationSearch stops.
+Journey-, geoSearch- and locationSearch-specific accessors are annotated
+accordingly and return undef in other contexts.
 
 =head1 METHODS
 
@@ -96,6 +116,74 @@ Distance in meters between the requested coordinates and this stop.
 
 Weight / Relevance / Importance of this stop using an unknown metric.
 Higher values indicate more relevant stops.
+
+=item $stop->rt_arr (journey)
+
+DateTime object for actual arrival.
+
+=item $stop->sched_arr (journey)
+
+DateTime object for scheduled arrival.
+
+=item $stop->arr (journey)
+
+DateTime object for actual or scheduled arrival.
+
+=item $stop->arr_delay (journey)
+
+Arrival delay in minutes.
+
+=item $stop->arr_cancelled (journey)
+
+Arrival is cancelled.
+
+=item $stop->rt_dep (journey)
+
+DateTime object for actual departure.
+
+=item $stop->sched_dep (journey)
+
+DateTime object for scheduled departure.
+
+=item $stop->dep (journey)
+
+DateTIme object for actual or scheduled departure.
+
+=item $stop->dep_delay (journey)
+
+Departure delay in minutes.
+
+=item $stop->dep_cancelled (journey)
+
+Departure is cancelled.
+
+=item $stop->delay (journey)
+
+Departure or arrival delay in minutes.
+
+=item $stop->direction (journey)
+
+Direction signage from this stop on, undef if unchanged.
+
+=item $stop->rt_platform (journey)
+
+Actual platform.
+
+=item $stop->sched_platform (journey)
+
+Scheduled platform.
+
+=item $stop->platform (journey)
+
+Actual or scheduled platform.
+
+=item $stop->is_changed_platform (journey)
+
+True if real-time and scheduled platform disagree.
+
+=item $stop->load (journey)
+
+Expected utilization / passenger load from this stop on.
 
 =back
 
