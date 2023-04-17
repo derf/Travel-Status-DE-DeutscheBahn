@@ -414,7 +414,13 @@ sub new_p {
 	my ( $obj, %conf ) = @_;
 	my $promise = $conf{promise}->new;
 
-	if ( not $conf{station} and not $conf{journey} ) {
+	if (
+		not(   $conf{station}
+			or $conf{journey}
+			or $conf{geoSearch}
+			or $conf{locationSearch} )
+	  )
+	{
 		return $promise->reject('station or journey flag must be passed');
 	}
 
