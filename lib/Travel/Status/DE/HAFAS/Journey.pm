@@ -9,6 +9,7 @@ use 5.014;
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
 use parent 'Class::Accessor';
+use List::Util qw(any);
 use Travel::Status::DE::HAFAS::Stop;
 
 our $VERSION = '4.09';
@@ -392,7 +393,9 @@ sub route_interesting {
 
 		while ( @via_show < $max_parts and @via_main ) {
 			my $stop = shift(@via_main);
-			if ( $stop ~~ \@via_show or $stop->{name} eq $last_stop->{name} ) {
+			if ( any { $_->{name} eq $stop->{name} } @via_show
+				or $stop->{name} eq $last_stop->{name} )
+			{
 				next;
 			}
 			push( @via_show, $stop );
