@@ -1,3 +1,9 @@
+Travel::Status::DE::DeutscheBahn 4.10 - Tue Apr 18 2023
+
+    * HAFAS->new, ->new_p: Add locationSearch option (search stops by name)
+    * Journey->route, ->route_interesting:
+      Return Travel::Status::DE::HAFAS::Stop instances
+
 Travel::Status::DE::DeutscheBahn 4.09 - Mon Apr 10 2023
 
     * HAFAS->new: Add geoSearch option (search stops by coordinates)
