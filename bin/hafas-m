@@ -7,7 +7,8 @@ our $VERSION = '4.10';
 
 use utf8;
 use DateTime;
-use Encode          qw(decode);
+use Encode qw(decode);
+use JSON;
 use Getopt::Long    qw(:config no_ignore_case);
 use List::MoreUtils qw(uniq);
 use List::Util      qw(first max);
@@ -17,6 +18,7 @@ my ( $date, $time );
 my $arrivals = 0;
 my $types    = q{};
 my $developer_mode;
+my $json_output;
 my ( $list_services, $service );
 my ( @excluded_mots, @exclusive_mots );
 
@@ -36,6 +38,7 @@ GetOptions(
 	't|time=s'    => \$time,
 	'V|version'   => \&show_version,
 	'devmode'     => \$developer_mode,
+	'json'        => \$json_output,
 	'list'        => \$list_services,
 
 ) or show_help(1);
@@ -245,6 +248,16 @@ if ( my $err = $status->errstr ) {
 	exit 2;
 }
 
+if ($json_output) {
+	if ( $opt{journey} ) {
+		say JSON->new->convert_blessed->encode( [ $status->result ] );
+	}
+	else {
+		say JSON->new->convert_blessed->encode( [ $status->results ] );
+	}
+	exit 0;
+}
+
 if ( $opt{geoSearch} ) {
 	for my $result ( $status->results ) {
 		printf(
@@ -383,6 +396,10 @@ the end station.
 =item B<-d>, B<--date> I<dd>.I<mm>.[I<yyyy>]
 
 Date to list departures for.  Default: today.
+
+=item B<--json>
+
+Print result(s) as JSON.
 
 =item B<--list>
 
