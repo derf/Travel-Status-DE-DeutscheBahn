@@ -420,6 +420,7 @@ sub TO_JSON {
 			$ret->{$k} = $ret->{$k}->epoch;
 		}
 	}
+	$ret->{route} = [ map { $_->TO_JSON } $self->route ];
 
 	return $ret;
 }
