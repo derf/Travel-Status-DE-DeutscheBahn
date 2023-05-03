@@ -121,12 +121,12 @@ sub new {
 
 		my $arr_delay
 		  = ( $sched_arr and $rt_arr )
-		  ? 0 + ( $rt_arr->epoch - $sched_arr->epoch ) / 60
+		  ? ( $rt_arr->epoch - $sched_arr->epoch ) / 60
 		  : undef;
 
 		my $dep_delay
 		  = ( $sched_dep and $rt_dep )
-		  ? 0 + ( $rt_dep->epoch - $sched_dep->epoch ) / 60
+		  ? ( $rt_dep->epoch - $sched_dep->epoch ) / 60
 		  : undef;
 
 		my $arr_cancelled = $stop->{aCncl};
