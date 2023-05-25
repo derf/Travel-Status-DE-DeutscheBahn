@@ -250,7 +250,7 @@ if ( my $err = $status->errstr ) {
 
 if ($json_output) {
 	if ( $opt{journey} ) {
-		say JSON->new->convert_blessed->encode( [ $status->result ] );
+		say JSON->new->convert_blessed->encode( $status->result );
 	}
 	else {
 		say JSON->new->convert_blessed->encode( [ $status->results ] );
