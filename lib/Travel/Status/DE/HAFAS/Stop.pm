@@ -22,8 +22,8 @@ sub new {
 	my $ref = {
 		eva        => $loc->{extId} + 0,
 		name       => $loc->{name},
-		lat        => $loc->{crd}{x} * 1e-6,
-		lon        => $loc->{crd}{y} * 1e-6,
+		lat        => $loc->{crd}{y} * 1e-6,
+		lon        => $loc->{crd}{x} * 1e-6,
 		weight     => $loc->{wt},
 		distance_m => $loc->{dist},
 	};
