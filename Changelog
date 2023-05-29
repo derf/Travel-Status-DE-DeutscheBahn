@@ -1,3 +1,8 @@
+Travel::Status::DE::DeutscheBahn 4.12 - Mon May 29 2023
+
+    * Fix Journey->route and HAFAS geoSearch / locationSearch returning
+      incorrect geocoordinates (latitude and longitude were mixed up)
+
 Travel::Status::DE::DeutscheBahn 4.11 - Thu May 25 2023
 
     * hafas-m: Add --json option

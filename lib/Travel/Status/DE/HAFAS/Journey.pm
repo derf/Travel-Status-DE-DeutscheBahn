@@ -12,7 +12,7 @@ use parent 'Class::Accessor';
 use List::Util qw(any);
 use Travel::Status::DE::HAFAS::Stop;
 
-our $VERSION = '4.11';
+our $VERSION = '4.12';
 
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(datetime sched_datetime rt_datetime
@@ -461,7 +461,7 @@ journey received by Travel::Status::DE::HAFAS
 
 =head1 VERSION
 
-version 4.11
+version 4.12
 
 =head1 DESCRIPTION
 
