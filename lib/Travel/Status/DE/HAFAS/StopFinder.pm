@@ -12,7 +12,7 @@ use Encode qw(decode);
 use JSON;
 use LWP::UserAgent;
 
-our $VERSION = '4.12';
+our $VERSION = '4.13';
 
 # {{{ Constructors
 
@@ -182,7 +182,7 @@ finder services
 
 =head1 VERSION
 
-version 4.12
+version 4.13
 
 =head1 DESCRIPTION
 

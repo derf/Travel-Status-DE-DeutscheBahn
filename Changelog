@@ -1,3 +1,8 @@
+Travel::Status::DE::DeutscheBahn 4.13 - Mon Aug 21 2023
+
+    * new_p: Return a Travel::Status::DE::HAFAS instance in addition to the
+      error message when rejecting a promise after receiving a HAFAS reply
+
 Travel::Status::DE::DeutscheBahn 4.12 - Mon May 29 2023
 
     * Fix Journey->route and HAFAS geoSearch / locationSearch returning
