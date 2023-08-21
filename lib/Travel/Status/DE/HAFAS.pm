@@ -1016,11 +1016,12 @@ Request a polyline (series of geo-coordinates) indicating the train's route.
 =item my $status_p = Travel::Status::DE::HAFAS->new_p(I<%opt>)
 
 Return a promise that resolves into a Travel::Status::DE::HAFAS instance
-($status) on success and rejects with an error message and optional HAFAS
-instance ($status->errstr[, $status]) on failure. The optional HAFAS instance
-is only present if the error occured late, e.g. due to an ambiguous location
-specifier.  In addition to the arguments of B<new>, the following mandatory
-arguments must be set.
+($status) on success and rejects with an error message on failure. If the
+failure occured after receiving a response from the HAFAS backend, the rejected
+promise contains a Travel::Status::DE::HAFAS instance as a second argument.
+This instance can be used e.g. to call similar_stops in case of an ambiguous
+location specifier. In addition to the arguments of B<new>, the following
+mandatory arguments must be set.
 
 =over
 
