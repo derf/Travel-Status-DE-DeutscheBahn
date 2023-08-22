@@ -772,10 +772,11 @@ sub similar_stops_p {
 
 	if ( $service and exists $hafas_instance{$service}{stopfinder} ) {
 		$opt{user_agent} //= $self->{ua};
+		$opt{promise}    //= $self->{promise};
 		return Travel::Status::DE::HAFAS::StopFinder->new_p(
 			url            => $hafas_instance{$service}{stopfinder},
 			input          => $self->{station},
-			ua             => $opt{user_agent},
+			user_agent     => $opt{user_agent},
 			developer_mode => $self->{developer_mode},
 			promise        => $opt{promise},
 		);
