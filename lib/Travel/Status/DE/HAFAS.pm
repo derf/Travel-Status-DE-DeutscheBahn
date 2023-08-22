@@ -512,7 +512,6 @@ sub post_with_cache {
 		say '  cache miss';
 	}
 
-	my $ua    = $self->{user_agent};
 	my $reply = $self->{ua}->post(
 		$url,
 		'Content-Type' => 'application/json',
