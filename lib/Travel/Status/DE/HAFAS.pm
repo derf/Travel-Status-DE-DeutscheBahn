@@ -1093,7 +1093,7 @@ Not available in journey mode.
 Returns a list of hashrefs describing stops whose name is similar to the one
 requested in the constructor's B<station> parameter. Returns nothing if
 the active service does not support this feature.
-This is most useful if B<errcode> returns 'H730', which means that the
+This is most useful if B<errcode> returns 'LOCATION', which means that the
 HAFAS backend could not identify the stop.
 
 See Travel::Status::DE::HAFAS::StopFinder(3pm)'s B<results> method for details
