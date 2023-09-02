@@ -13,7 +13,7 @@ use DateTime::Format::Strptime;
 use List::Util qw(any);
 use Travel::Status::DE::HAFAS::Stop;
 
-our $VERSION = '4.14';
+our $VERSION = '4.15';
 
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(datetime sched_datetime rt_datetime
@@ -467,7 +467,7 @@ journey received by Travel::Status::DE::HAFAS
 
 =head1 VERSION
 
-version 4.14
+version 4.15
 
 =head1 DESCRIPTION
 

@@ -1,3 +1,7 @@
+Travel::Status::DE::DeutscheBahn 4.15 - Wed Aug 22 2023
+
+    * HAFAS: Add similar_stops_p function
+
 Travel::Status::DE::DeutscheBahn 4.14 - Tue Aug 22 2023
 
     * Journey: Correctly calculate datetimes when requesting a cross-midnight
