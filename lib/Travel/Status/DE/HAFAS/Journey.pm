@@ -89,7 +89,13 @@ sub new {
 		}
 	}
 
-	my $date_ref     = ( split( qr{[|]}, $jid ) )[4];
+	my $date_ref = ( split( qr{[|]}, $jid ) )[4];
+	if ( length($date_ref) < 7 ) {
+		warn("HAFAS, not even once -- midnight crossing may be bogus");
+	}
+	if ( length($date_ref) == 7 ) {
+		$date_ref = "0${date_ref}";
+	}
 	my $datetime_ref = DateTime::Format::Strptime->new(
 		pattern   => '%d%m%Y',
 		time_zone => 'Europe/Berlin'
