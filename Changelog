@@ -1,3 +1,8 @@
+Travel::Status::DE::DeutscheBahn 4.16 - Sun Sep 03 2023
+
+    * Journey: Fix date parser for cross-midnight journeys that start on the
+      1st through 9th day of a month.
+
 Travel::Status::DE::DeutscheBahn 4.15 - Wed Aug 22 2023
 
     * HAFAS: Add similar_stops_p function
