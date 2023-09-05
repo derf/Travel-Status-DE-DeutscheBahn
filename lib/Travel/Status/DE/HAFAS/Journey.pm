@@ -218,7 +218,7 @@ sub new {
 		}
 	}
 	else {
-		$ref->{route_start} = $stops[0]{name};
+		$ref->{route_start} = $stops[0]{loc}{name};
 	}
 
 	bless( $ref, $obj );
