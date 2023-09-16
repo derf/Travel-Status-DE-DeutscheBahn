@@ -53,7 +53,7 @@ sub new {
 	my $train_no = $product->{prodCtx}{num};
 	my $cat      = $product->{prodCtx}{catOut};
 	my $catlong  = $product->{prodCtx}{catOutL};
-	if ( $name and $cat and $name eq $cat ) {
+	if ( $name and $cat and $name eq $cat and $product->{nameS} ) {
 		$name .= ' ' . $product->{nameS};
 	}
 	if ( defined $train_no and not $train_no ) {
