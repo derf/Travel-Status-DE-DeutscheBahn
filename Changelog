@@ -1,3 +1,7 @@
+Travel::Status::DE::DeutscheBahn 4.17 - Sun Sep 03 2023
+
+    * Journey: handle empty / undefined nameS fields
+
 Travel::Status::DE::DeutscheBahn 4.16 - Sun Sep 03 2023
 
     * Journey: Fix date parser for cross-midnight journeys that start on the
