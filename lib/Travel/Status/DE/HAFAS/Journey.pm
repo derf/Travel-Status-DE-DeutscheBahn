@@ -89,17 +89,21 @@ sub new {
 		}
 	}
 
-	my $date_ref = ( split( qr{[|]}, $jid ) )[4];
-	if ( length($date_ref) < 7 ) {
-		warn("HAFAS, not even once -- midnight crossing may be bogus");
+	my $datetime_ref;
+
+	if ( @{ $journey->{stopL} // [] } or $journey->{stbStop} ) {
+		my $date_ref = ( split( qr{[|]}, $jid ) )[4];
+		if ( length($date_ref) < 7 ) {
+			warn("HAFAS, not even once -- midnight crossing may be bogus");
+		}
+		if ( length($date_ref) == 7 ) {
+			$date_ref = "0${date_ref}";
+		}
+		$datetime_ref = DateTime::Format::Strptime->new(
+			pattern   => '%d%m%Y',
+			time_zone => 'Europe/Berlin'
+		)->parse_datetime($date_ref);
 	}
-	if ( length($date_ref) == 7 ) {
-		$date_ref = "0${date_ref}";
-	}
-	my $datetime_ref = DateTime::Format::Strptime->new(
-		pattern   => '%d%m%Y',
-		time_zone => 'Europe/Berlin'
-	)->parse_datetime($date_ref);
 
 	my $class = $product->{cls};
 
