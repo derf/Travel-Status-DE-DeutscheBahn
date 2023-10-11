@@ -520,7 +520,7 @@ Semantics depend on backend, e.g. "1" and "2" for long-distance trains and
 Returns the journey or line name, either in a format like "Bus SB16" (Bus line
 SB16), "RE 42" (RegionalExpress train 42) or "IC 2901" (InterCity train 2901,
 no line information).  May contain extraneous whitespace characters.  Note that
-this accessor does not return line informatikn for IC/ICE/EC services, even if
+this accessor does not return line information for IC/ICE/EC services, even if
 it is available. Use B<line_no> for those.
 
 =item $journey->line_no
