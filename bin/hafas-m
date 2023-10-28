@@ -371,17 +371,56 @@ hafas-m - Interface to the DeutscheBahn/HAFAS online departure monitor
 B<hafas-m> [B<-d> I<date>] [B<-t> I<time>] [B<-m> I<motlist>]
 [B<-s> I<service>] I<station>
 
+B<hafas-m> [B<-s> I<service>] B<?>I<query>|I<lat>B<:>I<lon>
+
+B<hafas-m> [B<-s> I<service>] I<journeyID>
+
 =head1 VERSION
 
 version 4.17
 
 =head1 DESCRIPTION
 
-hafas-m is an interface to HAFAS-based departure monitors such as the one
+hafas-m is an interface to HAFAS arrival/departure monitors such as the one
 available at L<https://reiseauskunft.bahn.de//bin/bhftafel.exe/dn>.
 
-It requests all departures at I<station> (optionally filtered by date, time,
-route and means of transport) and lists them on stdout.
+It has three operating modes that depend on the contents of its argument.
+
+=head2 Arrival/Departure Monitor
+
+Show departures (or arrivals) at I<station>, optionally filtered by date, time
+and mode of transport. I<station> may be given as a station name or EVA ID.
+EVA IDs tend to be similar to, but not always identical with, UIC station
+codes. Output format:
+
+=over
+
+=item * scheduled departure (or arrival) time
+
+=item * delay, if known
+
+=item * trip number or line
+
+=item * direction / destination
+
+=item * platform (B<!> indicates a platform change)
+
+=item * expected occupancy of first and second class, if known
+
+=back
+
+Occupancy indicators are, from least occupied to fully booked: B<.> B<o>
+B<*> B<!>.
+
+=head2 Location Search
+
+List stations that match I<query> or that are located in the vicinity of
+I<lat>B<:>I<lon> geocoordinates with EVA ID and name.
+
+=head2 Trip Details
+
+List intermediate stops of I<journeyID> with arrival/departure time, delay (if
+available), occupancy (if available), and stop name.
 
 =head1 OPTIONS
 
