@@ -438,12 +438,14 @@ Date to list departures for.  Default: today.
 
 =item B<--json>
 
-Print result(s) as JSON.
+Print result(s) as JSON. This is a dump of internal data structures and not
+guaranteed to remain stable between minor versions. Please use the
+Travel::Status::DE::HAFAS(3pm) module if you need a proper API.
 
 =item B<--list>
 
-List known HAFAS installations. A HAFAS service from this list can be querie
-using B<--service>.
+List known HAFAS installations and exit. Use B<-s>|B<--service> to select an
+operator from this list for a HAFAS request.
 
 =item B<-m>, B<--mot> I<motlist>
 
@@ -468,13 +470,13 @@ Time to list departures for.  Default: now.
 
 =item B<-V>, B<--version>
 
-Show version information.
+Show version information and exit.
 
 =back
 
 =head1 EXIT STATUS
 
-Zero unless things went wrong.
+0 upon success, 1 upon internal error, 2 upon backend error.
 
 =head1 CONFIGURATION
 
@@ -492,7 +494,7 @@ None.
 
 =head1 BUGS AND LIMITATIONS
 
-The non-default services (anything other than DB) are not well tested.
+The non-default services (anything other than DB) are not well-tested.
 
 =head1 AUTHOR
 
