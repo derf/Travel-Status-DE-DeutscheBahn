@@ -5,8 +5,6 @@ use warnings;
 use 5.014;
 use utf8;
 
-no if $] >= 5.018, warnings => 'experimental::smartmatch';
-
 use Carp   qw(confess);
 use Encode qw(decode);
 use JSON;

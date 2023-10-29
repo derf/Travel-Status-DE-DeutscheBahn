@@ -6,8 +6,6 @@ use strict;
 use warnings;
 use 5.014;
 
-no if $] >= 5.018, warnings => 'experimental::smartmatch';
-
 use parent 'Class::Accessor';
 use DateTime::Format::Strptime;
 use List::Util qw(any);
