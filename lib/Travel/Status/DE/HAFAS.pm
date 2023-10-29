@@ -33,6 +33,7 @@ my %hafas_instance = (
 		name        => 'Deutsche Bahn',
 		productbits => [qw[ice ic_ec d regio s bus ferry u tram ondemand]],
 		salt        => 'bdI8UVj4' . '0K5fvxwf',
+		languages   => [qw[de en fr es]],
 		request     => {
 			client => {
 				id   => 'DB',
@@ -337,6 +338,10 @@ sub new {
 			],
 			%{ $hafas_instance{$service}{request} }
 		};
+	}
+
+	if ( $conf{language} ) {
+		$req->{lang} = $conf{language};
 	}
 
 	$self->{strptime_obj} //= DateTime::Format::Strptime->new(
@@ -985,6 +990,12 @@ B<get_services> or B<get_service> to get the supported values.
 If this option is set, only the modes of transport appearing in I<mot1>,
 I<mot2>, ...  will be returned.  The supported modes depend on B<service>, use
 B<get_services> or B<get_service> to get the supported values.
+
+=item B<language> => I<language>
+
+Request text messages to be provided in I<language>. Supported languages depend
+on B<service>, use B<get_services> or B<get_service> to get the supported
+values. Providing an unsupported or invalid value may lead to garbage output.
 
 =item B<lookahead> => I<int> (station)
 

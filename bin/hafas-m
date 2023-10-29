@@ -14,7 +14,7 @@ use List::MoreUtils qw(uniq);
 use List::Util      qw(first max);
 use Travel::Status::DE::HAFAS;
 
-my ( $date, $time );
+my ( $date, $time, $language );
 my $arrivals = 0;
 my $types    = q{};
 my $developer_mode;
@@ -30,23 +30,28 @@ for my $arg (@ARGV) {
 }
 
 GetOptions(
-	'a|arrivals'  => \$arrivals,
-	'd|date=s'    => \$date,
-	'h|help'      => sub { show_help(0) },
-	'm|mot=s'     => \$types,
-	's|service=s' => \$service,
-	't|time=s'    => \$time,
-	'V|version'   => \&show_version,
-	'devmode'     => \$developer_mode,
-	'json'        => \$json_output,
-	'list'        => \$list_services,
+	'a|arrivals'   => \$arrivals,
+	'd|date=s'     => \$date,
+	'h|help'       => sub { show_help(0) },
+	'l|language=s' => \$language,
+	'm|mot=s'      => \$types,
+	's|service=s'  => \$service,
+	't|time=s'     => \$time,
+	'V|version'    => \&show_version,
+	'devmode'      => \$developer_mode,
+	'json'         => \$json_output,
+	'list'         => \$list_services,
 
 ) or show_help(1);
 
 if ($list_services) {
-	printf( "%-40s %-14s\n\n", 'operator', 'abbr. (-s)' );
+	printf( "%-40s %-14s %s\n\n", 'operator', 'abbr. (-s)', 'languages (-l)' );
 	for my $service ( Travel::Status::DE::HAFAS::get_services() ) {
-		printf( "%-40s %-14s\n", @{$service}{qw(name shortname)} );
+		printf(
+			"%-40s %-14s %s\n",
+			@{$service}{qw(name shortname)},
+			join( q{ }, @{ $service->{languages} // [] } )
+		);
 	}
 	exit 0;
 }
@@ -60,6 +65,7 @@ my %opt = (
 	arrivals       => $arrivals,
 	developer_mode => $developer_mode,
 	service        => $service,
+	language       => $language,
 );
 
 if ( $opt{station} =~ m{ ^ (?<lat> [0-9.]+ ) : (?<lon> [0-9].+ ) $ }x ) {
@@ -369,11 +375,11 @@ hafas-m - Interface to the DeutscheBahn/HAFAS online departure monitor
 =head1 SYNOPSIS
 
 B<hafas-m> [B<-d> I<date>] [B<-t> I<time>] [B<-m> I<motlist>]
-[B<-s> I<service>] I<station>
+[B<-s> I<service>] [B<-l> I<language>] I<station>
 
 B<hafas-m> [B<-s> I<service>] B<?>I<query>|I<lat>B<:>I<lon>
 
-B<hafas-m> [B<-s> I<service>] I<journeyID>
+B<hafas-m> [B<-s> I<service>] [B<-l> I<language>] I<journeyID>
 
 =head1 VERSION
 
@@ -441,6 +447,12 @@ Date to list departures for.  Default: today.
 Print result(s) as JSON. This is a dump of internal data structures and not
 guaranteed to remain stable between minor versions. Please use the
 Travel::Status::DE::HAFAS(3pm) module if you need a proper API.
+
+=item B<-l>, B<--language> I<language>
+
+Request free-text messages to be provided in I<language>.
+See B<--list> for a list of languages supported by individual HAFAS instances.
+Note that requesting an invalid/unsupported language may lead to garbage output.
 
 =item B<--list>
 
