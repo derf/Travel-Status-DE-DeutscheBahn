@@ -176,6 +176,19 @@ sub show_similar_stops {
 		for my $c (@candidates) {
 			printf( "%s (%s)\n", $c->{name}, $c->{id} );
 		}
+		return;
+	}
+	my $hafas = Travel::Status::DE::HAFAS->new(
+		locationSearch => $opt{station},
+		developer_mode => $developer_mode,
+		service        => $service,
+		language       => $language,
+	);
+	if ( $hafas->results ) {
+		say 'You might want to try one of the following stops:';
+		for my $r ( $hafas->results ) {
+			printf( "%s (%s)\n", $r->name, $r->eva );
+		}
 	}
 	return;
 }
