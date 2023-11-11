@@ -92,6 +92,56 @@ string such as "Information". Does not contain newlines.
 
 Detailed message content. Does not contain newlines.
 
+=item $message->code
+
+Two-digit message code, seems to be only used with messages of type "A".
+Details unknown.
+
+=item $message->type
+
+A single character indicating the message type.
+The following types are known:
+
+=over
+
+=item A
+
+Generic information about a specific trip such as "WiFi available", "air
+conditioning", "DB tickets are not valid here", or "from here on as [line]
+towards [destination]".
+
+=item C
+
+"Current information available", possibly more.
+
+=item D
+
+Large-scale disruption, e.g. medical emergency on line.
+
+=item G
+
+Platform change, possibly more.
+
+=item H
+
+Misc stuff such as "Journey contains trains with mandatory reservation" or
+"ICE Sprinter".
+
+=item L
+
+Replacement journey
+
+=item M
+
+Free-text infos about construction sites, broken elevators, large events and
+similar occasions.
+
+=item P
+
+Journey has been cancelled, possibly more.
+
+=back
+
 =item $message->ref_count
 
 Counter indicating how often this message is used by the requested
