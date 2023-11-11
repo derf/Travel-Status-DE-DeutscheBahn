@@ -1,3 +1,8 @@
+Travel::Status::DE::DeutscheBahn 4.19 - Sat Nov 11 2023
+
+    * hafas-m: Fall back to locationSearch if StopFinder is unavailable
+    * Message: Expose message type; document ->code and ->type
+
 Travel::Status::DE::DeutscheBahn 4.18 - Sun Oct 29 2023
 
     * Allow HAFAS and hafas-m users to specify the backend language

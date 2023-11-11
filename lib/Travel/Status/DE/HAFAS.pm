@@ -20,7 +20,7 @@ use Travel::Status::DE::HAFAS::Journey;
 use Travel::Status::DE::HAFAS::StopFinder;
 use Travel::Status::DE::HAFAS::Stop;
 
-our $VERSION = '4.18';
+our $VERSION = '4.19';
 
 # {{{ Endpoint Definition
 
@@ -902,7 +902,7 @@ monitors
 
 =head1 VERSION
 
-version 4.18
+version 4.19
 
 =head1 DESCRIPTION
 
