@@ -619,6 +619,7 @@ sub add_message {
 
 	my $short = $json->{txtS};
 	my $text  = $json->{txtN};
+	my $type  = $json->{type};
 	my $code  = $json->{code};
 	my $prio  = $json->{prio};
 
@@ -643,6 +644,7 @@ sub add_message {
 	my $message = Travel::Status::DE::HAFAS::Message->new(
 		short     => $short,
 		text      => $text,
+		type      => $type,
 		code      => $code,
 		prio      => $prio,
 		is_him    => $is_him,

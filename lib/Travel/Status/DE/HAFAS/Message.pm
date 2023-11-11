@@ -9,7 +9,7 @@ use parent 'Class::Accessor';
 our $VERSION = '4.18';
 
 Travel::Status::DE::HAFAS::Message->mk_ro_accessors(
-	qw(short text code prio is_him ref_count));
+	qw(short type text code prio is_him ref_count));
 
 sub new {
 	my ( $obj, %conf ) = @_;
