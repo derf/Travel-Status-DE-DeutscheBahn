@@ -617,16 +617,12 @@ sub check_mgate {
 sub add_message {
 	my ( $self, $json, $is_him ) = @_;
 
-	my $short = $json->{txtS};
-	my $text  = $json->{txtN};
-	my $type  = $json->{type};
-	my $code  = $json->{code};
-	my $prio  = $json->{prio};
+	my $text = $json->{txtN};
+	my $code = $json->{code};
 
 	if ($is_him) {
-		$short = $json->{head};
-		$text  = $json->{text};
-		$code  = $json->{hid};
+		$text = $json->{text};
+		$code = $json->{hid};
 	}
 
 	# Some backends use remL for operator information. We don't want that.
@@ -642,12 +638,7 @@ sub add_message {
 	}
 
 	my $message = Travel::Status::DE::HAFAS::Message->new(
-		short     => $short,
-		text      => $text,
-		type      => $type,
-		code      => $code,
-		prio      => $prio,
-		is_him    => $is_him,
+		json      => $json,
 		ref_count => 1,
 	);
 	push( @{ $self->{messages} }, $message );

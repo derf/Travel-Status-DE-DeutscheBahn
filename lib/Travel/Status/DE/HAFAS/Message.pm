@@ -14,7 +14,31 @@ Travel::Status::DE::HAFAS::Message->mk_ro_accessors(
 sub new {
 	my ( $obj, %conf ) = @_;
 
-	my $ref = \%conf;
+	my $json   = $conf{json};
+	my $is_him = $conf{is_him};
+
+	my $short = $json->{txtS};
+	my $text  = $json->{txtN};
+	my $type  = $json->{type};
+	my $code  = $json->{code};
+	my $prio  = $json->{prio};
+
+	if ($is_him) {
+		$short = $json->{head};
+		$text  = $json->{text};
+		$code  = $json->{hid};
+	}
+
+	my $ref = {
+		short     => $short,
+		text      => $text,
+		type      => $type,
+		code      => $code,
+		prio      => $prio,
+		is_him    => $is_him,
+		ref_count => $conf{ref_count},
+	};
+
 	bless( $ref, $obj );
 
 	return $ref;
