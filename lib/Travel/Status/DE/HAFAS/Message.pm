@@ -112,7 +112,7 @@ towards [destination]".
 
 =item C
 
-"Current information available", possibly more.
+"Current information available", "Journey cancelled", "connection may not be caught", possibly more.
 
 =item D
 
