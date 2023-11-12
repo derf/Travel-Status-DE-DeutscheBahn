@@ -11,7 +11,14 @@ use parent 'Class::Accessor';
 our $VERSION = '4.19';
 
 Travel::Status::DE::HAFAS::Stop->mk_ro_accessors(
-	qw(eva name lat lon distance_m weight));
+	qw(eva name lat lon distance_m weight
+	  rt_arr sched_arr arr arr_delay arr_cancelled
+	  rt_dep sched_dep dep dep_delay dep_cancelled
+	  delay direction
+	  rt_platform sched_platform platform is_changed_platform
+	  load
+	)
+);
 
 # {{{ Constructor
 
