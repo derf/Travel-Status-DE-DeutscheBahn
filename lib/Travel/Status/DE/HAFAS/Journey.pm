@@ -108,76 +108,20 @@ sub new {
 	my @stops;
 	my $route_end;
 	for my $stop ( @{ $journey->{stopL} // [] } ) {
-		my $loc       = $locL[ $stop->{locX} ];
-		my $sched_arr = $stop->{aTimeS};
-		my $rt_arr    = $stop->{aTimeR};
-		my $sched_dep = $stop->{dTimeS};
-		my $rt_dep    = $stop->{dTimeR};
-
-		# dIn. / aOut. -> may passengers enter / exit the train?
-
-		my $sched_platform   = $stop->{aPlatfS}  // $stop->{dPlatfS};
-		my $rt_platform      = $stop->{aPlatfR}  // $stop->{dPlatfR};
-		my $changed_platform = $stop->{aPlatfCh} // $stop->{dPlatfCh};
-
-		for my $timestr ( $sched_arr, $rt_arr, $sched_dep, $rt_dep ) {
-			if ( not defined $timestr ) {
-				next;
-			}
-
-			$timestr = handle_day_change(
-				input    => $timestr,
-				date     => $date,
-				strp_obj => $hafas->{strptime_obj},
-				ref      => $datetime_ref
-			);
-
-		}
-
-		my $arr_delay
-		  = ( $sched_arr and $rt_arr )
-		  ? ( $rt_arr->epoch - $sched_arr->epoch ) / 60
-		  : undef;
-
-		my $dep_delay
-		  = ( $sched_dep and $rt_dep )
-		  ? ( $rt_dep->epoch - $sched_dep->epoch ) / 60
-		  : undef;
-
-		my $arr_cancelled = $stop->{aCncl};
-		my $dep_cancelled = $stop->{dCncl};
-
-		my $tco = {};
-		for my $tco_id ( @{ $stop->{dTrnCmpSX}{tcocX} // [] } ) {
-			my $tco_kv = $tcocL[$tco_id];
-			$tco->{ $tco_kv->{c} } = $tco_kv->{r};
-		}
+		my $loc = $locL[ $stop->{locX} ];
 
 		push(
 			@stops,
 			{
-				loc   => $loc,
-				extra => {
-					sched_arr           => $sched_arr,
-					rt_arr              => $rt_arr,
-					arr                 => $rt_arr // $sched_arr,
-					arr_delay           => $arr_delay,
-					arr_cancelled       => $arr_cancelled,
-					sched_dep           => $sched_dep,
-					rt_dep              => $rt_dep,
-					dep                 => $rt_dep // $sched_dep,
-					dep_delay           => $dep_delay,
-					dep_cancelled       => $dep_cancelled,
-					delay               => $dep_delay // $arr_delay,
-					direction           => $stop->{dDirTxt},
-					sched_platform      => $sched_platform,
-					rt_platform         => $rt_platform,
-					is_changed_platform => $changed_platform,
-					platform            => $rt_platform // $sched_platform,
-					load                => $tco,
-				}
+				loc          => $loc,
+				stop         => $stop,
+				common       => $opt{common},
+				date         => $date,
+				datetime_ref => $datetime_ref,
+				strp_obj     => $hafas->{strptime_obj},
 			}
 		);
+
 		$route_end = $loc->{name};
 	}
 
@@ -242,7 +186,7 @@ sub new {
 				next;
 			}
 
-			$timestr = handle_day_change(
+			$timestr = Travel::Status::DE::HAFAS::Stop::handle_day_change(
 				input    => $timestr,
 				date     => $date,
 				strp_obj => $hafas->{strptime_obj},
@@ -288,24 +232,6 @@ sub new {
 }
 
 # }}}
-
-sub handle_day_change {
-	my (%opt)   = @_;
-	my $date    = $opt{date};
-	my $timestr = $opt{input};
-	if ( length($timestr) == 8 ) {
-
-		# arrival time includes a day offset
-		my $offset_date = $opt{ref}->clone;
-		$offset_date->add( days => substr( $timestr, 0, 2, q{} ) );
-		$offset_date = $offset_date->strftime('%Y%m%d');
-		$timestr = $opt{strp_obj}->parse_datetime("${offset_date}T${timestr}");
-	}
-	else {
-		$timestr = $opt{strp_obj}->parse_datetime("${date}T${timestr}");
-	}
-	return $timestr;
-}
 
 # {{{ Accessors
 
@@ -353,7 +279,7 @@ sub route {
 	my ($self) = @_;
 
 	if ( $self->{route} ) {
-		if ( $self->{route}[0] and $self->{route}[0]{extra} ) {
+		if ( $self->{route}[0] and $self->{route}[0]{stop} ) {
 			$self->{route}
 			  = [ map { Travel::Status::DE::HAFAS::Stop->new( %{$_} ) }
 				  @{ $self->{route} } ];

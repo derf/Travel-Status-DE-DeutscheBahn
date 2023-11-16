@@ -43,10 +43,100 @@ sub new {
 
 	bless( $ref, $obj );
 
+	if ( $opt{stop} ) {
+		$ref->parse_stop( $opt{stop}, $opt{common}, $opt{date},
+			$opt{datetime_ref}, $opt{strp_obj} );
+	}
+
 	return $ref;
 }
 
+sub parse_stop {
+	my ( $self, $stop, $common, $date, $datetime_ref, $strp_obj ) = @_;
+
+	my $sched_arr = $stop->{aTimeS};
+	my $rt_arr    = $stop->{aTimeR};
+	my $sched_dep = $stop->{dTimeS};
+	my $rt_dep    = $stop->{dTimeR};
+
+	# dIn. / aOut. -> may passengers enter / exit the train?
+
+	my $sched_platform   = $stop->{aPlatfS}  // $stop->{dPlatfS};
+	my $rt_platform      = $stop->{aPlatfR}  // $stop->{dPlatfR};
+	my $changed_platform = $stop->{aPlatfCh} // $stop->{dPlatfCh};
+
+	for my $timestr ( $sched_arr, $rt_arr, $sched_dep, $rt_dep ) {
+		if ( not defined $timestr ) {
+			next;
+		}
+
+		$timestr = handle_day_change(
+			input    => $timestr,
+			date     => $date,
+			strp_obj => $strp_obj,
+			ref      => $datetime_ref
+		);
+
+	}
+
+	my $arr_delay
+	  = ( $sched_arr and $rt_arr )
+	  ? ( $rt_arr->epoch - $sched_arr->epoch ) / 60
+	  : undef;
+
+	my $dep_delay
+	  = ( $sched_dep and $rt_dep )
+	  ? ( $rt_dep->epoch - $sched_dep->epoch ) / 60
+	  : undef;
+
+	my $arr_cancelled = $stop->{aCncl};
+	my $dep_cancelled = $stop->{dCncl};
+
+	my $tco = {};
+	for my $tco_id ( @{ $stop->{dTrnCmpSX}{tcocX} // [] } ) {
+		my $tco_kv = $common->{tcocL}[$tco_id];
+		$tco->{ $tco_kv->{c} } = $tco_kv->{r};
+	}
+
+	$self->{sched_arr}           = $sched_arr;
+	$self->{rt_arr}              = $rt_arr;
+	$self->{arr}                 = $rt_arr // $sched_arr;
+	$self->{arr_delay}           = $arr_delay;
+	$self->{arr_cancelled}       = $arr_cancelled;
+	$self->{sched_dep}           = $sched_dep;
+	$self->{rt_dep}              = $rt_dep;
+	$self->{dep}                 = $rt_dep // $sched_dep;
+	$self->{dep_delay}           = $dep_delay;
+	$self->{dep_cancelled}       = $dep_cancelled;
+	$self->{delay}               = $dep_delay // $arr_delay;
+	$self->{direction}           = $stop->{dDirTxt};
+	$self->{sched_platform}      = $sched_platform;
+	$self->{rt_platform}         = $rt_platform;
+	$self->{is_changed_platform} = $changed_platform;
+	$self->{platform}            = $rt_platform // $sched_platform;
+	$self->{load}                = $tco;
+
+}
+
 # }}}
+
+sub handle_day_change {
+	my (%opt)   = @_;
+	my $date    = $opt{date};
+	my $timestr = $opt{input};
+	if ( length($timestr) == 8 ) {
+
+		# arrival time includes a day offset
+		my $offset_date = $opt{ref}->clone;
+		$offset_date->add( days => substr( $timestr, 0, 2, q{} ) );
+		$offset_date = $offset_date->strftime('%Y%m%d');
+		$timestr = $opt{strp_obj}->parse_datetime("${offset_date}T${timestr}");
+	}
+	else {
+		$timestr = $opt{strp_obj}->parse_datetime("${date}T${timestr}");
+	}
+	return $timestr;
+}
 
 sub TO_JSON {
 	my ($self) = @_;
