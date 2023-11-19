@@ -26,7 +26,6 @@ Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 sub new {
 	my ( $obj, %opt ) = @_;
 
-	my @locL  = @{ $opt{common}{locL}  // [] };
 	my @prodL = @{ $opt{common}{prodL} // [] };
 	my @opL   = @{ $opt{common}{opL}   // [] };
 	my @icoL  = @{ $opt{common}{icoL}  // [] };
@@ -34,6 +33,7 @@ sub new {
 	my @remL  = @{ $opt{common}{remL}  // [] };
 	my @himL  = @{ $opt{common}{himL}  // [] };
 
+	my $locL    = $opt{locL};
 	my $hafas   = $opt{hafas};
 	my $journey = $opt{journey};
 
@@ -108,7 +108,7 @@ sub new {
 	my @stops;
 	my $route_end;
 	for my $stop ( @{ $journey->{stopL} // [] } ) {
-		my $loc = $locL[ $stop->{locX} ];
+		my $loc = $locL->[ $stop->{locX} ];
 
 		push(
 			@stops,
@@ -122,7 +122,7 @@ sub new {
 			}
 		);
 
-		$route_end = $loc->{name};
+		$route_end = $loc->name;
 	}
 
 	if ( $journey->{stbStop} ) {
@@ -164,14 +164,14 @@ sub new {
 		}
 	}
 	else {
-		$ref->{route_start} = $stops[0]{loc}{name};
+		$ref->{route_start} = $stops[0]{loc}->name;
 	}
 
 	bless( $ref, $obj );
 
 	if ( $journey->{stbStop} ) {
-		$ref->{station}     = $locL[ $journey->{stbStop}{locX} ]->{name};
-		$ref->{station_eva} = 0 + $locL[ $journey->{stbStop}{locX} ]->{extId};
+		$ref->{station}        = $locL->[ $journey->{stbStop}{locX} ]->name;
+		$ref->{station_eva}    = 0 + $locL->[ $journey->{stbStop}{locX} ]->eva;
 		$ref->{sched_platform} = $journey->{stbStop}{dPlatfS};
 		$ref->{rt_platform}    = $journey->{stbStop}{dPlatfR};
 		$ref->{platform}       = $ref->{rt_platform} // $ref->{sched_platform};

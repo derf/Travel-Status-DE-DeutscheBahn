@@ -323,7 +323,7 @@ elsif ( $opt{journey} ) {
 			$stop->delay ? sprintf( '(%+d)', $stop->delay ) : q{},
 			display_occupancy( $stop->load->{FIRST} ),
 			display_occupancy( $stop->load->{SECOND} ),
-			$stop->name,
+			$stop->loc->name,
 			$stop->direction ? sprintf( '  → %s', $stop->direction ) : q{}
 		);
 	}

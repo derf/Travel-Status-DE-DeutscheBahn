@@ -11,7 +11,7 @@ use parent 'Class::Accessor';
 our $VERSION = '4.19';
 
 Travel::Status::DE::HAFAS::Stop->mk_ro_accessors(
-	qw(eva name lat lon distance_m weight
+	qw(loc
 	  rt_arr sched_arr arr arr_delay arr_cancelled
 	  rt_dep sched_dep dep dep_delay dep_cancelled
 	  delay direction
@@ -25,28 +25,14 @@ Travel::Status::DE::HAFAS::Stop->mk_ro_accessors(
 sub new {
 	my ( $obj, %opt ) = @_;
 
-	my $loc = $opt{loc};
 	my $ref = {
-		eva        => $loc->{extId} + 0,
-		name       => $loc->{name},
-		lat        => $loc->{crd}{y} * 1e-6,
-		lon        => $loc->{crd}{x} * 1e-6,
-		weight     => $loc->{wt},
-		distance_m => $loc->{dist},
+		loc => $opt{loc},
 	};
-
-	if ( $opt{extra} ) {
-		while ( my ( $k, $v ) = each %{ $opt{extra} } ) {
-			$ref->{$k} = $v;
-		}
-	}
 
 	bless( $ref, $obj );
 
-	if ( $opt{stop} ) {
-		$ref->parse_stop( $opt{stop}, $opt{common}, $opt{date},
-			$opt{datetime_ref}, $opt{strp_obj} );
-	}
+	$ref->parse_stop( $opt{stop}, $opt{common}, $opt{date},
+		$opt{datetime_ref}, $opt{strp_obj} );
 
 	return $ref;
 }
@@ -162,12 +148,13 @@ Travel::Status::DE::HAFAS::Stop - Information about a HAFAS stop.
 
 =head1 SYNOPSIS
 
-	# in geoSearch mode
-	for my $stop ($status->results) {
+	# in journey mode
+	for my $stop ($journey->route) {
 		printf(
-			"%5.1f km  %8d  %s\n",
-			$result->distance_m * 1e-3,
-			$result->eva, $result->name
+			%5s -> %5s %s\n",
+			$stop->arr ? $stop->arr->strftime('%H:%M') : '--:--',
+			$stop->dep ? $stop->dep->strftime('%H:%M') : '--:--',
+			$stop->loc->name
 		);
 	}
 
@@ -177,11 +164,10 @@ version 4.19
 
 =head1 DESCRIPTION
 
-Travel::Status::DE::HAFAS::Stop describes a HAFAS stop. It may be part of a
-journey or part of a geoSearch / locationSearch request.
-
-Journey-, geoSearch- and locationSearch-specific accessors are annotated
-accordingly and return undef in other contexts.
+Travel::Status::DE::HAFAS::Stop describes a
+Travel::Status::DE::HAFAS::Journey(3pm)'s stop at a given
+Travel::Status::DE::HAFAS::Location(3pm) with arrival/departure time,
+platform, etc.
 
 =head1 METHODS
 
@@ -189,96 +175,76 @@ accordingly and return undef in other contexts.
 
 =over
 
-=item $stop->name
+=item $stop->loc
 
-Stop name, e.g. "Essen Hbf" or "Unter den Linden/B75, Tostedt".
+Travel::Status::DE::HAFAS::Location(3pm) dinstance describing stop name, EVA
+ID, et cetera.
 
-=item $stop->eva
-
-EVA ID, e.g. 8000080.
-
-=item $stop->lat
-
-Stop latitude (WGS-84)
-
-=item $stop->lon
-
-Stop longitude (WGS-84)
-
-=item $stop->distance_m (geoSearch)
-
-Distance in meters between the requested coordinates and this stop.
-
-=item $stop->weight
-
-Weight / Relevance / Importance of this stop using an unknown metric.
-Higher values indicate more relevant stops.
-
-=item $stop->rt_arr (journey)
+=item $stop->rt_arr
 
 DateTime object for actual arrival.
 
-=item $stop->sched_arr (journey)
+=item $stop->sched_arr
 
 DateTime object for scheduled arrival.
 
-=item $stop->arr (journey)
+=item $stop->arr
 
 DateTime object for actual or scheduled arrival.
 
-=item $stop->arr_delay (journey)
+=item $stop->arr_delay
 
 Arrival delay in minutes.
 
-=item $stop->arr_cancelled (journey)
+=item $stop->arr_cancelled
 
 Arrival is cancelled.
 
-=item $stop->rt_dep (journey)
+=item $stop->rt_dep
 
 DateTime object for actual departure.
 
-=item $stop->sched_dep (journey)
+=item $stop->sched_dep
 
 DateTime object for scheduled departure.
 
-=item $stop->dep (journey)
+=item $stop->dep
 
 DateTIme object for actual or scheduled departure.
 
-=item $stop->dep_delay (journey)
+=item $stop->dep_delay
 
 Departure delay in minutes.
 
-=item $stop->dep_cancelled (journey)
+=item $stop->dep_cancelled
 
 Departure is cancelled.
 
-=item $stop->delay (journey)
+=item $stop->delay
 
 Departure or arrival delay in minutes.
 
-=item $stop->direction (journey)
+=item $stop->direction
 
 Direction signage from this stop on, undef if unchanged.
 
-=item $stop->rt_platform (journey)
+=item $stop->rt_platform
 
 Actual platform.
 
-=item $stop->sched_platform (journey)
+=item $stop->sched_platform
 
 Scheduled platform.
 
-=item $stop->platform (journey)
+=item $stop->platform
 
 Actual or scheduled platform.
 
-=item $stop->is_changed_platform (journey)
+=item $stop->is_changed_platform
 
 True if real-time and scheduled platform disagree.
 
-=item $stop->load (journey)
+=item $stop->load
 
 Expected utilization / passenger load from this stop on.
 

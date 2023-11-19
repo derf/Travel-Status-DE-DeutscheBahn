@@ -14,11 +14,11 @@ use Digest::MD5 qw(md5_hex);
 use Encode      qw(decode encode);
 use JSON;
 use LWP::UserAgent;
+use Travel::Status::DE::HAFAS::Journey;
+use Travel::Status::DE::HAFAS::Location;
 use Travel::Status::DE::HAFAS::Message;
 use Travel::Status::DE::HAFAS::Polyline qw(decode_polyline);
-use Travel::Status::DE::HAFAS::Journey;
 use Travel::Status::DE::HAFAS::StopFinder;
-use Travel::Status::DE::HAFAS::Stop;
 
 our $VERSION = '4.19';
 
@@ -654,19 +654,14 @@ sub parse_search {
 		return $self;
 	}
 
-	my @refLocL = @{ $self->{raw_json}{svcResL}[0]{res}{common}{locL} // [] };
-	my @locL    = @{ $self->{raw_json}{svcResL}[0]{res}{locL}         // [] };
+	my @locL = @{ $self->{raw_json}{svcResL}[0]{res}{locL} // [] };
 
 	if ( $self->{raw_json}{svcResL}[0]{res}{match} ) {
 		@locL = @{ $self->{raw_json}{svcResL}[0]{res}{match}{locL} // [] };
 	}
 
-	for my $loc (@locL) {
-		push(
-			@{ $self->{results} },
-			Travel::Status::DE::HAFAS::Stop->new( loc => $loc )
-		);
-	}
+	@{ $self->{results} }
+	  = map { Travel::Status::DE::HAFAS::Location->new( loc => $_ ) } @locL;
 
 	return $self;
 }
@@ -678,7 +673,8 @@ sub parse_journey {
 		return $self;
 	}
 
-	my @locL    = @{ $self->{raw_json}{svcResL}[0]{res}{common}{locL} // [] };
+	my @locL = map { Travel::Status::DE::HAFAS::Location->new( loc => $_ ) }
+	  @{ $self->{raw_json}{svcResL}[0]{res}{common}{locL} // [] };
 	my $journey = $self->{raw_json}{svcResL}[0]{res}{journey};
 	my @polyline;
 
@@ -688,13 +684,14 @@ sub parse_journey {
 			my $poly = $polyline[ $ref->{ppIdx} ];
 			my $loc  = $locL[ $ref->{locX} ];
 
-			$poly->{name} = $loc->{name};
-			$poly->{eva}  = $loc->{extId} + 0;
+			$poly->{name} = $loc->name;
+			$poly->{eva}  = $loc->eva;
 		}
 	}
 
 	$self->{result} = Travel::Status::DE::HAFAS::Journey->new(
 		common   => $self->{raw_json}{svcResL}[0]{res}{common},
+		locL     => \@locL,
 		journey  => $journey,
 		polyline => \@polyline,
 		hafas    => $self,
@@ -712,6 +709,8 @@ sub parse_board {
 		return $self;
 	}
 
+	my @locL = map { Travel::Status::DE::HAFAS::Location->new( loc => $_ ) }
+	  @{ $self->{raw_json}{svcResL}[0]{res}{common}{locL} // [] };
 	my @jnyL = @{ $self->{raw_json}{svcResL}[0]{res}{jnyL} // [] };
 
 	for my $result (@jnyL) {
@@ -719,6 +718,7 @@ sub parse_board {
 			@{ $self->{results} },
 			Travel::Status::DE::HAFAS::Journey->new(
 				common  => $self->{raw_json}{svcResL}[0]{res}{common},
+				locL    => \@locL,
 				journey => $result,
 				hafas   => $self,
 			)
@@ -791,6 +791,7 @@ sub station {
 		return $self->{station_info};
 	}
 
+	# no need to use Location instances here
 	my @locL = @{ $self->{raw_json}{svcResL}[0]{res}{common}{locL} // [] };
 
 	my %prefc_by_loc;
@@ -1054,8 +1055,8 @@ describing it.  If no error occurred, returns undef.
 
 =item $status->results (geoSearch, locationSearch)
 
-Returns a list of stations. Each list element is a
-Travel::Status::DE::HAFAS::Stop(3pm) object.
+Returns a list of stop locations. Each list element is a
+Travel::Status::DE::HAFAS::Location(3pm) object.
 
 If no matching results were found or the parser / http request failed, returns
 an empty list.
