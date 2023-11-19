@@ -84,6 +84,10 @@ elsif ( $opt{station} =~ m{[|]} ) {
 	$opt{journey} = { id => $opt{station} };
 	delete $opt{station};
 }
+elsif ( $opt{station} =~ m{ ^ [!] (?<query> .*) $ }x ) {
+	$opt{journeyMatch} = $+{query};
+	delete $opt{station};
+}
 
 if ( $date or $time ) {
 	my $dt = DateTime->now( time_zone => 'Europe/Berlin' );
@@ -337,6 +341,28 @@ elsif ( $opt{journey} ) {
 	}
 	exit 0;
 }
+elsif ( $opt{journeyMatch} ) {
+	for my $result ( $status->results ) {
+		my $start = ( $result->route )[0];
+		my $end   = ( $result->route )[-1];
+		say $result->id;
+		print $result->name;
+		if ( $result->number ) {
+			printf( "  |  Zug  %s", $result->number );
+		}
+		if ( $result->line_no ) {
+			printf( "  |  Linie %s", $result->line_no );
+		}
+		say q{};
+		printf( "%s  ab  %s\n",
+			$start->dep->strftime('%H:%M'),
+			$start->loc->name );
+		printf( "%s  an  %s\n\n",
+			$end->arr->strftime('%H:%M'),
+			$end->loc->name );
+	}
+	exit 0;
+}
 
 my $message_id = 1;
 for my $m ( $status->messages ) {
@@ -399,7 +425,7 @@ B<hafas-m> [B<-d> I<date>] [B<-t> I<time>] [B<-m> I<motlist>]
 
 B<hafas-m> [B<-s> I<service>] B<?>I<query>|I<lat>B<:>I<lon>
 
-B<hafas-m> [B<-s> I<service>] [B<-l> I<language>] I<journeyID>
+B<hafas-m> [B<-s> I<service>] [B<-l> I<language>] B<!>I<query>|I<journeyID>
 
 =head1 VERSION
 
@@ -412,7 +438,7 @@ available at L<https://reiseauskunft.bahn.de//bin/bhftafel.exe/dn>.
 
 It has three operating modes that depend on the contents of its argument.
 
-=head2 Arrival/Departure Monitor
+=head2 Arrival/Departure Monitor (I<station>)
 
 Show departures (or arrivals) at I<station>, optionally filtered by date, time
 and mode of transport. I<station> may be given as a station name or EVA ID.
@@ -438,12 +464,17 @@ codes. Output format:
 Occupancy indicators are, from least occupied to fully booked: B<.> B<o>
 B<*> B<!>.
 
-=head2 Location Search
+=head2 Location Search (B<!>I<query>|I<lat>B<:>I<lon>)
 
 List stations that match I<query> or that are located in the vicinity of
 I<lat>B<:>I<lon> geocoordinates with EVA ID and name.
 
-=head2 Trip Details
+=head2 Trip Search (B<!>I<query>)
+
+List journey IDs that match the train numer I<query> (e.g. "ICE 205" or
+"S 31111").
+
+=head2 Trip Details (I<journeyID>)
 
 List intermediate stops of I<journeyID> with arrival/departure time, delay (if
 available), occupancy (if available), and stop name.
