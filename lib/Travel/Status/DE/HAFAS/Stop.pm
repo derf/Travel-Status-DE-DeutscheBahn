@@ -25,20 +25,11 @@ Travel::Status::DE::HAFAS::Stop->mk_ro_accessors(
 sub new {
 	my ( $obj, %opt ) = @_;
 
-	my $ref = {
-		loc => $opt{loc},
-	};
-
-	bless( $ref, $obj );
-
-	$ref->parse_stop( $opt{stop}, $opt{common}, $opt{date},
-		$opt{datetime_ref}, $opt{strp_obj} );
-
-	return $ref;
-}
-
-sub parse_stop {
-	my ( $self, $stop, $common, $date, $datetime_ref, $strp_obj ) = @_;
+	my $stop         = $opt{stop};
+	my $common       = $opt{common};
+	my $date         = $opt{date};
+	my $datetime_ref = $opt{datetime_ref};
+	my $strp_obj     = $opt{strp_obj};
 
 	my $sched_arr = $stop->{aTimeS};
 	my $rt_arr    = $stop->{aTimeR};
@@ -84,24 +75,30 @@ sub parse_stop {
 		$tco->{ $tco_kv->{c} } = $tco_kv->{r};
 	}
 
-	$self->{sched_arr}           = $sched_arr;
-	$self->{rt_arr}              = $rt_arr;
-	$self->{arr}                 = $rt_arr // $sched_arr;
-	$self->{arr_delay}           = $arr_delay;
-	$self->{arr_cancelled}       = $arr_cancelled;
-	$self->{sched_dep}           = $sched_dep;
-	$self->{rt_dep}              = $rt_dep;
-	$self->{dep}                 = $rt_dep // $sched_dep;
-	$self->{dep_delay}           = $dep_delay;
-	$self->{dep_cancelled}       = $dep_cancelled;
-	$self->{delay}               = $dep_delay // $arr_delay;
-	$self->{direction}           = $stop->{dDirTxt};
-	$self->{sched_platform}      = $sched_platform;
-	$self->{rt_platform}         = $rt_platform;
-	$self->{is_changed_platform} = $changed_platform;
-	$self->{platform}            = $rt_platform // $sched_platform;
-	$self->{load}                = $tco;
+	my $ref = {
+		loc                 => $opt{loc},
+		sched_arr           => $sched_arr,
+		rt_arr              => $rt_arr,
+		arr                 => $rt_arr // $sched_arr,
+		arr_delay           => $arr_delay,
+		arr_cancelled       => $arr_cancelled,
+		sched_dep           => $sched_dep,
+		rt_dep              => $rt_dep,
+		dep                 => $rt_dep // $sched_dep,
+		dep_delay           => $dep_delay,
+		dep_cancelled       => $dep_cancelled,
+		delay               => $dep_delay // $arr_delay,
+		direction           => $stop->{dDirTxt},
+		sched_platform      => $sched_platform,
+		rt_platform         => $rt_platform,
+		is_changed_platform => $changed_platform,
+		platform            => $rt_platform // $sched_platform,
+		load                => $tco,
+	};
 
+	bless( $ref, $obj );
+
+	return $ref;
 }
 
 # }}}
