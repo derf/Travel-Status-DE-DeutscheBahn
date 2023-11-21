@@ -61,9 +61,9 @@ version 4.19
 
 =head1 DESCRIPTION
 
-Travel::Status::DE::HAFAS::Location describes a HAFAS location that either
-belongs to a location (e.g. on a journey's route) or has been returned as part of
-a location search request.
+Travel::Status::DE::HAFAS::Location describes a HAFAS location that belongs to
+a stop (e.g. on a journey's route) or has been returned as part of a
+locationSearch or geoSearch request.
 
 =head1 METHODS
 
