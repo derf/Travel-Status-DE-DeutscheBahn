@@ -1,3 +1,18 @@
+Travel::Status::DE::DeutscheBahn 5.00 - Tue Nov 21 2023
+
+    * hafas-m: Add --raw-json option (useful for HAFAS client development)
+    * hafas-m: Add train search support, e.g. "hafas-m '!EC 6'"
+    * HAFAS->new, HAFAS->new_p: Add journeyMatch flag
+    * Add Travel::Status::DE::HAFAS::Location module
+    * HAFAS::Stop: Fix some documented accessors not being provided by the
+      module
+    * HAFAS::Stop: Add "loc" accessor that returns the corresponding Location
+      instance
+    * HAFAS::Stop: Breaking change: The "eva", "name", "lat", "lon",
+      "distance_m", and "weight" accessors are no longer supported. Use the
+      (identically named) Location accessors instead, i.e., "$stop->loc->name"
+      instead of "$stop->name", etc.
+
 Travel::Status::DE::DeutscheBahn 4.19 - Sat Nov 11 2023
 
     * hafas-m: Fall back to locationSearch if StopFinder is unavailable
