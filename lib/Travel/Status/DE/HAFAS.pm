@@ -984,7 +984,7 @@ Requests item(s) as specified by I<opt> and returns a new
 Travel::Status::DE::HAFAS element with the results.  Dies if the wrong
 I<opt> were passed.
 
-I<opt> must contain either a B<station>, B<geoSearch>, B<locationSearch>, or B<journey> flag:
+I<opt> must contain either a B<station>, B<geoSearch>, B<locationSearch>, B<journey>, or B<journeyMatch> flag:
 
 =over
 
