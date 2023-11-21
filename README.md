@@ -20,7 +20,7 @@ homepage](https://finalrewind.org/projects/Travel-Status-DE-DeutscheBahn) and
 
 You have four installation options:
 
-* Nightly `.deb` builds for Debian-based distributions
+* `.deb` releases for Debian-based distributions
 * Installing the latest release from CPAN
 * Installation from source
 * Using a Docker image
@@ -29,36 +29,19 @@ Except for Docker, __hafas-m__ is available in your PATH after installation.
 You can run `hafas-m --version` to verify this. Documentation is available via
 `man hafas-m`.
 
-### Nightly Builds for Debian
+### Release Builds for Debian
 
 [lib.finalrewind.org/deb](https://lib.finalrewind.org/deb) provides Debian
-packages of both development and release versions. Note that these are not part
-of the official Debian repository and are not covered by its quality assurance
-process.
+packages of all release versions. Note that these are not part of the official
+Debian repository and are not covered by its quality assurance process.
 
 To install the latest release, run:
 
 ```
 wget https://lib.finalrewind.org/deb/libtravel-status-de-deutschebahn-perl_latest_all.deb
-sudo dpkg -i libtravel-status-de-deutschebahn-perl_latest_all.deb
-sudo apt --fix-broken install
+sudo apt install ./libtravel-status-de-deutschebahn-perl_latest_all.deb
 rm libtravel-status-de-deutschebahn-perl_latest_all.deb
 ```
-
-For a (possibly broken) development snapshot of the Git master branch, run:
-
-```
-wget https://lib.finalrewind.org/deb/libtravel-status-de-deutschebahn-perl_dev_all.deb
-sudo dpkg -i libtravel-status-de-deutschebahn-perl_dev_all.deb
-sudo apt --fix-broken install
-rm libtravel-status-de-deutschebahn-perl_dev_all.deb
-```
-
-Note that dpkg, unlike apt, does not automatically install missing
-dependencies. If a dependency is not satisfied yet, `dpkg -i` will complain
-about unmet dependencies and bail out. `apt --fix-broken install` installs
-these dependencies and also silently finishes the
-Travel::Status::DE::DeutscheBahn installation.
 
 Uninstallation works as usual:
 
