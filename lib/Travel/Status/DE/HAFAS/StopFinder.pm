@@ -191,6 +191,10 @@ available at L<https://reiseauskunft.bahn.de/bin/ajax-getstop.exe/dn>.
 It takes a string (usually a location or station name) and reports all
 stations and stops which are lexically similar to it.
 
+StopFinder typically gives less coarse results than
+Travel::Status::DE::HAFAS(3pm)'s locationSearch method. However, it is unclear
+whether HAFAS instances will continue supporting it in the future.
+
 =head1 METHODS
 
 =over
