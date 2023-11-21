@@ -174,7 +174,7 @@ platform, etc.
 
 =item $stop->loc
 
-Travel::Status::DE::HAFAS::Location(3pm) dinstance describing stop name, EVA
+Travel::Status::DE::HAFAS::Location(3pm) instance describing stop name, EVA
 ID, et cetera.
 
 =item $stop->rt_arr
