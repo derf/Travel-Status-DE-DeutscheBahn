@@ -288,6 +288,37 @@ if ($json_output) {
 	exit 0;
 }
 
+if ( $opt{journeyMatch} ) {
+	if ( scalar $status->results == 1 ) {
+		my ($journey) = $status->results;
+		$opt{journey} = { id => $journey->id };
+		delete $opt{journeyMatch};
+		$status = Travel::Status::DE::HAFAS->new(%opt);
+	}
+	else {
+		for my $result ( $status->results ) {
+			my $start = ( $result->route )[0];
+			my $end   = ( $result->route )[-1];
+			say $result->id;
+			print $result->name;
+			if ( $result->number ) {
+				printf( "  |  Zug  %s", $result->number );
+			}
+			if ( $result->line_no ) {
+				printf( "  |  Linie %s", $result->line_no );
+			}
+			say q{};
+			printf( "%s  ab  %s\n",
+				$start->dep->strftime('%H:%M'),
+				$start->loc->name );
+			printf( "%s  an  %s\n\n",
+				$end->arr->strftime('%H:%M'),
+				$end->loc->name );
+		}
+		exit 0;
+	}
+}
+
 if ( $opt{geoSearch} ) {
 	for my $result ( $status->results ) {
 		printf(
@@ -338,28 +369,6 @@ elsif ( $opt{journey} ) {
 			printf( "%s\n", $msg->short );
 		}
 		printf( "%s\n", $msg->text );
-	}
-	exit 0;
-}
-elsif ( $opt{journeyMatch} ) {
-	for my $result ( $status->results ) {
-		my $start = ( $result->route )[0];
-		my $end   = ( $result->route )[-1];
-		say $result->id;
-		print $result->name;
-		if ( $result->number ) {
-			printf( "  |  Zug  %s", $result->number );
-		}
-		if ( $result->line_no ) {
-			printf( "  |  Linie %s", $result->line_no );
-		}
-		say q{};
-		printf( "%s  ab  %s\n",
-			$start->dep->strftime('%H:%M'),
-			$start->loc->name );
-		printf( "%s  an  %s\n\n",
-			$end->arr->strftime('%H:%M'),
-			$end->loc->name );
 	}
 	exit 0;
 }
@@ -471,8 +480,9 @@ I<lat>B<:>I<lon> geocoordinates with EVA ID and name.
 
 =head2 Trip Search (B<!>I<query>)
 
-List journey IDs that match the train numer I<query> (e.g. "ICE 205" or
-"S 31111").
+Show trip details (see below) for the train number provided in I<query>
+(e.g. "ICE 205" or "S 31111") if it resolves into a single journey ID.
+Otherwise, list all journey IDs that match I<query>.
 
 =head2 Trip Details (I<journeyID>)
 
