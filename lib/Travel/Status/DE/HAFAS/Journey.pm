@@ -37,7 +37,7 @@ sub new {
 	my $hafas   = $opt{hafas};
 	my $journey = $opt{journey};
 
-	my $date = $journey->{date};
+	my $date = $opt{date} // $journey->{date};
 
 	my $direction = $journey->{dirTxt};
 	my $jid       = $journey->{jid};
