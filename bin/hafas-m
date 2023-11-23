@@ -262,6 +262,14 @@ sub display_occupancy {
 	return q{?};
 }
 
+sub format_delay {
+	my ( $delay, $len ) = @_;
+	if ( $delay and $len ) {
+		return sprintf( "(%+${len}d)", $delay );
+	}
+	return q{};
+}
+
 if ( my $err = $status->errstr ) {
 	say STDERR "Request error: ${err}";
 	if (    $status->errcode
@@ -347,17 +355,35 @@ elsif ( $opt{journey} ) {
 	}
 	say q{};
 
+	my $delay_len     = 0;
+	my $delay_fmt     = 0;
+	my $occupancy_len = 0;
+	for my $stop ( $result->route ) {
+		if ( $stop->delay ) {
+			$delay_len = max( $delay_len, length( $stop->delay ) + 1 );
+		}
+		if ( $stop->load and ( $stop->load->{FIRST} or $stop->load->{SECOND} ) )
+		{
+			$occupancy_len = 2;
+		}
+	}
+	if ($delay_len) {
+		$delay_fmt = $delay_len + 3;
+	}
+
 	for my $stop ( $result->route ) {
 		printf(
-			"%5s %s %5s %5s %1s%1s %s%s\n",
+"%5s %s %5s %-${delay_fmt}s%${occupancy_len}s%-${occupancy_len}s %s%s\n",
 			$stop->arr_cancelled ? '--:--'
 			: ( $stop->arr ? $stop->arr->strftime('%H:%M') : q{} ),
 			( $stop->arr and $stop->dep ) ? '→' : q{ },
 			$stop->dep_cancelled          ? '--:--'
 			: ( $stop->dep ? $stop->dep->strftime('%H:%M') : q{} ),
-			$stop->delay ? sprintf( '(%+d)', $stop->delay ) : q{},
-			display_occupancy( $stop->load->{FIRST} ),
-			display_occupancy( $stop->load->{SECOND} ),
+			format_delay( $stop->delay, $delay_len ),
+			$stop->load->{FIRST} ? display_occupancy( $stop->load->{FIRST} )
+			: q{},
+			$stop->load->{SECOND} ? display_occupancy( $stop->load->{SECOND} )
+			: q{},
 			$stop->loc->name,
 			$stop->direction ? sprintf( '  → %s', $stop->direction ) : q{}
 		);
