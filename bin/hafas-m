@@ -412,7 +412,22 @@ for my $m ( $status->messages ) {
 	}
 }
 
-for my $d ( $status->results ) {
+my @results = map { $_->[1] }
+  sort { $a->[0] <=> $b->[0] }
+  map { [ $_->datetime->epoch, $_ ] } $status->results;
+
+my $delay_len     = 0;
+my $occupancy_len = 0;
+for my $d (@results) {
+	if ( $d->delay ) {
+		$delay_len = max( $delay_len, length( $d->delay ) + 1 );
+	}
+	if ( $d->load and ( $d->load->{FIRST} or $d->load->{SECOND} ) ) {
+		$occupancy_len = 2;
+	}
+}
+
+for my $d (@results) {
 
 	my $info_line = q{};
 
@@ -432,10 +447,10 @@ for my $d ( $status->results ) {
 	push(
 		@output,
 		[
-			$d->sched_datetime->strftime('%H:%M'),
+			$d->is_cancelled ? '--:--' : $d->datetime->strftime('%H:%M'),
 			$d->is_cancelled
-			? 'CANCELED'
-			: ( $d->delay ? sprintf( '%+d', $d->delay ) : q{} ),
+			? q{}
+			: format_delay( $d->delay, $delay_len ),
 			$d->name,
 			$d->route_end,
 			( $d->platform // q{} ) . ( $d->is_changed_platform ? ' !' : q{} ),
