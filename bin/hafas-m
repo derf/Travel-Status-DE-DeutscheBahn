@@ -216,7 +216,7 @@ sub display_result {
 		my $d             = $line->[6];
 		my $first_message = 1;
 		for my $msg ( $d->messages ) {
-			if ( $msg->ref_count == 1 ) {
+			if ( $msg->ref_count == 0 ) {
 				if ($first_message) {
 					print "\n";
 					$first_message = 0;
@@ -399,19 +399,6 @@ elsif ( $opt{journey} ) {
 	exit 0;
 }
 
-my $message_id = 1;
-for my $m ( $status->messages ) {
-	if ( $m->ref_count > 1 ) {
-		$m->{id} = $message_id++;
-		if ( $m->short ) {
-			printf( "# (%d) %s\n# %s\n\n", $m->{id}, $m->short, $m->text );
-		}
-		else {
-			printf( "# (%d) %s\n\n", $m->{id}, $m->text );
-		}
-	}
-}
-
 my @results = map { $_->[1] }
   sort { $a->[0] <=> $b->[0] }
   map { [ $_->datetime->epoch, $_ ] } $status->results;
@@ -427,12 +414,19 @@ for my $d (@results) {
 	}
 }
 
+my $message_id = 1;
+for my $m ( $status->messages ) {
+	if ( $m->ref_count > 0 ) {
+		$m->{id} = $message_id++;
+	}
+}
+
 for my $d (@results) {
 
 	my $info_line = q{};
 
 	for my $message ( $d->messages ) {
-		if ( $message->ref_count > 1 ) {
+		if ( $message->ref_count > 0 ) {
 			$info_line = sprintf( '(%d) %s', $message->{id}, $info_line );
 		}
 	}
@@ -461,6 +455,17 @@ for my $d (@results) {
 }
 
 display_result(@output);
+
+for my $m ( $status->messages ) {
+	if ( $m->ref_count > 0 ) {
+		if ( $m->short ) {
+			printf( "\n# (%d) %s\n# %s\n", $m->{id}, $m->short, $m->text );
+		}
+		else {
+			printf( "\n# (%d) %s\n", $m->{id}, $m->text );
+		}
+	}
+}
 
 __END__
 
