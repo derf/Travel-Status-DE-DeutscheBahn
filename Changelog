@@ -1,3 +1,12 @@
+Travel::Status::DE::DeutscheBahn 5.01 - Sat Nov 25 2023
+
+    * Fix incorrect handling of HIM messages (introduced in 4.19)
+    * hafas-m: Declutter station board output: sort by real-time data and show
+      all messages at the end
+    * Journey: Support construction from JSON that does not provide a date
+      attribute (i.e., add date parameter to constructor)
+    * Stop: Add messages accessor
+
 Travel::Status::DE::DeutscheBahn 5.00 - Tue Nov 21 2023
 
     * hafas-m: Add --raw-json option (useful for HAFAS client development)

@@ -12,7 +12,7 @@ use List::Util   qw(any);
 use Scalar::Util qw(weaken);
 use Travel::Status::DE::HAFAS::Stop;
 
-our $VERSION = '5.00';
+our $VERSION = '5.01';
 
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(datetime sched_datetime rt_datetime
@@ -403,7 +403,7 @@ journey received by Travel::Status::DE::HAFAS
 
 =head1 VERSION
 
-version 5.00
+version 5.01
 
 =head1 DESCRIPTION
 
