@@ -422,28 +422,28 @@ undef for non-station journeys.
 
 =item $journey->name
 
-Returns the journey or line name, either in a format like "Bus SB16" (Bus line
+Journey or line name, either in a format like "Bus SB16" (Bus line
 SB16) or "RE 10111" (RegionalExpress train 10111, no line information).  May
 contain extraneous whitespace characters.
 
 =item $journey->type
 
-Returns the type of this journey, e.g. "S" for S-Bahn, "RE" for Regional Express
+Type of this journey, e.g. "S" for S-Bahn, "RE" for Regional Express
 or "STR" for tram / StraE<szlig>enbahn.
 
 =item $journey->type_long
 
-Returns the long type of this journey, e.g. "S-Bahn" or "Regional-Express".
+Long type of this journey, e.g. "S-Bahn" or "Regional-Express".
 
 =item $journey->class
 
-Returns an integer identifying the the mode of transport class.
+An integer identifying the the mode of transport class.
 Semantics depend on backend, e.g. "1" and "2" for long-distance trains and
 "4" and "8" for regional trains.
 
 =item $journey->line
 
-Returns the journey or line name, either in a format like "Bus SB16" (Bus line
+Journey or line name, either in a format like "Bus SB16" (Bus line
 SB16), "RE 42" (RegionalExpress train 42) or "IC 2901" (InterCity train 2901,
 no line information).  May contain extraneous whitespace characters.  Note that
 this accessor does not return line information for IC/ICE/EC services, even if
@@ -451,18 +451,18 @@ it is available. Use B<line_no> for those.
 
 =item $journey->line_no
 
-Returns the line identifier, or undef if it is unknown.
+Line identifier, or undef if it is unknown.
 The line identifier may be a single number such as "11" (underground train
 line U 11), a single word (e.g. "AIR") or a combination (e.g. "SB16").
 May also provide line numbers of IC/ICE services.
 
 =item $journey->number
 
-Returns the journey number (e.g. train number), or undef if it is unknown.
+Journey number (e.g. train number), or undef if it is unknown.
 
 =item $journey->id
 
-Returns tha HAFAS-internal journey ID.
+HAFAS-internal journey ID.
 
 =item $journey->rt_datetime (station only)
 
@@ -482,7 +482,7 @@ undef if neither is available.
 
 =item $journey->delay (station only)
 
-Returns the delay in minutes, or undef if it is unknown.
+Delay in minutes, or undef if it is unknown.
 Also returns undef if the arrival/departure has been cancelled.
 
 =item $journey->is_cancelled
@@ -522,13 +522,13 @@ Undef if unknown.
 
 =item $journey->messages
 
-Returns a list of message strings related to this journey. Messages usually are
-service notices (e.g. "missing carriage") or detailed delay reasons
-(e.g. "switch damage between X and Y, expect delays").
+List of Travel::Status::DE::HAFAS::Message(3pm) instances related to this
+journey. Messages usually are service notices (e.g. "missing carriage") or
+detailed delay reasons (e.g. "switch damage between X and Y, expect delays").
 
 =item $journey->operator
 
-Returns the operator responsible for this journey. Returns undef
+The operator responsible for this journey. Returns undef
 if the backend does not provide an operator.
 
 =item $journey->station (station only)
@@ -541,16 +541,15 @@ UIC/EVA ID of the station at which this journey was requested.
 
 =item $journey->route
 
-Returns a list of Travel::Status::DE::HAFAS::Stop(3pm) objects that describe
-individual stops along the journey. In stationboard mode, the list only
-contains arrivals prior to the requested station or departures after the
-requested station. In journey mode, it contains the entire route.
+List of Travel::Status::DE::HAFAS::Stop(3pm) objects that describe individual
+stops along the journey. In stationboard mode, the list only contains arrivals
+prior to the requested station or departures after the requested station. In
+journey mode, it contains the entire route.
 
 =item $journey->route_interesting([I<count>])
 
-Return up to I<count> (default: B<3>) parts of C<< $journey->route >> that may
+Up to I<count> (default: B<3>) parts of C<< $journey->route >> that may
 be particularly helpful, e.g. main stations or airports.
-Returns a list of hashes, see above for the layout.
 
 =item $journey->route_end
 
