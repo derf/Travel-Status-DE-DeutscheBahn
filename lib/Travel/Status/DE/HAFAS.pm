@@ -671,6 +671,7 @@ sub add_message {
 
 	my $message = Travel::Status::DE::HAFAS::Message->new(
 		json      => $json,
+		is_him    => $is_him,
 		ref_count => 1,
 	);
 	push( @{ $self->{messages} }, $message );
