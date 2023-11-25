@@ -8,7 +8,8 @@ use 5.014;
 
 use parent 'Class::Accessor';
 use DateTime::Format::Strptime;
-use List::Util qw(any);
+use List::Util   qw(any);
+use Scalar::Util qw(weaken);
 use Travel::Status::DE::HAFAS::Stop;
 
 our $VERSION = '5.00';
@@ -110,17 +111,18 @@ sub new {
 	for my $stop ( @{ $journey->{stopL} // [] } ) {
 		my $loc = $locL->[ $stop->{locX} ];
 
-		push(
-			@stops,
-			{
-				loc          => $loc,
-				stop         => $stop,
-				common       => $opt{common},
-				date         => $date,
-				datetime_ref => $datetime_ref,
-				strp_obj     => $hafas->{strptime_obj},
-			}
-		);
+		my $stopref = {
+			loc          => $loc,
+			stop         => $stop,
+			common       => $opt{common},
+			hafas        => $hafas,
+			date         => $date,
+			datetime_ref => $datetime_ref,
+		};
+
+		weaken( $stopref->{hafas} );
+
+		push( @stops, $stopref );
 
 		$route_end = $loc->name;
 	}

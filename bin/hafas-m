@@ -371,9 +371,24 @@ elsif ( $opt{journey} ) {
 		$delay_fmt = $delay_len + 3;
 	}
 
+	my $message_id = 1;
+
 	for my $stop ( $result->route ) {
+		my $msg_line = q{};
+		for my $message ( $stop->messages ) {
+			if (    $message->ref_count > 0
+				and $message->code ne
+				'text.journeystop.product.or.direction.changes.stop.message'
+				and $message->text ne 'Halt entfällt' )
+			{
+				if ( not $message->{id} ) {
+					$message->{id} = $message_id++;
+				}
+				$msg_line .= sprintf( ' (%d)', $message->{id} );
+			}
+		}
 		printf(
-"%5s %s %5s %-${delay_fmt}s%${occupancy_len}s%-${occupancy_len}s %s%s\n",
+"%5s %s %5s %-${delay_fmt}s%${occupancy_len}s%-${occupancy_len}s %s%s%s\n",
 			$stop->arr_cancelled ? '--:--'
 			: ( $stop->arr ? $stop->arr->strftime('%H:%M') : q{} ),
 			( $stop->arr and $stop->dep ) ? '→' : q{ },
@@ -385,7 +400,8 @@ elsif ( $opt{journey} ) {
 			$stop->load->{SECOND} ? display_occupancy( $stop->load->{SECOND} )
 			: q{},
 			$stop->loc->name,
-			$stop->direction ? sprintf( '  → %s', $stop->direction ) : q{}
+			$stop->direction ? sprintf( ' → %s', $stop->direction ) : q{},
+			$msg_line,
 		);
 	}
 
@@ -400,6 +416,16 @@ elsif ( $opt{journey} ) {
 			printf( "%s\n", $msg->short );
 		}
 		printf( "%s\n", $msg->text );
+	}
+
+	for my $msg ( $status->messages ) {
+		if ( $msg->{id} ) {
+			say '';
+			if ( $msg->short ) {
+				printf( "(%d) %s\n", $msg->{id}, $msg->short );
+			}
+			printf( "(%d) %s\n", $msg->{id}, $msg->text );
+		}
 	}
 	exit 0;
 }

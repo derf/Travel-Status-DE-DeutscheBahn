@@ -29,7 +29,8 @@ sub new {
 	my $common       = $opt{common};
 	my $date         = $opt{date};
 	my $datetime_ref = $opt{datetime_ref};
-	my $strp_obj     = $opt{strp_obj};
+	my $hafas        = $opt{hafas};
+	my $strp_obj     = $opt{hafas}{strptime_obj};
 
 	my $sched_arr = $stop->{aTimeS};
 	my $rt_arr    = $stop->{aTimeR};
@@ -69,6 +70,21 @@ sub new {
 	my $arr_cancelled = $stop->{aCncl};
 	my $dep_cancelled = $stop->{dCncl};
 
+	my @messages;
+	for my $msg ( @{ $stop->{msgL} // [] } ) {
+		if ( $msg->{type} eq 'REM' and defined $msg->{remX} ) {
+			push( @messages,
+				$hafas->add_message( $opt{common}{remL}[ $msg->{remX} ] ) );
+		}
+		elsif ( $msg->{type} eq 'HIM' and defined $msg->{himX} ) {
+			push( @messages,
+				$hafas->add_message( $opt{common}{himL}[ $msg->{himX} ], 1 ) );
+		}
+		else {
+			say "Unknown message type $msg->{type}";
+		}
+	}
+
 	my $tco = {};
 	for my $tco_id ( @{ $stop->{dTrnCmpSX}{tcocX} // [] } ) {
 		my $tco_kv = $common->{tcocL}[$tco_id];
@@ -94,6 +110,7 @@ sub new {
 		is_changed_platform => $changed_platform,
 		platform            => $rt_platform // $sched_platform,
 		load                => $tco,
+		messages            => \@messages,
 	};
 
 	bless( $ref, $obj );
@@ -119,6 +136,15 @@ sub handle_day_change {
 		$timestr = $opt{strp_obj}->parse_datetime("${date}T${timestr}");
 	}
 	return $timestr;
+}
+
+sub messages {
+	my ($self) = @_;
+
+	if ( $self->{messages} ) {
+		return @{ $self->{messages} };
+	}
+	return;
 }
 
 sub TO_JSON {
@@ -224,6 +250,12 @@ Departure or arrival delay in minutes.
 =item $stop->direction
 
 Direction signage from this stop on, undef if unchanged.
+
+=item $journey->messages
+
+List of Travel::Status::DE::HAFAS::Message(3pm) instances related to this stop.
+These typically refer to delay reasons, platform changes, or changes in the
+line number / direction heading.
 
 =item $stop->rt_platform
 
