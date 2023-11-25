@@ -390,6 +390,11 @@ elsif ( $opt{journey} ) {
 	}
 
 	for my $msg ( $result->messages ) {
+		if ( $msg->code eq
+			'text.journeystop.product.or.direction.changes.journey.message' )
+		{
+			next;
+		}
 		say '';
 		if ( $msg->short ) {
 			printf( "%s\n", $msg->short );
