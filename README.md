@@ -1,17 +1,7 @@
 # hafas-m - Commandline Public Transit Departure Monitor
 
 hafas-m is a commandline client and Perl module for HAFAS public transit
-departure interfaces. It provides native support for the following
-services.
-
-* Deutsche Bahn (DB)
-* Nahverkehrsverbund Schleswig-Holstein (NAHSH)
-* Nahverkehrsservice Sachsen-Anhalt (NASA)
-* Nordhessischer VerkehrsVerbund (NVV)
-* Österreichische Bundesbahnen (ÖBB)
-* Verkehrsverbund Berlin-Brandenburg (VBB)
-* Verkehrsverbund Bremen/Niedersachsen (VBN)
-
+departure interfaces, with a focus on the one operated by Deutsche Bahn.
 See the [Travel::Status::DE::HAFAS
 homepage](https://finalrewind.org/projects/Travel-Status-DE-DeutscheBahn) and
 [hafas-m manual](https://man.finalrewind.org/1/hafas-m) for details.
