@@ -11,13 +11,14 @@ use Encode qw(decode);
 use JSON;
 use Getopt::Long    qw(:config no_ignore_case);
 use List::MoreUtils qw(uniq);
-use List::Util      qw(first max);
+use List::Util      qw(any first max);
 use Travel::Status::DE::HAFAS;
 
 my ( $date, $time, $language );
-my $arrivals = 0;
-my $types    = q{};
+my $arrivals;
+my $types = q{};
 my $developer_mode;
+my $via;
 my ( $json_output,   $raw_json_output );
 my ( $list_services, $service );
 my ( @excluded_mots, @exclusive_mots );
@@ -37,6 +38,7 @@ GetOptions(
 	'm|mot=s'      => \$types,
 	's|service=s'  => \$service,
 	't|time=s'     => \$time,
+	'v|via=s'      => \$via,
 	'V|version'    => \&show_version,
 	'devmode'      => \$developer_mode,
 	'json'         => \$json_output,
@@ -194,6 +196,24 @@ sub show_similar_stops {
 		for my $r ( $hafas->results ) {
 			printf( "%s (%s)\n", $r->name, $r->eva );
 		}
+	}
+	return;
+}
+
+sub journey_has_via {
+	my ( $journey, $via ) = @_;
+
+	if ($via =~ m{ ^ [0-9,]+ $ }x) {
+		for my $eva (split(qr{,}, $via)) {
+			if ( any { $_->loc->eva == $eva } $journey->route ) {
+				return 1;
+			}
+		}
+		return;
+	}
+
+	if ( any { $_->loc->name =~ m{$via}io } $journey->route ) {
+		return 1;
 	}
 	return;
 }
@@ -434,6 +454,10 @@ my @results = map { $_->[1] }
   sort { $a->[0] <=> $b->[0] }
   map { [ $_->datetime->epoch, $_ ] } $status->results;
 
+if ($via) {
+	@results = grep { journey_has_via( $_, $via ) } @results;
+}
+
 my $delay_len     = 0;
 my $occupancy_len = 0;
 for my $d (@results) {
@@ -622,6 +646,13 @@ to DB (Deutsche Bahn). See B<--list> for a list of known services.
 =item B<-t>, B<--time> I<hh>:I<mm>
 
 Time to list departures for.  Default: now.
+
+=item B<-v>, B<--via> I<stopname>|I<eva1>,I<eva2>,...
+
+Only show departures that pass by I<stopname> (or arivals that have passed by
+I<stopname>). If I<stopname> is given as a list of numeric EVA IDs, only
+arrivals/departures with an exact EVA ID match are shown. Otherwise I<stopname>
+is treated as a regular expression and matched against stop names.
 
 =item B<-V>, B<--version>
 
