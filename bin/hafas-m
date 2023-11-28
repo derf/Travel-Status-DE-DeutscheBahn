@@ -482,6 +482,7 @@ for my $d (@results) {
 
 	for my $message ( $d->messages ) {
 		if ( $message->ref_count > 0 ) {
+			$message->{show} = 1;
 			$info_line = sprintf( '(%d) %s', $message->{id}, $info_line );
 		}
 	}
@@ -523,7 +524,7 @@ for my $d (@results) {
 display_result(@output);
 
 for my $m ( $status->messages ) {
-	if ( $m->ref_count > 0 ) {
+	if ( $m->ref_count > 0 and $m->{show} ) {
 		if ( $m->short ) {
 			printf( "\n# (%d) %s\n# %s\n", $m->{id}, $m->short, $m->text );
 		}
