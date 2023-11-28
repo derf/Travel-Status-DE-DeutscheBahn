@@ -11,7 +11,7 @@ use Encode qw(decode);
 use JSON;
 use Getopt::Long    qw(:config no_ignore_case);
 use List::MoreUtils qw(uniq);
-use List::Util      qw(any first max);
+use List::Util      qw(first max);
 use Travel::Status::DE::HAFAS;
 
 my ( $date, $time, $language );
@@ -203,17 +203,17 @@ sub show_similar_stops {
 sub journey_has_via {
 	my ( $journey, $via ) = @_;
 
-	if ($via =~ m{ ^ [0-9,]+ $ }x) {
-		for my $eva (split(qr{,}, $via)) {
-			if ( any { $_->loc->eva == $eva } $journey->route ) {
-				return 1;
+	if ( $via =~ m{ ^ [0-9,]+ $ }x ) {
+		for my $eva ( split( qr{,}, $via ) ) {
+			if ( my $stop = first { $_->loc->eva == $eva } $journey->route ) {
+				return $stop;
 			}
 		}
 		return;
 	}
 
-	if ( any { $_->loc->name =~ m{$via}io } $journey->route ) {
-		return 1;
+	if ( my $stop = first { $_->loc->name =~ m{$via}io } $journey->route ) {
+		return $stop;
 	}
 	return;
 }
@@ -493,20 +493,31 @@ for my $d (@results) {
 		  . $info_line;
 	}
 
-	push(
-		@output,
-		[
-			$d->is_cancelled ? '--:--' : $d->datetime->strftime('%H:%M'),
-			$d->is_cancelled
-			? q{}
-			: format_delay( $d->delay, $delay_len ),
-			$d->name,
-			$d->route_end,
-			( $d->platform // q{} ) . ( $d->is_changed_platform ? ' !' : q{} ),
-			$info_line,
-			$d
-		]
-	);
+	my $entry = [
+		$d->is_cancelled ? '--:--' : $d->datetime->strftime('%H:%M'),
+		$d->is_cancelled
+		? q{}
+		: format_delay( $d->delay, $delay_len ),
+		$d->name,
+		$d->route_end,
+		( $d->platform // q{} ) . ( $d->is_changed_platform ? ' !' : q{} ),
+		$info_line,
+		$d
+	];
+
+	if ($via) {
+		my $stop = journey_has_via( $d, $via );
+
+		# HAFAS does not provide real-time data for route entries, so we have to guesstimate the arrival time
+		$entry->[0] .= ' → '
+		  . (
+			$stop->arr_cancelled
+			? '--:--'
+			: $stop->arr->add( minutes => $d->delay // 0 )->strftime('%H:%M')
+		  );
+	}
+
+	push( @output, $entry, );
 }
 
 display_result(@output);
