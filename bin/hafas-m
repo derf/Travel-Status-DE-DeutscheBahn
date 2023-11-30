@@ -692,7 +692,15 @@ None.
 
 =head1 BUGS AND LIMITATIONS
 
-The non-default services (anything other than DB) are not well-tested.
+=over
+
+=item * The non-default services (anything other than DB) are not well-tested.
+
+=item * HAFAS does not provide real-time data for routes of stationboard
+entries.  Hence, B<--via> estimates the arrival time from scheduled
+departure and departure delay
+
+=back
 
 =head1 AUTHOR
 
