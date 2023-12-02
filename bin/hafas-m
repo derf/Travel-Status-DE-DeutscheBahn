@@ -514,7 +514,8 @@ for my $d (@results) {
 		  . (
 			$stop->arr_cancelled
 			? '--:--'
-			: $stop->arr->add( minutes => $d->delay // 0 )->strftime('%H:%M')
+			: $stop->arr->clone->add( minutes => $d->delay // 0 )
+			  ->strftime('%H:%M')
 		  );
 	}
 
