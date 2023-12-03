@@ -8,9 +8,10 @@ homepage](https://finalrewind.org/projects/Travel-Status-DE-DeutscheBahn) and
 
 ## Installation
 
-You have four installation options:
+You have five installation options:
 
 * `.deb` releases for Debian-based distributions
+* finalrewind.org APT repository for Debian-based distributions
 * Installing the latest release from CPAN
 * Installation from source
 * Using a Docker image
@@ -37,6 +38,41 @@ Uninstallation works as usual:
 
 ```
 sudo apt remove libtravel-status-de-deutschebahn-perl
+```
+
+### finalrewind.org APT repository
+
+[lib.finalrewind.org/apt](https://lib.finalrewind.org/apt) provides an APT
+repository with Debian packages of the latest release versions. Note that this
+is not a Debian repository; it is operated under a best-effort SLA and if you
+use it you will have to trust me not to screw up your system with bogus
+packages. Also, note that the packages are not part of the official Debian
+repository and are not covered by its quality assurance process.
+
+To set up the repository and install the latest Travel::Status::DE::DeutscheBahn
+release, run:
+
+```
+curl -s https://finalrewind.org/apt.asc | sudo tee /etc/apt/trusted.gpg.d/finalrewind.asc
+echo 'deb https://lib.finalrewind.org/apt stable main' | sudo tee /etc/apt/sources.list.d/finalrewind.list
+sudo apt update
+sudo apt install libtravel-status-de-deutschebahn-perl
+```
+
+Afterwards, `apt update` and `apt upgrade` will automatically install new
+Travel::Status::DE::DeutscheBahn releases.
+
+Uninstallation of Travel::Status::DE::DeutscheBahn works as usual:
+
+```
+sudo apt remove libtravel-status-de-deutschebahn-perl
+```
+
+To remove the APT repository from your system, run:
+
+```
+sudo rm /etc/apt/trusted.gpg.d/finalrewind.asc \
+        /etc/apt/sources.list.d/finalrewind.list
 ```
 
 ### Installation from CPAN
