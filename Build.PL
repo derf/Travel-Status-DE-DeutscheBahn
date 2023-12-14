@@ -29,7 +29,6 @@ Module::Build->new(
 		'List::Util'                 => 0,
 		'LWP::UserAgent'             => 0,
 		'LWP::Protocol::https'       => 0,
-		'Scalar::Util'               => 0,
 	},
 	script_files  => 'bin/',
 	sign          => 1,

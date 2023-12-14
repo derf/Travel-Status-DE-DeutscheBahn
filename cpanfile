@@ -8,7 +8,6 @@ requires 'List::MoreUtils';
 requires 'List::Util';
 requires 'LWP::UserAgent';
 requires 'LWP::Protocol::https';
-requires 'Scalar::Util';
 
 on test => sub {
 	requires 'File::Slurp';
