@@ -1,3 +1,12 @@
+Travel::Status::DE::DeutscheBahn 5.02 - Wed Dec 14 2023
+
+    * Fix calls to $journey->route crashing in handle_day_change or add_message
+      in some circumstances if the $hafas object that created $journey has
+      gone out of scope (and become eligible for garbage collection) in the
+      meantime. The culprit was a mis-application of weaken() introduced in
+      v5.01.
+    * hafas-m: Add -v/--via option
+
 Travel::Status::DE::DeutscheBahn 5.01 - Sat Nov 25 2023
 
     * Fix incorrect handling of HIM messages (introduced in 4.19)

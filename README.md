@@ -1,6 +1,6 @@
 # hafas-m - Commandline Public Transit Departure Monitor
 
-hafas-m is a commandline client and Perl module for HAFAS public transit
+**hafas-m** is a commandline client and Perl module for HAFAS public transit
 departure interfaces, with a focus on the one operated by Deutsche Bahn.
 See the [Travel::Status::DE::HAFAS
 homepage](https://finalrewind.org/projects/Travel-Status-DE-DeutscheBahn) and
