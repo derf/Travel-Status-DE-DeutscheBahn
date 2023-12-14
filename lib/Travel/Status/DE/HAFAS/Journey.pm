@@ -8,8 +8,7 @@ use 5.014;
 
 use parent 'Class::Accessor';
 use DateTime::Format::Strptime;
-use List::Util   qw(any);
-use Scalar::Util qw(weaken);
+use List::Util qw(any);
 use Travel::Status::DE::HAFAS::Stop;
 
 our $VERSION = '5.01';
@@ -119,8 +118,6 @@ sub new {
 			date         => $date,
 			datetime_ref => $datetime_ref,
 		};
-
-		weaken( $stopref->{hafas} );
 
 		push( @stops, $stopref );
 
