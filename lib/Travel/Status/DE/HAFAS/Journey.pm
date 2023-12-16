@@ -299,7 +299,7 @@ sub route_interesting {
 	# HB:  swiss main station (Hbf in .ch)
 	# hl.n.: czech main station (Hbf in .cz)
 	for my $stop (@via) {
-		if ( $stop->{name}
+		if ( $stop->loc->name
 			=~ m{ HB $ | hl\.n\. $ | Hbf | Hauptbahnhof | Bf | Bahnhof | Centraal | Flughafen }x
 		  )
 		{
@@ -308,14 +308,15 @@ sub route_interesting {
 	}
 	$last_stop = pop(@via);
 
-	if ( @via_main and $via_main[-1]{name} eq $last_stop->{name} ) {
+	if ( @via_main and $via_main[-1]->loc->name eq $last_stop->loc->name ) {
 		pop(@via_main);
 	}
-	if ( @via and $via[-1]{name} eq $last_stop->{name} ) {
+	if ( @via and $via[-1]->loc->name eq $last_stop->loc->name ) {
 		pop(@via);
 	}
 
-	if ( @via_main and @via and $via[0]{name} eq $via_main[0]{name} ) {
+	if ( @via_main and @via and $via[0]->loc->name eq $via_main[0]->loc->name )
+	{
 		shift(@via_main);
 	}
 
@@ -332,17 +333,13 @@ sub route_interesting {
 
 		while ( @via_show < $max_parts and @via_main ) {
 			my $stop = shift(@via_main);
-			if ( any { $_->{name} eq $stop->{name} } @via_show
-				or $stop->{name} eq $last_stop->{name} )
+			if ( any { $_->loc->name eq $stop->loc->name } @via_show
+				or $stop->loc->name eq $last_stop->loc->name )
 			{
 				next;
 			}
 			push( @via_show, $stop );
 		}
-	}
-
-	for my $stop (@via_show) {
-		$stop->{name} =~ s{ \s? Hbf .* }{}x;
 	}
 
 	return @via_show;
