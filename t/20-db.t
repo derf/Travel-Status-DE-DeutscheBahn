@@ -7,7 +7,7 @@ use utf8;
 
 use File::Slurp qw(read_file);
 use JSON;
-use Test::More tests => 52;
+use Test::More tests => 55;
 
 use Travel::Status::DE::HAFAS;
 
@@ -55,6 +55,8 @@ is( $results[0]->number,    '50833',   'result 0: number' );
 is( $results[0]->operator, 'Nahreisezug', 'result 0: operator' );
 is( $results[0]->platform, undef,         'result 0: platform' );
 
+is( $results[0]->direction, 'Tiergarten, Philharmonie', 'result 0: direction' );
+
 for my $res ( $results[0]->route_end, $results[0]->destination ) {
 	is( $res, 'Philharmonie Süd, Berlin', 'result 0: route start/end' );
 }
@@ -87,6 +89,9 @@ is( $results[2]->number,    '20024',  'result 2: number' );
 is( $results[2]->operator, 'Nahreisezug', 'result 2: operator' );
 is( $results[2]->platform, undef,         'result 2: no platform' );
 
+is( $results[2]->direction, 'Hermannstr. (S+U), Berlin',
+	'result 2: direction' );
+
 for my $res ( $results[2]->route_end, $results[2]->destination ) {
 	is( $res, 'Hermannstr. (S+U), Berlin', 'result 2: route start/end' );
 }
@@ -118,6 +123,8 @@ is( $results[3]->number,    '3122',   'result 3: number' );
 
 is( $results[3]->operator, 'S-Bahn Berlin', 'result 3: operator' );
 is( $results[3]->platform, 4,               'result 3: platform' );
+
+is( $results[3]->direction, 'Berlin-Spandau (S)', 'result 3: direction' );
 
 for my $res ( $results[3]->route_end, $results[3]->destination ) {
 	is( $res, 'Berlin-Spandau (S)', 'result 3: route start/end' );
