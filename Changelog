@@ -1,3 +1,7 @@
+Travel::Status::DE::DeutscheBahn 5.03 - Wed Dec 19 2023
+
+    * Journey: Fix route_interesting accessor (broken by 5.00)
+
 Travel::Status::DE::DeutscheBahn 5.02 - Wed Dec 14 2023
 
     * Fix calls to $journey->route crashing in handle_day_change or add_message
