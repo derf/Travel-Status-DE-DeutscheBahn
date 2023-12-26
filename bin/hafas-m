@@ -386,8 +386,8 @@ elsif ( $opt{journey} ) {
 	if ( $result->number ) {
 		printf( "  |  Zug  %s", $result->number );
 	}
-	if ( $result->line ) {
-		printf( "  |  Linie %s", $result->line );
+	if ( $result->line_no ) {
+		printf( "  |  Linie %s", $result->line_no );
 	}
 	say q{};
 
