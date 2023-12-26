@@ -30,6 +30,9 @@ for my $arg (@ARGV) {
 	$arg = decode( 'UTF-8', $arg );
 }
 
+my $output_bold  = -t STDOUT ? "\033[1m" : q{};
+my $output_reset = -t STDOUT ? "\033[0m" : q{};
+
 GetOptions(
 	'a|arrivals'   => \$arrivals,
 	'd|date=s'     => \$date,
@@ -404,6 +407,19 @@ elsif ( $opt{journey} ) {
 		$delay_fmt = $delay_len + 3;
 	}
 
+	my $now       = DateTime->now( time_zone => 'Europe/Berlin' );
+	my $mark_stop = 0;
+	for my $i ( reverse 1 .. scalar $result->route ) {
+		my $stop = ( $result->route )[ $i - 1 ];
+		if ( not $stop->dep_cancelled and $stop->dep and $now <= $stop->dep ) {
+			$mark_stop = $stop;
+		}
+		elsif ( not $stop->arr_cancelled and $stop->arr and $now <= $stop->arr )
+		{
+			$mark_stop = $stop;
+		}
+	}
+
 	my $message_id = 1;
 
 	for my $stop ( $result->route ) {
@@ -421,7 +437,8 @@ elsif ( $opt{journey} ) {
 			}
 		}
 		printf(
-"%5s %s %5s %-${delay_fmt}s%${occupancy_len}s%-${occupancy_len}s %s%s%s\n",
+"%s%5s %s %5s %-${delay_fmt}s%${occupancy_len}s%-${occupancy_len}s %s%s%s%s\n",
+			$stop == $mark_stop  ? $output_bold : q{},
 			$stop->arr_cancelled ? '--:--'
 			: ( $stop->arr ? $stop->arr->strftime('%H:%M') : q{} ),
 			( $stop->arr and $stop->dep ) ? '→' : q{ },
@@ -433,7 +450,8 @@ elsif ( $opt{journey} ) {
 			$stop->load->{SECOND} ? display_occupancy( $stop->load->{SECOND} )
 			: q{},
 			$stop->loc->name,
-			$stop->direction ? sprintf( ' → %s', $stop->direction ) : q{},
+			$stop == $mark_stop ? $output_reset                        : q{},
+			$stop->direction    ? sprintf( ' → %s', $stop->direction ) : q{},
 			$msg_line,
 		);
 	}
