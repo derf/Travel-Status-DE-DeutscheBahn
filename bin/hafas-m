@@ -322,6 +322,19 @@ if ( $opt{journeyMatch} ) {
 		$opt{journey} = { id => $journey->id };
 		delete $opt{journeyMatch};
 		$status = Travel::Status::DE::HAFAS->new(%opt);
+		if ( my $err = $status->errstr ) {
+			say STDERR "Request error: ${err}";
+			if (
+				$status->errcode
+				and
+				( $status->errcode eq 'H730' or $status->errcode eq 'LOCATION' )
+				and not $raw_json_output
+			  )
+			{
+				show_similar_stops();
+			}
+			exit 2;
+		}
 	}
 	else {
 		for my $result ( $status->results ) {
