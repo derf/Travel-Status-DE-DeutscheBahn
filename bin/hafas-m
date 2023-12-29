@@ -384,12 +384,13 @@ elsif ( $opt{journey} ) {
 
 	printf( "%s → %s", $result->name, $result->route_end );
 	if ( $result->number ) {
-		printf( "  |  Zug  %s", $result->number );
+		printf( " / Zug %s", $result->number );
 	}
 	if ( $result->line_no ) {
-		printf( "  |  Linie %s", $result->line_no );
+		printf( " / Linie %s", $result->line_no );
 	}
-	say q{};
+	printf( "\nFahrt %s am %s\n\n",
+		$result->id, ( $result->route )[0]->sched_dep->strftime('%d.%m.%Y') );
 
 	my $delay_len     = 0;
 	my $delay_fmt     = 0;
