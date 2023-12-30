@@ -1,3 +1,8 @@
+Travel::Status::DE::DeutscheBahn 5.04 - Sat Dec 30 2023
+
+    * Journey: Add is_additional accessor
+    * Stop: Add is_additional accessor
+
 Travel::Status::DE::DeutscheBahn 5.03 - Wed Dec 19 2023
 
     * Journey: Fix route_interesting accessor (broken by 5.00)
