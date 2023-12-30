@@ -16,6 +16,7 @@ Travel::Status::DE::HAFAS::Stop->mk_ro_accessors(
 	  rt_dep sched_dep dep dep_delay dep_cancelled
 	  delay direction
 	  rt_platform sched_platform platform is_changed_platform
+	  is_additional
 	  load
 	)
 );
@@ -69,6 +70,7 @@ sub new {
 
 	my $arr_cancelled = $stop->{aCncl};
 	my $dep_cancelled = $stop->{dCncl};
+	my $is_additional = $stop->{isAdd};
 
 	my @messages;
 	for my $msg ( @{ $stop->{msgL} // [] } ) {
@@ -109,6 +111,7 @@ sub new {
 		rt_platform         => $rt_platform,
 		is_changed_platform => $changed_platform,
 		platform            => $rt_platform // $sched_platform,
+		is_additional       => $is_additional,
 		load                => $tco,
 		messages            => \@messages,
 	};
@@ -272,6 +275,10 @@ Actual or scheduled platform.
 =item $stop->is_changed_platform
 
 True if real-time and scheduled platform disagree.
+
+=item $stop->is_additional
+
+True if the stop is an unscheduled addition to the train's route.
 
 =item $stop->load
 
