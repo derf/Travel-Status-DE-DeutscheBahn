@@ -515,13 +515,17 @@ sub mot_mask {
 	if ( my @mots = @{ $self->{exclusive_mots} // [] } ) {
 		$mot_mask = 0;
 		for my $mot (@mots) {
-			$mot_mask |= 1 << $mot_pos{$mot};
+			if ( exists $mot_pos{$mot} ) {
+				$mot_mask |= 1 << $mot_pos{$mot};
+			}
 		}
 	}
 
 	if ( my @mots = @{ $self->{excluded_mots} // [] } ) {
 		for my $mot (@mots) {
-			$mot_mask &= ~( 1 << $mot_pos{$mot} );
+			if ( exists $mot_pos{$mot} ) {
+				$mot_mask &= ~( 1 << $mot_pos{$mot} );
+			}
 		}
 	}
 
