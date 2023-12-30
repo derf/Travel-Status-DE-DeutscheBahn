@@ -15,7 +15,7 @@ our $VERSION = '5.03';
 
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(datetime sched_datetime rt_datetime
-	  is_cancelled is_partially_cancelled
+	  is_additional is_cancelled is_partially_cancelled
 	  station station_eva platform sched_platform rt_platform operator
 	  id name type type_long class number line line_no load delay
 	  route_end route_start origin destination direction)
@@ -161,6 +161,7 @@ sub new {
 			$ref->{destination} = $ref->{route_end};
 			$ref->{is_cancelled} ||= $journey->{stbStop}{dCncl};
 		}
+		$ref->{is_additional} = $journey->{stbStop}{isAdd};
 	}
 	else {
 		$ref->{route_start} = $stops[0]{loc}->name;
@@ -478,6 +479,11 @@ undef if neither is available.
 
 Delay in minutes, or undef if it is unknown.
 Also returns undef if the arrival/departure has been cancelled.
+
+=item $journey->is_additional (station only)
+
+True if the journey's stop at the requested station is an unscheduled addition
+to its route.
 
 =item $journey->is_cancelled
 
