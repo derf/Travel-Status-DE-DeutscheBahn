@@ -619,7 +619,7 @@ codes. Output format:
 Occupancy indicators are, from least occupied to fully booked: B<.> B<o>
 B<*> B<!>.
 
-=head2 Location Search (B<!>I<query>|I<lat>B<:>I<lon>)
+=head2 Location Search (B<?>I<query>|I<lat>B<:>I<lon>)
 
 List stations that match I<query> or that are located in the vicinity of
 I<lat>B<:>I<lon> geocoordinates with EVA ID and name.
