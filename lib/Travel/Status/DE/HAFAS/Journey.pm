@@ -572,8 +572,9 @@ see above.
 
 =item $journey->polyline (journey only)
 
-List of geocoordinates that describe the train's route. Each list entry is
-a hash with the following keys.
+List of geocoordinates that describe the train's route. Only available if the
+HAFAS object constructor was passed a true B<with_polyline> value.  Each list
+entry is a hash with the following keys.
 
 =over
 
