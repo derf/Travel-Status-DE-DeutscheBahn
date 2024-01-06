@@ -588,10 +588,10 @@ version 5.04
 
 =head1 DESCRIPTION
 
-hafas-m is an interface to HAFAS arrival/departure monitors such as the one
-available at L<https://reiseauskunft.bahn.de//bin/bhftafel.exe/dn>.
+hafas-m is an interface to HAFAS public transport services such as the one
+operated by Deutsche Bahn.
 
-It has three operating modes that depend on the contents of its argument.
+It has four operating modes that depend on the contents of its argument.
 
 =head2 Arrival/Departure Monitor (I<station>)
 
