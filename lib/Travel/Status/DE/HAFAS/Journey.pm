@@ -89,16 +89,30 @@ sub new {
 
 	my $datetime_ref;
 
-	if ( @{ $journey->{stopL} // [] } or $journey->{stbStop} ) {
-		my $date_ref = ( split( qr{[|]}, $jid ) )[4];
-		if ( length($date_ref) < 7 ) {
-			warn("HAFAS, not even once -- midnight crossing may be bogus");
-		}
-		if ( length($date_ref) == 7 ) {
-			$date_ref = "0${date_ref}";
+	if ( @{ $journey->{stopL} // [] } or $journey->{stbStop}) {
+		my ($date_ref, $parse_fmt);
+		if ($jid =~ /#/) {
+			# ÖBB Journey ID - technically we ought to use Europe/Vienna tz
+			#  but let's not get into that...
+			$date_ref = ( split( /#/, $jid ) )[12];
+			$parse_fmt = '%d%m%y';
+			if ( length($date_ref) < 5 ) {
+				warn("HAFAS, not even once -- midnight crossing may be bogus -- date_ref $date_ref");
+			} elsif ( length($date_ref) == 5 ) {
+				$date_ref = "0${date_ref}";
+			}
+		} else {
+			# DB Journey ID
+			$date_ref = ( split( qr{[|]}, $jid ) )[4];
+			$parse_fmt = '%d%m%Y';
+			if ( length($date_ref) < 7 ) {
+				warn("HAFAS, not even once -- midnight crossing may be bogus -- date_ref $date_ref");
+			} elsif ( length($date_ref) == 7 ) {
+				$date_ref = "0${date_ref}";
+			}
 		}
 		$datetime_ref = DateTime::Format::Strptime->new(
-			pattern   => '%d%m%Y',
+			pattern   => $parse_fmt,
 			time_zone => 'Europe/Berlin'
 		)->parse_datetime($date_ref);
 	}
