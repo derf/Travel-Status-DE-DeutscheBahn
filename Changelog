@@ -1,3 +1,10 @@
+Travel::Status::DE::DeutscheBahn 5.05 - Wed Feb 21 2024
+
+    * ÖBB backend: handle midnight crossing and fix associated warnings
+      (patch by Cassidy Dingenskirchen)
+    * ÖBB backend: adjust request version to fix backend errors with certain
+      trains (patch by Cassidy Dingenskirchen)
+
 Travel::Status::DE::DeutscheBahn 5.04 - Sat Dec 30 2023
 
     * Journey: Add is_additional accessor
