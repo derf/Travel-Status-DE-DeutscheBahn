@@ -125,7 +125,7 @@ my %hafas_instance = (
 				type => 'IPH',
 				name => 'oebbPROD-ADHOC',
 			},
-			ver  => '1.41',
+			ver  => '1.57',
 			auth => {
 				type => 'AID',
 				aid  => 'OWDL4fE4' . 'ixNiPBBm',
