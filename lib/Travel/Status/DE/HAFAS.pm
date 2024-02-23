@@ -117,7 +117,7 @@ my %hafas_instance = (
 		stopfinder  => 'https://fahrplan.oebb.at/bin/ajax-getstop.exe',
 		name        => 'Österreichische Bundesbahnen',
 		productbits =>
-		  [qw[ice ice ice regio regio s bus ferry u tram ice ondemand ice]],
+		  [qw[ice_rj sev ic_ec d_n regio s bus ferry u tram other]],
 		request => {
 			client => {
 				id   => 'OEBB',
