@@ -26,13 +26,15 @@ our $VERSION = '5.05';
 
 my %hafas_instance = (
 	DB => {
-		stopfinder  => 'https://reiseauskunft.bahn.de/bin/ajax-getstop.exe',
-		mgate       => 'https://reiseauskunft.bahn.de/bin/mgate.exe',
-		name        => 'Deutsche Bahn',
-		productbits => [qw[ice ic_ec d regio s bus ferry u tram ondemand]],
-		salt        => 'bdI8UVj4' . '0K5fvxwf',
-		languages   => [qw[de en fr es]],
-		request     => {
+		stopfinder    => 'https://reiseauskunft.bahn.de/bin/ajax-getstop.exe',
+		mgate         => 'https://reiseauskunft.bahn.de/bin/mgate.exe',
+		name          => 'Deutsche Bahn',
+		productbits   => [qw[ice ic_ec d regio s bus ferry u tram ondemand]],
+		productgroups =>
+		  [ [qw[ice ic_ec d]], [qw[regio s]], [qw[bus ferry u tram ondemand]] ],
+		salt      => 'bdI8UVj4' . '0K5fvxwf',
+		languages => [qw[de en fr es]],
+		request   => {
 			client => {
 				id   => 'DB',
 				v    => '20100000',
@@ -116,8 +118,21 @@ my %hafas_instance = (
 		mgate       => 'https://fahrplan.oebb.at/bin/mgate.exe',
 		stopfinder  => 'https://fahrplan.oebb.at/bin/ajax-getstop.exe',
 		name        => 'Österreichische Bundesbahnen',
-		productbits =>
-		  [qw[ice_rj sev ic_ec d_n regio s bus ferry u tram other]],
+		productbits => [
+			[ ice_rj => 'long distance trains' ],
+			[ sev    => 'rail replacement service' ],
+			[ ic_ec  => 'long distance trains' ],
+			[ d_n    => 'night trains and rapid trains' ],
+			[ regio  => 'regional trains' ],
+			[ s      => 'suburban trains' ],
+			[ bus    => 'busses' ],
+			[ ferry  => 'maritime transit' ],
+			[ u      => 'underground' ],
+			[ tram   => 'trams' ],
+			[ other  => 'other transit services' ]
+		],
+		productgroups =>
+		  [ qw[ice_rj ic_ec d_n], qw[regio s sev], qw[bus ferry u tram other] ],
 		request => {
 			client => {
 				id   => 'OEBB',
@@ -509,7 +524,12 @@ sub mot_mask {
 
 	my %mot_pos;
 	for my $i ( 0 .. $#{ $hafas_instance{$service}{productbits} } ) {
-		$mot_pos{ $hafas_instance{$service}{productbits}[$i] } = $i;
+		if ( ref( $hafas_instance{$service}{productbits}[$i] ) eq 'ARRAY' ) {
+			$mot_pos{ $hafas_instance{$service}{productbits}[$i][0] } = $i;
+		}
+		else {
+			$mot_pos{ $hafas_instance{$service}{productbits}[$i] } = $i;
+		}
 	}
 
 	if ( my @mots = @{ $self->{exclusive_mots} // [] } ) {
