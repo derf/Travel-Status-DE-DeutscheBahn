@@ -891,6 +891,11 @@ sub station {
 	my @prefcounts = sort { $b->[0] <=> $a->[0] }
 	  map { [ $_, $prefc_by_loc{$_} ] } keys %prefc_by_loc;
 
+	if ( not @prefcounts ) {
+		$self->{station_info} = {};
+		return $self->{station_info};
+	}
+
 	my $loc = $locL[ $prefcounts[0][0] ];
 
 	if ($loc) {
