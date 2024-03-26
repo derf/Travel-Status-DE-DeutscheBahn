@@ -18,6 +18,7 @@ use Travel::Status::DE::HAFAS::Journey;
 use Travel::Status::DE::HAFAS::Location;
 use Travel::Status::DE::HAFAS::Message;
 use Travel::Status::DE::HAFAS::Polyline qw(decode_polyline);
+use Travel::Status::DE::HAFAS::Product;
 use Travel::Status::DE::HAFAS::StopFinder;
 
 our $VERSION = '5.05';
@@ -702,6 +703,20 @@ sub add_message {
 	return $message;
 }
 
+sub parse_prodL {
+	my ($self) = @_;
+
+	my $common = $self->{raw_json}{svcResL}[0]{res}{common};
+	return [
+		map {
+			Travel::Status::DE::HAFAS::Product->new(
+				common  => $common,
+				product => $_
+			)
+		} @{ $common->{prodL} }
+	];
+}
+
 sub parse_search {
 	my ($self) = @_;
 
@@ -730,6 +745,8 @@ sub parse_journey {
 		return $self;
 	}
 
+	my $prodL = $self->parse_prodL;
+
 	my @locL = map { Travel::Status::DE::HAFAS::Location->new( loc => $_ ) }
 	  @{ $self->{raw_json}{svcResL}[0]{res}{common}{locL} // [] };
 	my $journey = $self->{raw_json}{svcResL}[0]{res}{journey};
@@ -748,6 +765,7 @@ sub parse_journey {
 
 	$self->{result} = Travel::Status::DE::HAFAS::Journey->new(
 		common   => $self->{raw_json}{svcResL}[0]{res}{common},
+		prodL    => $prodL,
 		locL     => \@locL,
 		journey  => $journey,
 		polyline => \@polyline,
@@ -766,6 +784,8 @@ sub parse_journey_match {
 		return $self;
 	}
 
+	my $prodL = $self->parse_prodL;
+
 	my @locL = map { Travel::Status::DE::HAFAS::Location->new( loc => $_ ) }
 	  @{ $self->{raw_json}{svcResL}[0]{res}{common}{locL} // [] };
 
@@ -776,6 +796,7 @@ sub parse_journey_match {
 			@{ $self->{results} },
 			Travel::Status::DE::HAFAS::Journey->new(
 				common  => $self->{raw_json}{svcResL}[0]{res}{common},
+				prodL   => $prodL,
 				locL    => \@locL,
 				journey => $result,
 				hafas   => $self,
@@ -794,6 +815,8 @@ sub parse_board {
 		return $self;
 	}
 
+	my $prodL = $self->parse_prodL;
+
 	my @locL = map { Travel::Status::DE::HAFAS::Location->new( loc => $_ ) }
 	  @{ $self->{raw_json}{svcResL}[0]{res}{common}{locL} // [] };
 	my @jnyL = @{ $self->{raw_json}{svcResL}[0]{res}{jnyL} // [] };
@@ -803,6 +826,7 @@ sub parse_board {
 			@{ $self->{results} },
 			Travel::Status::DE::HAFAS::Journey->new(
 				common  => $self->{raw_json}{svcResL}[0]{res}{common},
+				prodL   => $prodL,
 				locL    => \@locL,
 				journey => $result,
 				hafas   => $self,

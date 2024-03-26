@@ -384,6 +384,8 @@ elsif ( $opt{locationSearch} ) {
 }
 elsif ( $opt{journey} ) {
 	my $result = $status->result;
+	my @prods;
+	my $prev_prod = 0;
 
 	printf( "%s → %s", $result->name, $result->route_end );
 	if ( $result->number ) {
@@ -392,7 +394,7 @@ elsif ( $opt{journey} ) {
 	if ( $result->line_no ) {
 		printf( " / Linie %s", $result->line_no );
 	}
-	printf( "\nFahrt %s am %s\n\n",
+	printf( "\nFahrt %s am %s\n",
 		$result->id, ( $result->route )[0]->sched_dep->strftime('%d.%m.%Y') );
 
 	my $delay_len     = 0;
@@ -406,10 +408,23 @@ elsif ( $opt{journey} ) {
 		{
 			$occupancy_len = 2;
 		}
+		my $prod = $stop->prod_dep // $stop->prod_arr;
+		if ( $prod and $prod != $prev_prod ) {
+			push( @prods, $prod );
+			$prev_prod = $prod;
+		}
 	}
 	if ($delay_len) {
 		$delay_fmt = $delay_len + 3;
 	}
+
+	if ( @prods == 1 ) {
+		printf( "Betrieb: %s\n\n", $prev_prod->operator );
+	}
+	else {
+		printf( "Betrieb: %s\n\n", join( q{, }, map { $_->operator } @prods ) );
+	}
+	$prev_prod = 0;
 
 	my $now       = DateTime->now( time_zone => 'Europe/Berlin' );
 	my $mark_stop = 0;
@@ -440,8 +455,19 @@ elsif ( $opt{journey} ) {
 				$msg_line .= sprintf( ' (%d)', $message->{id} );
 			}
 		}
+
+		my $prod_line = q{};
+		if ( @prods > 1 ) {
+			my $prod = $stop->prod_dep // $stop->prod_arr;
+			if ( $prod and $prod != $prev_prod ) {
+				$prod_line
+				  = sprintf( " : %s (%s)", $prod->name, $prod->operator );
+				$prev_prod = $prod;
+			}
+		}
+
 		printf(
-"%s%5s %s %5s %-${delay_fmt}s%${occupancy_len}s%-${occupancy_len}s %s%s%s%s\n",
+"%s%5s %s %5s %-${delay_fmt}s%${occupancy_len}s%-${occupancy_len}s %s%s%s%s%s\n",
 			$stop == $mark_stop  ? $output_bold : q{},
 			$stop->arr_cancelled ? '--:--'
 			: ( $stop->arr ? $stop->arr->strftime('%H:%M') : q{} ),
@@ -454,8 +480,9 @@ elsif ( $opt{journey} ) {
 			$stop->load->{SECOND} ? display_occupancy( $stop->load->{SECOND} )
 			: q{},
 			$stop->loc->name,
-			$stop == $mark_stop ? $output_reset                        : q{},
-			$stop->direction    ? sprintf( ' → %s', $stop->direction ) : q{},
+			$stop == $mark_stop ? $output_reset : q{},
+			$prod_line,
+			$stop->direction ? sprintf( ' → %s', $stop->direction ) : q{},
 			$msg_line,
 		);
 	}

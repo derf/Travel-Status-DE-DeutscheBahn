@@ -26,13 +26,12 @@ Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 sub new {
 	my ( $obj, %opt ) = @_;
 
-	my @prodL = @{ $opt{common}{prodL} // [] };
-	my @opL   = @{ $opt{common}{opL}   // [] };
 	my @icoL  = @{ $opt{common}{icoL}  // [] };
 	my @tcocL = @{ $opt{common}{tcocL} // [] };
 	my @remL  = @{ $opt{common}{remL}  // [] };
 	my @himL  = @{ $opt{common}{himL}  // [] };
 
+	my $prodL   = $opt{prodL};
 	my $locL    = $opt{locL};
 	my $hafas   = $opt{hafas};
 	my $journey = $opt{journey};
@@ -45,34 +44,7 @@ sub new {
 	my $is_cancelled        = $journey->{isCncl};
 	my $partially_cancelled = $journey->{isPartCncl};
 
-	my $product  = $prodL[ $journey->{prodX} ];
-	my $name     = $product->{addName} // $product->{name};
-	my $line_no  = $product->{prodCtx}{line};
-	my $train_no = $product->{prodCtx}{num};
-	my $cat      = $product->{prodCtx}{catOut};
-	my $catlong  = $product->{prodCtx}{catOutL};
-	if ( $name and $cat and $name eq $cat and $product->{nameS} ) {
-		$name .= ' ' . $product->{nameS};
-	}
-	if ( defined $train_no and not $train_no ) {
-		$train_no = undef;
-	}
-	if (
-		    not defined $line_no
-		and defined $product->{prodCtx}{matchId}
-		and
-		( not defined $train_no or $product->{prodCtx}{matchId} ne $train_no )
-	  )
-	{
-		$line_no = $product->{prodCtx}{matchId};
-	}
-
-	my $operator;
-	if ( defined $product->{oprX} ) {
-		if ( my $opref = $opL[ $product->{oprX} ] ) {
-			$operator = $opref->{name};
-		}
-	}
+	my $product = $prodL->[ $journey->{prodX} ];
 
 	my @messages;
 	for my $msg ( @{ $journey->{msgL} // [] } ) {
@@ -89,25 +61,33 @@ sub new {
 
 	my $datetime_ref;
 
-	if ( @{ $journey->{stopL} // [] } or $journey->{stbStop}) {
-		my ($date_ref, $parse_fmt);
-		if ($jid =~ /#/) {
+	if ( @{ $journey->{stopL} // [] } or $journey->{stbStop} ) {
+		my ( $date_ref, $parse_fmt );
+		if ( $jid =~ /#/ ) {
+
 			# ÖBB Journey ID - technically we ought to use Europe/Vienna tz
 			#  but let's not get into that...
-			$date_ref = ( split( /#/, $jid ) )[12];
+			$date_ref  = ( split( /#/, $jid ) )[12];
 			$parse_fmt = '%d%m%y';
 			if ( length($date_ref) < 5 ) {
-				warn("HAFAS, not even once -- midnight crossing may be bogus -- date_ref $date_ref");
-			} elsif ( length($date_ref) == 5 ) {
+				warn(
+"HAFAS, not even once -- midnight crossing may be bogus -- date_ref $date_ref"
+				);
+			}
+			elsif ( length($date_ref) == 5 ) {
 				$date_ref = "0${date_ref}";
 			}
-		} else {
+		}
+		else {
 			# DB Journey ID
-			$date_ref = ( split( qr{[|]}, $jid ) )[4];
+			$date_ref  = ( split( qr{[|]}, $jid ) )[4];
 			$parse_fmt = '%d%m%Y';
 			if ( length($date_ref) < 7 ) {
-				warn("HAFAS, not even once -- midnight crossing may be bogus -- date_ref $date_ref");
-			} elsif ( length($date_ref) == 7 ) {
+				warn(
+"HAFAS, not even once -- midnight crossing may be bogus -- date_ref $date_ref"
+				);
+			}
+			elsif ( length($date_ref) == 7 ) {
 				$date_ref = "0${date_ref}";
 			}
 		}
@@ -116,8 +96,6 @@ sub new {
 			time_zone => 'Europe/Berlin'
 		)->parse_datetime($date_ref);
 	}
-
-	my $class = $product->{cls};
 
 	my @stops;
 	my $route_end;
@@ -128,6 +106,7 @@ sub new {
 			loc          => $loc,
 			stop         => $stop,
 			common       => $opt{common},
+			prodL        => $prodL,
 			hafas        => $hafas,
 			date         => $date,
 			datetime_ref => $datetime_ref,
@@ -150,14 +129,15 @@ sub new {
 
 	my $ref = {
 		id                     => $jid,
-		name                   => $name,
-		number                 => $train_no,
-		line                   => $name,
-		line_no                => $line_no,
-		type                   => $cat,
-		type_long              => $catlong,
-		class                  => $class,
-		operator               => $operator,
+		product                => $product,
+		name                   => $product->name,
+		number                 => $product->number,
+		line                   => $product->name,
+		line_no                => $product->line_no,
+		type                   => $product->type,
+		type_long              => $product->type_long,
+		class                  => $product->class,
+		operator               => $product->operator,
 		direction              => $direction,
 		is_cancelled           => $is_cancelled,
 		is_partially_cancelled => $partially_cancelled,

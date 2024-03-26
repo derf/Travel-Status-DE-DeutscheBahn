@@ -12,8 +12,8 @@ our $VERSION = '5.05';
 
 Travel::Status::DE::HAFAS::Stop->mk_ro_accessors(
 	qw(loc
-	  rt_arr sched_arr arr arr_delay arr_cancelled
-	  rt_dep sched_dep dep dep_delay dep_cancelled
+	  rt_arr sched_arr arr arr_delay arr_cancelled prod_arr
+	  rt_dep sched_dep dep dep_delay dep_cancelled prod_dep
 	  delay direction
 	  rt_platform sched_platform platform is_changed_platform
 	  is_additional
@@ -28,6 +28,7 @@ sub new {
 
 	my $stop         = $opt{stop};
 	my $common       = $opt{common};
+	my $prodL        = $opt{prodL};
 	my $date         = $opt{date};
 	my $datetime_ref = $opt{datetime_ref};
 	my $hafas        = $opt{hafas};
@@ -37,6 +38,11 @@ sub new {
 	my $rt_arr    = $stop->{aTimeR};
 	my $sched_dep = $stop->{dTimeS};
 	my $rt_dep    = $stop->{dTimeR};
+
+	my $prod_arr
+	  = defined $stop->{aProdX} ? $prodL->[ $stop->{aProdX} ] : undef;
+	my $prod_dep
+	  = defined $stop->{dProdX} ? $prodL->[ $stop->{dProdX} ] : undef;
 
 	# dIn. / aOut. -> may passengers enter / exit the train?
 
@@ -100,11 +106,13 @@ sub new {
 		arr                 => $rt_arr // $sched_arr,
 		arr_delay           => $arr_delay,
 		arr_cancelled       => $arr_cancelled,
+		prod_arr            => $prod_arr,
 		sched_dep           => $sched_dep,
 		rt_dep              => $rt_dep,
 		dep                 => $rt_dep // $sched_dep,
 		dep_delay           => $dep_delay,
 		dep_cancelled       => $dep_cancelled,
+		prod_dep            => $prod_dep,
 		delay               => $dep_delay // $arr_delay,
 		direction           => $stop->{dDirTxt},
 		sched_platform      => $sched_platform,
@@ -254,11 +262,21 @@ Departure or arrival delay in minutes.
 
 Direction signage from this stop on, undef if unchanged.
 
-=item $journey->messages
+=item $stop->messages
 
 List of Travel::Status::DE::HAFAS::Message(3pm) instances related to this stop.
 These typically refer to delay reasons, platform changes, or changes in the
 line number / direction heading.
+
+=item $stop->prod_arr
+
+Travel::Status::DE::HAFAS::Product(3pm) instance describing the transit product
+(name, type, line number, operator, ...) upon arrival at this stop.
+
+=item $stop->prod_dep
+
+Travel::Status::DE::HAFAS::Product(3pm) instance describing the transit product
+(name, type, line number, operator, ...) upon departure from this stop.
 
 =item $stop->rt_platform
 

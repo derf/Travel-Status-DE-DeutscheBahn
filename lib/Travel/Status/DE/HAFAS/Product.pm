@@ -1,0 +1,181 @@
+package Travel::Status::DE::HAFAS::Product;
+
+# vim:foldmethod=marker
+
+use strict;
+use warnings;
+use 5.014;
+
+use parent 'Class::Accessor';
+
+our $VERSION = '5.05';
+
+Travel::Status::DE::HAFAS::Product->mk_ro_accessors(
+	qw(name type type_long class number line line_no operator)
+);
+
+# {{{ Constructor
+
+sub new {
+	my ( $obj, %opt ) = @_;
+
+	my $product      = $opt{product};
+	my $common       = $opt{common};
+	my $opL = $common->{opL};
+
+	my $class = $product->{cls};
+	my $name     = $product->{addName} // $product->{name};
+	my $line_no  = $product->{prodCtx}{line};
+	my $train_no = $product->{prodCtx}{num};
+	my $cat      = $product->{prodCtx}{catOut};
+	my $catlong  = $product->{prodCtx}{catOutL};
+	if ( $name and $cat and $name eq $cat and $product->{nameS} ) {
+		$name .= ' ' . $product->{nameS};
+	}
+	if ( defined $train_no and not $train_no ) {
+		$train_no = undef;
+	}
+	if (
+		    not defined $line_no
+		and defined $product->{prodCtx}{matchId}
+		and
+		( not defined $train_no or $product->{prodCtx}{matchId} ne $train_no )
+	  )
+	{
+		$line_no = $product->{prodCtx}{matchId};
+	}
+
+	my $operator;
+	if ( defined $product->{oprX} ) {
+		if ( my $opref = $opL->[ $product->{oprX} ] ) {
+			$operator = $opref->{name};
+		}
+	}
+
+	my $ref = {
+		name                   => $name,
+		number                 => $train_no,
+		line                   => $name,
+		line_no                => $line_no,
+		type                   => $cat,
+		type_long              => $catlong,
+		class                  => $class,
+		operator               => $operator,
+	};
+
+	bless( $ref, $obj );
+
+	return $ref;
+}
+
+# }}}
+
+sub TO_JSON {
+	my ($self) = @_;
+
+	return { %{$self} };
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+Travel::Status::DE::HAFAS::Product - Information about a HAFAS product
+associated with a journey.
+
+=head1 SYNOPSIS
+
+=head1 VERSION
+
+version 5.05
+
+=head1 DESCRIPTION
+
+Travel::Status::DE::HAFAS::Product describes a product (e.g. train or bus)
+associated with a Travel::Status::DE::HAFAS::Journey(3pm) or one of its
+stops.
+
+=head1 METHODS
+
+=head2 ACCESSORS
+
+=over
+
+=item $product->name
+
+Journey or line name, either in a format like "Bus SB16" (Bus line
+SB16) or "RE 10111" (RegionalExpress train 10111, no line information).  May
+contain extraneous whitespace characters.
+
+=item $product->type
+
+Type of this journey, e.g. "S" for S-Bahn, "RE" for Regional Express
+or "STR" for tram / StraE<szlig>enbahn.
+
+=item $product->type_long
+
+Long type of this journey, e.g. "S-Bahn" or "Regional-Express".
+
+=item $product->class
+
+An integer identifying the the mode of transport class.
+Semantics depend on backend, e.g. "1" and "2" for long-distance trains and
+"4" and "8" for regional trains.
+
+=item $product->line
+
+Journey or line name, either in a format like "Bus SB16" (Bus line
+SB16), "RE 42" (RegionalExpress train 42) or "IC 2901" (InterCity train 2901,
+no line information).  May contain extraneous whitespace characters.  Note that
+this accessor does not return line information for IC/ICE/EC services, even if
+it is available. Use B<line_no> for those.
+
+=item $product->line_no
+
+Line identifier, or undef if it is unknown.
+The line identifier may be a single number such as "11" (underground train
+line U 11), a single word (e.g. "AIR") or a combination (e.g. "SB16").
+May also provide line numbers of IC/ICE services.
+
+=item $product->number
+
+Journey number (e.g. train number), or undef if it is unknown.
+
+=item $product->operator
+
+The operator responsible for this journey. Returns undef
+if the backend does not provide an operator.
+
+Foo.
+
+=back
+
+=head1 DIAGNOSTICS
+
+None.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item Class::Accessor(3pm)
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+None known.
+
+=head1 SEE ALSO
+
+Travel::Status::DE::HAFAS(3pm).
+
+=head1 AUTHOR
+
+Copyright (C) 2024 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+
+=head1 LICENSE
+
+This module is licensed under the same terms as Perl itself.
