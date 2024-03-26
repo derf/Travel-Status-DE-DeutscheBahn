@@ -419,10 +419,13 @@ elsif ( $opt{journey} ) {
 	}
 
 	if ( @prods == 1 ) {
-		printf( "Betrieb: %s\n\n", $prev_prod->operator );
+		if ( $prev_prod->operator ) {
+			printf( "Betrieb: %s\n", $prev_prod->operator );
+		}
 	}
 	else {
-		printf( "Betrieb: %s\n\n", join( q{, }, map { $_->operator } @prods ) );
+		printf( "Betrieb: %s\n",
+			join( q{, }, map { $_->operator } grep { $_->operator } @prods ) );
 	}
 	$prev_prod = 0;
 
@@ -441,6 +444,7 @@ elsif ( $opt{journey} ) {
 
 	my $message_id = 1;
 
+	print "\n";
 	for my $stop ( $result->route ) {
 		my $msg_line = q{};
 		for my $message ( $stop->messages ) {
