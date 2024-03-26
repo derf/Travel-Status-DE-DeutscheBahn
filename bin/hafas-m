@@ -148,8 +148,12 @@ sub show_version {
 	exit 0;
 }
 
-sub parse_mot_options {
+sub spacer {
+	my ($len) = @_;
+	return ( $len % 2 ? q { } : q{} ) . ( q{ ·} x ( $len / 2 ) );
+}
 
+sub parse_mot_options {
 	my $default_yes = 1;
 
 	for my $type ( split( qr{,}, $types ) ) {
@@ -385,6 +389,7 @@ elsif ( $opt{locationSearch} ) {
 elsif ( $opt{journey} ) {
 	my $result = $status->result;
 	my @prods;
+	my @directions;
 	my $prev_prod = 0;
 
 	printf( "%s → %s", $result->name, $result->route_end );
@@ -400,6 +405,7 @@ elsif ( $opt{journey} ) {
 	my $delay_len     = 0;
 	my $delay_fmt     = 0;
 	my $occupancy_len = 0;
+	my $stop_len      = 0;
 	for my $stop ( $result->route ) {
 		if ( $stop->delay ) {
 			$delay_len = max( $delay_len, length( $stop->delay ) + 1 );
@@ -408,10 +414,16 @@ elsif ( $opt{journey} ) {
 		{
 			$occupancy_len = 2;
 		}
+		if ( length( $stop->loc->name ) > $stop_len ) {
+			$stop_len = length( $stop->loc->name );
+		}
 		my $prod = $stop->prod_dep // $stop->prod_arr;
 		if ( $prod and $prod != $prev_prod ) {
 			push( @prods, $prod );
 			$prev_prod = $prod;
+		}
+		if ( $stop->direction ) {
+			push( @directions, $stop->direction );
 		}
 	}
 	if ($delay_len) {
@@ -424,8 +436,11 @@ elsif ( $opt{journey} ) {
 		}
 	}
 	else {
-		printf( "Betrieb: %s\n",
-			join( q{, }, map { $_->operator } grep { $_->operator } @prods ) );
+		printf(
+			"Betrieb: %s\n",
+			join( q{, },
+				uniq map { $_->operator } grep { $_->operator } @prods )
+		);
 	}
 	$prev_prod = 0;
 
@@ -465,13 +480,18 @@ elsif ( $opt{journey} ) {
 			my $prod = $stop->prod_dep // $stop->prod_arr;
 			if ( $prod and $prod != $prev_prod ) {
 				$prod_line
-				  = sprintf( " : %s (%s)", $prod->name, $prod->operator );
+				  = sprintf( " %s (%s)", $prod->name, $prod->operator );
 				$prev_prod = $prod;
 			}
 		}
 
+		my $dir_line = q{};
+		if ( @directions > 1 and $stop->direction ) {
+			$dir_line = ' → ' . $stop->direction;
+		}
+
 		printf(
-"%s%5s %s %5s %-${delay_fmt}s%${occupancy_len}s%-${occupancy_len}s %s%s%s%s%s\n",
+"%s%5s %s %5s %-${delay_fmt}s%${occupancy_len}s%-${occupancy_len}s %s%s%s%s%s%s\n",
 			$stop == $mark_stop  ? $output_bold : q{},
 			$stop->arr_cancelled ? '--:--'
 			: ( $stop->arr ? $stop->arr->strftime('%H:%M') : q{} ),
@@ -485,8 +505,11 @@ elsif ( $opt{journey} ) {
 			: q{},
 			$stop->loc->name,
 			$stop == $mark_stop ? $output_reset : q{},
+			( $prod_line or $dir_line or $msg_line )
+			? spacer( $stop_len + 1 - length( $stop->loc->name ) )
+			: q{},
 			$prod_line,
-			$stop->direction ? sprintf( ' → %s', $stop->direction ) : q{},
+			$dir_line,
 			$msg_line,
 		);
 	}
