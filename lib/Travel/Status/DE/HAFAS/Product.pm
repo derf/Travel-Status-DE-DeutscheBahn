@@ -137,9 +137,10 @@ Long type of this journey, e.g. "S-Bahn" or "Regional-Express".
 
 =item $product->class
 
-An integer identifying the the mode of transport class.
-Semantics depend on backend, e.g. "1" and "2" for long-distance trains and
-"4" and "8" for regional trains.
+An integer identifying the the mode of transport class.  Semantics depend on
+backend, e.g. "1" and "2" for long-distance trains and "4" and "8" for regional
+trains.  See Travel::Status::DE::HAFAS(3pm)'s C<< $hafas->get_active_service >>
+method.
 
 =item $product->line
 
