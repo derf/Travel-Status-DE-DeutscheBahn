@@ -1,3 +1,14 @@
+git HEAD
+
+    * ÖBB backend: Remove redundant train numbers from $product->name
+    * ÖBB backend: update productbits (thanks to Cassidy Dingenskirchen)
+    * Add Travel::Status::DE::HAFAS::Product module to handle line numbers,
+      operators, and similar. This enables proper support for journeys with
+      multiple operators and possibly multiple train/line numbers along the
+      route.
+    * Journey: Add ->product accessor
+    * Stop: Add ->product accessor
+
 Travel::Status::DE::DeutscheBahn 5.05 - Wed Feb 21 2024
 
     * ÖBB backend: handle midnight crossing and fix associated warnings
