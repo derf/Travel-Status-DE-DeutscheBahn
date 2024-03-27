@@ -32,12 +32,20 @@ sub new {
 	my $train_no = $product->{prodCtx}{num};
 	my $cat      = $product->{prodCtx}{catOut};
 	my $catlong  = $product->{prodCtx}{catOutL};
+
+	# ÖBB, you so silly
+	if ( $name and $name =~ m{Zug-Nr} and $product->{nameS} ) {
+		$name = $product->{nameS};
+	}
+
 	if ( $name and $cat and $name eq $cat and $product->{nameS} ) {
 		$name .= ' ' . $product->{nameS};
 	}
+
 	if ( defined $train_no and not $train_no ) {
 		$train_no = undef;
 	}
+
 	if (
 		    not defined $line_no
 		and defined $product->{prodCtx}{matchId}
