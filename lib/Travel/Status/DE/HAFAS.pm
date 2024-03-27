@@ -752,9 +752,17 @@ sub parse_journey {
 	my $journey = $self->{raw_json}{svcResL}[0]{res}{journey};
 	my @polyline;
 
-	if ( $journey->{poly} ) {
-		@polyline = decode_polyline( $journey->{poly}{crdEncYX} );
-		for my $ref ( @{ $journey->{poly}{ppLocRefL} // [] } ) {
+	my $poly = $journey->{poly};
+
+	# ÖBB
+	if ( $journey->{polyG} and @{ $journey->{polyG}{polyXL} // [] } ) {
+		$poly = $self->{raw_json}{svcResL}[0]{res}{common}{polyL}
+		  [ $journey->{polyG}{polyXL}[0] ];
+	}
+
+	if ($poly) {
+		@polyline = decode_polyline( $poly->{crdEncYX} );
+		for my $ref ( @{ $poly->{ppLocRefL} // [] } ) {
 			my $poly = $polyline[ $ref->{ppIdx} ];
 			my $loc  = $locL[ $ref->{locX} ];
 
