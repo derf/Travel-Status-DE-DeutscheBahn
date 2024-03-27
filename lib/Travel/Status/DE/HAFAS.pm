@@ -1295,7 +1295,21 @@ The non-default services (anything other than DB) are not well tested.
 
 =head1 SEE ALSO
 
-Travel::Status::DE::HAFAS::Journey(3pm), Travel::Status::DE::HAFAS::StopFinder(3pm).
+=over
+
+=item * Travel::Status::DE::HAFAS::Journey(3pm)
+
+=item * Travel::Status::DE::HAFAS::Location(3pm)
+
+=item * Travel::Status::DE::HAFAS::Message(3pm)
+
+=item * Travel::Status::DE::HAFAS::Product(3pm)
+
+=item * Travel::Status::DE::HAFAS::StopFinder(3pm)
+
+=item * Travel::Status::DE::HAFAS::Stop(3pm)
+
+=back
 
 =head1 AUTHOR
 
