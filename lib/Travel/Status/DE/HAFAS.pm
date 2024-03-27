@@ -1206,8 +1206,9 @@ If no result was found or the parser / http request failed, returns undef.
 
 =item $status->messages
 
-Returns a list of Travel::Status::DE::HAFAS::Message(3pm) objects with
-service messages. Each message belongs to at least one arrival/departure.
+Returns a list of Travel::Status::DE::HAFAS::Message(3pm) objects with service
+messages. Each message belongs to at least one arrival/departure (station,
+journey) or to at least stop alongside its route (journey).
 
 =item $status->station
 
@@ -1298,7 +1299,7 @@ Travel::Status::DE::HAFAS::Journey(3pm), Travel::Status::DE::HAFAS::StopFinder(3
 
 =head1 AUTHOR
 
-Copyright (C) 2015-2023 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2015-2024 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 
