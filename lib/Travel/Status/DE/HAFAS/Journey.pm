@@ -17,6 +17,7 @@ Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(datetime sched_datetime rt_datetime
 	  is_additional is_cancelled is_partially_cancelled
 	  station station_eva platform sched_platform rt_platform operator
+	  product
 	  id name type type_long class number line line_no load delay
 	  route_end route_start origin destination direction)
 );
@@ -486,6 +487,13 @@ True if the journey was cancelled, false otherwise.
 =item $journey->is_partially_cancelled
 
 True if part of the journey was cancelled, false otherwise.
+
+=item $journey->product
+
+Travel::Status::DE::HAFAS::Product(3pm) instance describing the product (mode
+of transport, line number / ID, operator, ...) associated with this journey.
+Note that journeys may be associated with multiple products -- see also
+C<< $journey->route >> and C<< $stop->product >>.
 
 =item $journey->rt_platform (station only)
 

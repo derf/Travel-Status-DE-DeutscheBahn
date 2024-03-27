@@ -11,19 +11,22 @@ use parent 'Class::Accessor';
 our $VERSION = '5.05';
 
 Travel::Status::DE::HAFAS::Product->mk_ro_accessors(
-	qw(name type type_long class number line line_no operator)
-);
+	qw(name type type_long class number line line_id line_no operator));
 
 # {{{ Constructor
 
 sub new {
 	my ( $obj, %opt ) = @_;
 
-	my $product      = $opt{product};
-	my $common       = $opt{common};
-	my $opL = $common->{opL};
+	my $product = $opt{product};
+	my $common  = $opt{common};
+	my $opL     = $common->{opL};
 
-	my $class = $product->{cls};
+	# DB:
+	# catIn / catOutS eq "IXr" => "ICE X Regio"? regional tickets are generally accepted
+	#                          <= does not hold
+
+	my $class    = $product->{cls};
 	my $name     = $product->{addName} // $product->{name};
 	my $line_no  = $product->{prodCtx}{line};
 	my $train_no = $product->{prodCtx}{num};
@@ -45,6 +48,11 @@ sub new {
 		$line_no = $product->{prodCtx}{matchId};
 	}
 
+	my $line_id;
+	if ( $product->{prodCtx}{lineId} ) {
+		$line_id = lc( $product->{prodCtx}{lineId} =~ s{_+}{-}gr );
+	}
+
 	my $operator;
 	if ( defined $product->{oprX} ) {
 		if ( my $opref = $opL->[ $product->{oprX} ] ) {
@@ -53,14 +61,15 @@ sub new {
 	}
 
 	my $ref = {
-		name                   => $name,
-		number                 => $train_no,
-		line                   => $name,
-		line_no                => $line_no,
-		type                   => $cat,
-		type_long              => $catlong,
-		class                  => $class,
-		operator               => $operator,
+		name      => $name,
+		number    => $train_no,
+		line      => $name,
+		line_id   => $line_id,
+		line_no   => $line_no,
+		type      => $cat,
+		type_long => $catlong,
+		class     => $class,
+		operator  => $operator,
 	};
 
 	bless( $ref, $obj );
