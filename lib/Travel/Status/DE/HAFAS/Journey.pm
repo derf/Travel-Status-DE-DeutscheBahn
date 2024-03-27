@@ -167,9 +167,11 @@ sub new {
 	if ( $journey->{stbStop} ) {
 		$ref->{station}        = $locL->[ $journey->{stbStop}{locX} ]->name;
 		$ref->{station_eva}    = 0 + $locL->[ $journey->{stbStop}{locX} ]->eva;
-		$ref->{sched_platform} = $journey->{stbStop}{dPlatfS};
-		$ref->{rt_platform}    = $journey->{stbStop}{dPlatfR};
-		$ref->{platform}       = $ref->{rt_platform} // $ref->{sched_platform};
+		$ref->{sched_platform} = $journey->{stbStop}{dPlatfS}
+		  // $journey->{stbStop}{dPltfS}{txt};
+		$ref->{rt_platform} = $journey->{stbStop}{dPlatfR}
+		  // $journey->{stbStop}{dPltfR}{txt};
+		$ref->{platform} = $ref->{rt_platform} // $ref->{sched_platform};
 
 		my $time_s
 		  = $journey->{stbStop}{ $hafas->{arrivals} ? 'aTimeS' : 'dTimeS' };
