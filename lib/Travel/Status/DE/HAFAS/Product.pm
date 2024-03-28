@@ -11,7 +11,7 @@ use parent 'Class::Accessor';
 our $VERSION = '5.05';
 
 Travel::Status::DE::HAFAS::Product->mk_ro_accessors(
-	qw(name type type_long class number line line_id line_no operator));
+	qw(class line_id line_no name number type type_long operator));
 
 # {{{ Constructor
 
@@ -71,7 +71,6 @@ sub new {
 	my $ref = {
 		name      => $name,
 		number    => $train_no,
-		line      => $name,
 		line_id   => $line_id,
 		line_no   => $line_no,
 		type      => $cat,
@@ -120,53 +119,50 @@ stops.
 
 =over
 
-=item $product->name
-
-Journey or line name, either in a format like "Bus SB16" (Bus line
-SB16) or "RE 10111" (RegionalExpress train 10111, no line information).  May
-contain extraneous whitespace characters.
-
-=item $product->type
-
-Type of this journey, e.g. "S" for S-Bahn, "RE" for Regional Express
-or "STR" for tram / StraE<szlig>enbahn.
-
-=item $product->type_long
-
-Long type of this journey, e.g. "S-Bahn" or "Regional-Express".
-
 =item $product->class
 
 An integer identifying the the mode of transport class.  Semantics depend on
-backend, e.g. "1" and "2" for long-distance trains and "4" and "8" for regional
-trains.  See Travel::Status::DE::HAFAS(3pm)'s C<< $hafas->get_active_service >>
+backend  See Travel::Status::DE::HAFAS(3pm)'s C<< $hafas->get_active_service >>
 method.
 
-=item $product->line
+=item $product->line_id
 
-Journey or line name, either in a format like "Bus SB16" (Bus line
-SB16), "RE 42" (RegionalExpress train 42) or "IC 2901" (InterCity train 2901,
-no line information).  May contain extraneous whitespace characters.  Note that
-this accessor does not return line information for IC/ICE/EC services, even if
-it is available. Use B<line_no> for those.
+Line identifier, or undef if it is unknown.
+This is a backend-specific identifier, e.g. "7-vrr010-17" for VRR U17.
+The format is compatible with L<https://github.com/Traewelling/line-colors>.
 
 =item $product->line_no
 
-Line identifier, or undef if it is unknown.
+Line number, or undef if it is unknown.
 The line identifier may be a single number such as "11" (underground train
 line U 11), a single word (e.g. "AIR") or a combination (e.g. "SB16").
 May also provide line numbers of IC/ICE services.
 
+=item $product->name
+
+Trip or line name, either in a format like "Bus SB16" (Bus line
+SB16), "RE 42" (RegionalExpress train 42) or "IC 2901" (InterCity train 2901,
+no line information).  May contain extraneous whitespace characters.  Note that
+this accessor does not return line information for DB IC/ICE/EC services, even
+if it is available. Use B<line_no> for those.
+
 =item $product->number
 
-Journey number (e.g. train number), or undef if it is unknown.
+Trip number (e.g. train number), or undef if it is unknown.
+
+=item $product->type
+
+Type of this product, e.g. "S" for S-Bahn, "RE" for Regional Express
+or "STR" for tram / StraE<szlig>enbahn.
+
+=item $product->type_long
+
+Long type of this product, e.g. "S-Bahn" or "Regional-Express".
 
 =item $product->operator
 
-The operator responsible for this journey. Returns undef
+The operator responsible for this product. Returns undef
 if the backend does not provide an operator.
-
-Foo.
 
 =back
 
