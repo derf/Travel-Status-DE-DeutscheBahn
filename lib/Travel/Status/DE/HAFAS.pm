@@ -21,7 +21,7 @@ use Travel::Status::DE::HAFAS::Polyline qw(decode_polyline);
 use Travel::Status::DE::HAFAS::Product;
 use Travel::Status::DE::HAFAS::StopFinder;
 
-our $VERSION = '5.05';
+our $VERSION = '5.06';
 
 # {{{ Endpoint Definition
 
@@ -1025,7 +1025,7 @@ monitors
 
 =head1 VERSION
 
-version 5.05
+version 5.06
 
 =head1 DESCRIPTION
 
