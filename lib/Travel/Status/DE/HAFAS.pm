@@ -26,6 +26,39 @@ our $VERSION = '5.06';
 # {{{ Endpoint Definition
 
 my %hafas_instance = (
+	AVV => {
+		stopfinder  => 'https://auskunft.avv.de/bin/ajax-getstop.exe',
+		mgate       => 'https://auskunft.avv.de/bin/mgate.exe',
+		name        => 'Aachener Verkehrsverbund',
+		productbits => [
+			[ regio    => 'region trains' ],
+			[ ic_ec    => 'long distance trains' ],
+			[ ice      => 'long distance trains' ],
+			[ bus      => 'long distance busses' ],
+			[ s        => 'sububrban trains' ],
+			[ u        => 'underground trains' ],
+			[ tram     => 'rams' ],
+			[ bus      => 'busses' ],
+			[ bus      => 'additional busses' ],
+			[ ondemand => 'on-demand services' ],
+			[ ferry    => 'maritime transit' ]
+		],
+		languages => [qw[de]],
+		request   => {
+			client => {
+				id   => 'AVV_AACHEN',
+				type => 'WEB',
+				name => 'webapp',
+				l    => 'vs_avv',
+			},
+			ver  => '1.26',
+			auth => {
+				type => 'AID',
+				aid  => '4vV1AcH3' . 'N511icH',
+			},
+			lang => 'deu',
+		},
+	},
 	DB => {
 		stopfinder    => 'https://reiseauskunft.bahn.de/bin/ajax-getstop.exe',
 		mgate         => 'https://reiseauskunft.bahn.de/bin/mgate.exe',
