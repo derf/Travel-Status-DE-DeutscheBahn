@@ -163,9 +163,11 @@ sub parse_mot_options {
 			if ($desc) {
 				for my $mot ( @{ $desc->{productbits} } ) {
 					if ( ref($mot) eq 'ARRAY' ) {
-						printf( "%-10s %s\n", @{$mot} );
+						if ( $mot->[0] ne '_' ) {
+							printf( "%-10s %s\n", @{$mot} );
+						}
 					}
-					else {
+					elsif ( $mot ne '_' ) {
 						say $mot;
 					}
 				}
