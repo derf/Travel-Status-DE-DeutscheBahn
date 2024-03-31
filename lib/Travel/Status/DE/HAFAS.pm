@@ -863,16 +863,30 @@ sub parse_board {
 	my @jnyL = @{ $self->{raw_json}{svcResL}[0]{res}{jnyL} // [] };
 
 	for my $result (@jnyL) {
-		push(
-			@{ $self->{results} },
-			Travel::Status::DE::HAFAS::Journey->new(
-				common  => $self->{raw_json}{svcResL}[0]{res}{common},
-				prodL   => $prodL,
-				locL    => \@locL,
-				journey => $result,
-				hafas   => $self,
-			)
-		);
+		eval {
+			push(
+				@{ $self->{results} },
+				Travel::Status::DE::HAFAS::Journey->new(
+					common  => $self->{raw_json}{svcResL}[0]{res}{common},
+					prodL   => $prodL,
+					locL    => \@locL,
+					journey => $result,
+					hafas   => $self,
+				)
+			);
+		};
+		if ($@) {
+			if ( $@ =~ m{Invalid local time for date in time zone} ) {
+
+				# Yes, HAFAS does in fact return invalid times during DST change
+				# (as in, it returns 02:XX:XX timestamps when the time jumps from 02:00:00 to 03:00:00)
+				# It's not clear what exactly is going wrong where and whether a 2:30 or a 3:30 journey is the correct one.
+				# For now, silently discard the affected journeys.
+			}
+			else {
+				warn("Skipping $result->{jid}: $@");
+			}
+		}
 	}
 	return $self;
 }
