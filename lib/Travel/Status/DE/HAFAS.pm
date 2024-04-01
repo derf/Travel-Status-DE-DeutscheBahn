@@ -113,6 +113,39 @@ my %hafas_instance = (
 			},
 		},
 	},
+	IE => {
+		stopfinder =>
+		  'https://journeyplanner.irishrail.ie/bin/ajax-getstop.exe',
+		mgate       => 'https://journeyplanner.irishrail.ie/bin/mgate.exe',
+		name        => 'Iarnród Éireann',
+		productbits => [
+			[ _     => undef ],
+			[ ic    => 'national trains' ],
+			[ _     => undef ],
+			[ regio => 'regional trains' ],
+			[ dart  => 'DART trains' ],
+			[ _     => undef ],
+			[ luas  => 'LUAS trams' ],
+		],
+		languages => [qw[en ga]],
+		request   => {
+			client => {
+				id   => 'IRISHRAIL',
+				type => 'IPA',
+				name => 'IrishRailPROD-APPSTORE',
+				v    => '4000100',
+				os   => 'iOS 12.4.8',
+			},
+			ver  => '1.33',
+			auth => {
+				type => 'AID',
+				aid  => 'P9bplgVCG' . 'nozdgQE',
+			},
+			lang => 'en',
+		},
+		salt   => 'i5s7m3q9' . 'z6b4k1c2',
+		micmac => 1,
+	},
 	NAHSH => {
 		mgate       => 'https://nah.sh.hafas.de/bin/mgate.exe',
 		stopfinder  => 'https://nah.sh.hafas.de/bin/ajax-getstop.exe',
