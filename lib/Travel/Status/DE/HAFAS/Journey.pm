@@ -411,7 +411,9 @@ a station-specific arrival/departure obtained by a stationboard query, or a
 train journey that does not belong to a specific station.
 
 stationboard-specific accessors are annotated with "(station only)" and return
-undef for non-station journeys.
+undef for non-station journeys. All date and time entries refer to the
+backend time zone (Europe/Berlin in most cases) and do not take local time
+into account; see B<tz_offset> for the latter.
 
 =head1 METHODS
 
@@ -481,10 +483,10 @@ undef if neither is available.
 
 =item $journey->tz_offset
 
-Offset between the backend's time zone (default: Europe/Berlin) and this
-journey's time zone in minutes, if any. For instance, if the backend is
-currently in UTC+2 (CEST) and the journey is in UTC+1 (IST), tz_offset is -60.
-undef if both are in the same time zone (or rather, the same UTC offset).
+Offset between backend time zone (default: Europe/Berlin) and this journey's
+time zone in minutes, if any. For instance, if the backend uses UTC+2 (CEST)
+and the journey uses UTC+1 (IST), tz_offset is -60. Returns undef if both use
+the same time zone (or rather, the same UTC offset).
 
 =item $journey->delay (station only)
 

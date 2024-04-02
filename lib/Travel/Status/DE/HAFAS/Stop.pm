@@ -227,6 +227,10 @@ Travel::Status::DE::HAFAS::Journey(3pm)'s stop at a given
 Travel::Status::DE::HAFAS::Location(3pm) with arrival/departure time,
 platform, etc.
 
+All date and time entries refer to the backend time zone (Europe/Berlin in most
+cases) and do not take local time into account; see B<tz_offset> for the
+latter.
+
 =head1 METHODS
 
 =head2 ACCESSORS
@@ -280,10 +284,10 @@ Departure is cancelled.
 
 =item $stop->tz_offset
 
-Offset between the backend's time zone (default: Europe/Berlin) and this stop's
-time zone in minutes, if any. For instance, if the backend is currently in UTC+2
-(CEST) and the stop is in UTC+1 (IST), tz_offset is -60. undef if both are in
-the same time zone (or rather, the same UTC offset).
+Offset between backend time zone (default: Europe/Berlin) and this stop's time
+zone in minutes, if any. For instance, if the backend uses UTC+2 (CEST) and the
+stop uses UTC+1 (IST), tz_offset is -60. Returns undef if both use the same
+time zone (or rather, the same UTC offset).
 
 =item $stop->delay
 
