@@ -2,7 +2,10 @@
 
 export PERL5LIB=lib
 
-checks="DB Berlin Jannowitzbrücke
+checks="AVV Ponttor, AC
+BART San Francisco International Airport, San Mateo
+DB Berlin Jannowitzbrücke
+IE Dublin
 NAHSH Flensburg
 NASA Wernigerode Hbf
 NVV Kassel Hauptbahnhof
