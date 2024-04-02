@@ -166,8 +166,8 @@ sub handle_day_change {
 	}
 
 	if ( defined $offset and $offset != $timestr->offset / 60 ) {
-		$self->{tz_offset} = $timestr->offset / 60 - $offset;
-		$timestr->add( minutes => $self->{tz_offset} );
+		$self->{tz_offset} = $offset - $timestr->offset / 60;
+		$timestr->subtract( minutes => $self->{tz_offset} );
 	}
 
 	return $timestr;
