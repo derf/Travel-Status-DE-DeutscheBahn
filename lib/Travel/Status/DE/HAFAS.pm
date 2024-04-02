@@ -1375,17 +1375,37 @@ arguments. Otherwise, the caller must specify B<promise> and B<user_agent>
 =item $status->get_active_service
 
 Returns a hashref describing the active service when a service is active and
-nothing otherwise. The hashref contains the keys B<url> (URL to the station
-board service), B<stopfinder> (URL to the stopfinder service, if supported),
-B<name>, and B<productbits> (arrayref describing the supported modes of
-transport, may contain duplicates).
+nothing otherwise. The hashref contains the following keys.
+
+=over
+
+=item B<name> => I<string>
+
+service name, e.g. Bay Area Rapid Transit or Deutsche Bahn.
+
+=item B<mgate> => I<string>
+
+HAFAS backend URL
+
+=item B<languages> => I<arrayref>
+
+Languages supported by the backend; see the constructor's B<language> argument.
+
+=item B<productbits> => I<arrayref>
+
+MOT bits supported by the backend. I<arrayref> contains either strings
+(one string per mode of transit) or arrayrefs (one string pair per mode of
+transit, with the first entry referring to the MOT identifier and the second
+one containing a slightly longer description of it).
+
+=back
 
 =item Travel::Status::DE::HAFAS::get_services()
 
 Returns an array containing all supported HAFAS services. Each element is a
 hashref and contains all keys mentioned in B<get_active_service>.
 It also contains a B<shortname> key, which is the service name used by
-the constructor's B<service> parameter.
+the constructor's B<service> parameter, e.g. BART or DB.
 
 =item Travel::Status::DE::HAFAS::get_service(I<$service>)
 
