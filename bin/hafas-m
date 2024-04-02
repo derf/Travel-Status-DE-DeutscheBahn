@@ -95,7 +95,9 @@ elsif ( $opt{station} =~ m{ ^ [!] (?<query> .*) $ }x ) {
 }
 
 if ( $date or $time ) {
-	my $dt = DateTime->now( time_zone => 'Europe/Berlin' );
+	my $desc = Travel::Status::DE::HAFAS::get_service($service) // {};
+	my $dt
+	  = DateTime->now( time_zone => $desc->{time_zone} // 'Europe/Berlin' );
 	if ($date) {
 		if ( $date
 			=~ m{ ^ (?<day> \d{1,2} ) [.] (?<month> \d{1,2} ) [.] (?<year> \d{4})? $ }x
@@ -355,7 +357,7 @@ if ( $opt{journeyMatch} ) {
 			say $result->id;
 			print $result->name;
 			if ( $result->number ) {
-				printf( "  |  Zug  %s", $result->number );
+				printf( "  |  Nr  %s", $result->number );
 			}
 			if ( $result->line_no ) {
 				printf( "  |  Linie %s", $result->line_no );
@@ -396,7 +398,7 @@ elsif ( $opt{journey} ) {
 
 	printf( "%s → %s", $result->name, $result->route_end );
 	if ( $result->number ) {
-		printf( " / Zug %s", $result->number );
+		printf( " / Nr %s", $result->number );
 	}
 	if ( $result->line_no ) {
 		printf( " / Linie %s", $result->line_no );
@@ -446,7 +448,9 @@ elsif ( $opt{journey} ) {
 	}
 	$prev_prod = 0;
 
-	my $now       = DateTime->now( time_zone => 'Europe/Berlin' );
+	my $desc = Travel::Status::DE::HAFAS::get_service($service) // {};
+	my $now
+	  = DateTime->now( time_zone => $desc->{time_zone} // 'Europe/Berlin' );
 	my $mark_stop = 0;
 	for my $i ( reverse 1 .. scalar $result->route ) {
 		my $stop = ( $result->route )[ $i - 1 ];

@@ -94,7 +94,8 @@ sub new {
 		}
 		$datetime_ref = DateTime::Format::Strptime->new(
 			pattern   => $parse_fmt,
-			time_zone => 'Europe/Berlin'
+			time_zone => $hafas->get_active_service->{time_zone}
+			  // 'Europe/Berlin'
 		)->parse_datetime($date_ref);
 	}
 

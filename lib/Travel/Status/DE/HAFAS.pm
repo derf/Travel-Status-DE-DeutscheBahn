@@ -63,6 +63,7 @@ my %hafas_instance = (
 		stopfinder  => 'https://planner.bart.gov/bin/ajax-getstop.exe',
 		mgate       => 'https://planner.bart.gov/bin/mgate.exe',
 		name        => 'Bay Area Rapid Transit',
+		time_zone   => 'America/Los_Angeles',
 		productbits => [
 			[ _     => undef ],
 			[ _     => undef ],
@@ -118,6 +119,7 @@ my %hafas_instance = (
 		  'https://journeyplanner.irishrail.ie/bin/ajax-getstop.exe',
 		mgate       => 'https://journeyplanner.irishrail.ie/bin/mgate.exe',
 		name        => 'Iarnród Éireann',
+		time_zone   => 'Europe/Dublin',
 		productbits => [
 			[ _     => undef ],
 			[ ic    => 'national trains' ],
@@ -215,6 +217,7 @@ my %hafas_instance = (
 		mgate       => 'https://fahrplan.oebb.at/bin/mgate.exe',
 		stopfinder  => 'https://fahrplan.oebb.at/bin/ajax-getstop.exe',
 		name        => 'Österreichische Bundesbahnen',
+		time_zone   => 'Europe/Vienna',
 		productbits => [
 			[ ice_rj => 'long distance trains' ],
 			[ sev    => 'rail replacement service' ],
@@ -328,7 +331,8 @@ sub new {
 		confess("The service '$service' is not supported");
 	}
 
-	my $now  = DateTime->now( time_zone => 'Europe/Berlin' );
+	my $now = DateTime->now( time_zone => $hafas_instance{$service}{time_zone}
+		  // 'Europe/Berlin' );
 	my $self = {
 		active_service => $service,
 		arrivals       => $conf{arrivals},
@@ -482,7 +486,7 @@ sub new {
 
 	$self->{strptime_obj} //= DateTime::Format::Strptime->new(
 		pattern   => '%Y%m%dT%H%M%S',
-		time_zone => 'Europe/Berlin',
+		time_zone => $hafas_instance{$service}{time_zone} // 'Europe/Berlin',
 	);
 
 	my $json = $self->{json} = JSON->new->utf8;
