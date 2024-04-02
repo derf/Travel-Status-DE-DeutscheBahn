@@ -51,12 +51,17 @@ GetOptions(
 ) or show_help(1);
 
 if ($list_services) {
-	printf( "%-40s %-14s %s\n\n", 'operator', 'abbr. (-s)', 'languages (-l)' );
+	printf(
+		"%-40s %-14s %-15s %s\n\n",
+		'operator', 'abbr. (-s)', 'languages (-l)',
+		'time zone'
+	);
 	for my $service ( Travel::Status::DE::HAFAS::get_services() ) {
 		printf(
-			"%-40s %-14s %s\n",
+			"%-40s %-14s %-15s %s\n",
 			@{$service}{qw(name shortname)},
-			join( q{ }, @{ $service->{languages} // [] } )
+			join( q{ }, @{ $service->{languages} // [] } ),
+			$service->{time_zone} // q{},
 		);
 	}
 	exit 0;
@@ -757,8 +762,8 @@ Note that requesting an invalid/unsupported language may lead to garbage output.
 
 =item B<--list>
 
-List known HAFAS installations and exit. Use B<-s>|B<--service> to select an
-operator from this list for a HAFAS request.
+List known HAFAS instances and exit. Use B<-s>|B<--service> to select a
+service from this list for a HAFAS request.
 
 =item B<-m>, B<--mot> I<motlist>
 
