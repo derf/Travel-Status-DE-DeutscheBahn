@@ -174,28 +174,33 @@ sub new {
 		  // $journey->{stbStop}{dPltfR}{txt};
 		$ref->{platform} = $ref->{rt_platform} // $ref->{sched_platform};
 
-		my $time_s
-		  = $journey->{stbStop}{ $hafas->{arrivals} ? 'aTimeS' : 'dTimeS' };
-		my $time_r
-		  = $journey->{stbStop}{ $hafas->{arrivals} ? 'aTimeR' : 'dTimeR' };
+		my $datetime_s = Travel::Status::DE::HAFAS::Stop::handle_day_change(
+			$ref,
+			input =>
+			  $journey->{stbStop}{ $hafas->{arrivals} ? 'aTimeS' : 'dTimeS' },
+			offset => $journey->{stbStop}{
+				$hafas->{arrivals}
+				? 'aTZOffset'
+				: 'dTZOffset'
+			},
+			date     => $date,
+			strp_obj => $hafas->{strptime_obj},
+			ref      => $datetime_ref,
+		);
 
-		for my $timestr ( $time_s, $time_r ) {
-			if ( not defined $timestr ) {
-				next;
-			}
-
-			$timestr = Travel::Status::DE::HAFAS::Stop::handle_day_change(
-				$journey,
-				input    => $timestr,
-				date     => $date,
-				strp_obj => $hafas->{strptime_obj},
-				ref      => $datetime_ref,
-			);
-
-		}
-
-		my $datetime_s = $time_s;
-		my $datetime_r = $time_r;
+		my $datetime_r = Travel::Status::DE::HAFAS::Stop::handle_day_change(
+			$ref,
+			input =>
+			  $journey->{stbStop}{ $hafas->{arrivals} ? 'aTimeR' : 'dTimeR' },
+			offset => $journey->{stbStop}{
+				$hafas->{arrivals}
+				? 'aTZOffset'
+				: 'dTZOffset'
+			},
+			date     => $date,
+			strp_obj => $hafas->{strptime_obj},
+			ref      => $datetime_ref,
+		);
 
 		my $delay
 		  = $datetime_r
