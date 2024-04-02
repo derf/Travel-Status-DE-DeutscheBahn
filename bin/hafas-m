@@ -694,28 +694,27 @@ It has four operating modes that depend on the contents of its argument.
 
 =head2 Arrival/Departure Monitor (I<station>)
 
-Show departures (or arrivals) at I<station>, optionally filtered by date, time
-and mode of transport. I<station> may be given as a station name or EVA ID.
-EVA IDs tend to be similar to, but not always identical with, UIC station
-codes. Output format:
+Show departures (or arrivals) at I<station>, optionally filtered by mode of
+transport. I<station> may be given as a station name or HAFAS station ID.
 
 =over
 
-=item * scheduled departure (or arrival) time
+=item * estimated departure (or arrival) time
 
 =item * delay, if known
 
-=item * trip number or line
+=item * trip name, number, or line
 
 =item * direction / destination
 
-=item * platform (B<!> indicates a platform change)
+=item * platform, if known (B<!> indicates a platform change)
 
 =item * expected occupancy of first and second class, if known
 
 =back
 
-Occupancy indicators are, from least occupied to fully booked: B<.> B<o>
+Departure/arrival times are marked with a C<< * >> if they differ from local
+time.  Occupancy indicators are, from least occupied to fully booked: B<.> B<o>
 B<*> B<!>.
 
 =head2 Location Search (B<?>I<query>|I<lat>B<:>I<lon>)
@@ -732,7 +731,11 @@ Otherwise, list all journey IDs that match I<query>.
 =head2 Trip Details (I<journeyID>)
 
 List intermediate stops of I<journeyID> with arrival/departure time, delay (if
-available), occupancy (if available), and stop name.
+available), occupancy (if available), and stop name. Also includes
+line/journey, operator, and heading information.
+
+Times are reported in the selected HAFAS service's default time zone (typically
+Europe/Berlin). If a stop's local time differs, it is also provided.
 
 =head1 OPTIONS
 
@@ -789,7 +792,8 @@ to DB (Deutsche Bahn). See B<--list> for a list of known services.
 
 =item B<-t>, B<--time> I<hh>:I<mm>
 
-Time to list departures for.  Default: now.
+Time to list departures for. Must be specified in the selected HAFAS
+service's default time zone, see B<--list>. Default: now.
 
 =item B<-v>, B<--via> I<stopname>|I<eva1>,I<eva2>,...
 
