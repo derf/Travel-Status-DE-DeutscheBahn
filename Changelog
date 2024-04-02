@@ -1,3 +1,16 @@
+Travel::Status::DE::DeutscheBahn 6.00 - Tue Apr 02 2024
+
+    * Add AVV (Aachener Verkehrsverbund), BART (Bay Area Rapid Transit), and IE
+      (Iarnród Éireann / Irish Rail) backends
+    * Support backend-specific time zones; add time_zone to service description
+    * Handle cross-timezone journeys and stops whose time zone differs from
+      the backend's default time zone. As of this release, all input and output
+      datetimes refer to the backend's default time zone rather than local
+      time (Stop and Journey accessors) / whatever (hafas-m and HAFAS
+      arguments). Use the new tz_offset accessor to determine local time.
+      This is a breaking change.
+    * Journey, Stop: Add tz_offset accessor
+
 Travel::Status::DE::DeutscheBahn 5.06 - Thu Mar 28 2024
 
     * Add Travel::Status::DE::HAFAS::Product module to handle line numbers,
