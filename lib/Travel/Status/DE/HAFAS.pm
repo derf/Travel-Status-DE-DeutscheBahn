@@ -1398,6 +1398,11 @@ MOT bits supported by the backend. I<arrayref> contains either strings
 transit, with the first entry referring to the MOT identifier and the second
 one containing a slightly longer description of it).
 
+=item B<time_zone> => I<string> (optional)
+
+The time zone this service reports arrival/departure times in. If this key is
+not present, it is safe to assume that it uses Europe/Berlin.
+
 =back
 
 =item Travel::Status::DE::HAFAS::get_services()
