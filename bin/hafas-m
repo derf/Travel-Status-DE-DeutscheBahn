@@ -496,8 +496,28 @@ elsif ( $opt{journey} ) {
 			$dir_line = ' → ' . $stop->direction;
 		}
 
+		my $tz_line = q{};
+		if ( $stop->tz_offset and ( $stop->arr or $stop->dep ) ) {
+			$tz_line = ( $prod_line or $dir_line ) ? q{ · } : q{ };
+			$tz_line .= 'local ';
+			if ( $stop->arr ) {
+				$tz_line
+				  .= $stop->arr->clone->add( minutes => $stop->tz_offset )
+				  ->strftime('%H:%M');
+			}
+			if ( $stop->arr and $stop->dep ) {
+				$tz_line .= ' → ';
+			}
+			if ( $stop->dep ) {
+				$tz_line
+				  .= $stop->dep->clone->add( minutes => $stop->tz_offset )
+				  ->strftime('%H:%M');
+			}
+			$tz_line .= q{  };
+		}
+
 		printf(
-"%s%5s %s %5s %-${delay_fmt}s%${occupancy_len}s%-${occupancy_len}s %s%s%s%s%s%s\n",
+"%s%5s %s %5s %-${delay_fmt}s%${occupancy_len}s%-${occupancy_len}s %s%s%s%s%s%s%s\n",
 			$stop == $mark_stop  ? $output_bold : q{},
 			$stop->arr_cancelled ? '--:--'
 			: ( $stop->arr ? $stop->arr->strftime('%H:%M') : q{} ),
@@ -511,11 +531,12 @@ elsif ( $opt{journey} ) {
 			: q{},
 			$stop->loc->name,
 			$stop == $mark_stop ? $output_reset : q{},
-			( $prod_line or $dir_line or $msg_line )
+			( $tz_line or $prod_line or $dir_line or $msg_line )
 			? spacer( $stop_len + 1 - length( $stop->loc->name ) )
 			: q{},
 			$prod_line,
 			$dir_line,
+			$tz_line,
 			$msg_line,
 		);
 	}
@@ -555,12 +576,16 @@ if ($via) {
 
 my $delay_len     = 0;
 my $occupancy_len = 0;
+my $offset_len    = 0;
 for my $d (@results) {
 	if ( $d->delay ) {
 		$delay_len = max( $delay_len, length( $d->delay ) + 1 );
 	}
 	if ( $d->load and ( $d->load->{FIRST} or $d->load->{SECOND} ) ) {
 		$occupancy_len = 2;
+	}
+	if ( $d->tz_offset ) {
+		$offset_len = 1;
 	}
 }
 
@@ -590,7 +615,8 @@ for my $d (@results) {
 	}
 
 	my $entry = [
-		$d->is_cancelled ? '--:--' : $d->datetime->strftime('%H:%M'),
+		  ( $d->is_cancelled ? '--:--' : $d->datetime->strftime('%H:%M') )
+		. ( $d->tz_offset    ? q{*}    : ( q{ } x $offset_len ) ),
 		$d->is_cancelled
 		? q{}
 		: format_delay( $d->delay, $delay_len ),
@@ -618,6 +644,11 @@ for my $d (@results) {
 }
 
 display_result(@output);
+
+if ($offset_len) {
+	printf( "\n* reported for %s; local time differs\n",
+		$status->get_active_service->{time_zone} // 'Europe/Berlin' );
+}
 
 for my $m ( $status->messages ) {
 	if ( $m->ref_count > 0 and $m->{show} ) {
