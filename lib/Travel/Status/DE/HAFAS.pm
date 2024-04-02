@@ -345,6 +345,7 @@ sub new {
 		station        => $conf{station},
 		ua             => $ua,
 		now            => $now,
+		tz_offset      => $now->offset / 60,
 	};
 
 	bless( $self, $obj );

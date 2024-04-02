@@ -16,7 +16,7 @@ Travel::Status::DE::HAFAS::Stop->mk_ro_accessors(
 	  rt_dep sched_dep dep dep_delay dep_cancelled prod_dep
 	  delay direction
 	  rt_platform sched_platform platform is_changed_platform
-	  is_additional
+	  is_additional tz_offset
 	  load
 	)
 );
@@ -34,11 +34,6 @@ sub new {
 	my $hafas        = $opt{hafas};
 	my $strp_obj     = $opt{hafas}{strptime_obj};
 
-	my $sched_arr = $stop->{aTimeS};
-	my $rt_arr    = $stop->{aTimeR};
-	my $sched_dep = $stop->{dTimeS};
-	my $rt_dep    = $stop->{dTimeR};
-
 	my $prod_arr
 	  = defined $stop->{aProdX} ? $prodL->[ $stop->{aProdX} ] : undef;
 	my $prod_dep
@@ -50,33 +45,76 @@ sub new {
 	my $rt_platform      = $stop->{aPlatfR}  // $stop->{dPlatfR};
 	my $changed_platform = $stop->{aPlatfCh} // $stop->{dPlatfCh};
 
-	for my $timestr ( $sched_arr, $rt_arr, $sched_dep, $rt_dep ) {
-		if ( not defined $timestr ) {
-			next;
-		}
+	my $arr_cancelled = $stop->{aCncl};
+	my $dep_cancelled = $stop->{dCncl};
+	my $is_additional = $stop->{isAdd};
 
-		$timestr = handle_day_change(
-			input    => $timestr,
-			date     => $date,
-			strp_obj => $strp_obj,
-			ref      => $datetime_ref
-		);
+	my $ref = {
+		loc                 => $opt{loc},
+		direction           => $stop->{dDirTxt},
+		sched_platform      => $sched_platform,
+		rt_platform         => $rt_platform,
+		is_changed_platform => $changed_platform,
+		platform            => $rt_platform // $sched_platform,
+		arr_cancelled       => $arr_cancelled,
+		dep_cancelled       => $dep_cancelled,
+		is_additional       => $is_additional,
+		prod_arr            => $prod_arr,
+		prod_dep            => $prod_dep,
+	};
 
-	}
+	bless( $ref, $obj );
 
-	my $arr_delay
+	my $sched_arr = $ref->handle_day_change(
+		input    => $stop->{aTimeS},
+		offset   => $stop->{aTZOffset},
+		date     => $date,
+		strp_obj => $strp_obj,
+		ref      => $datetime_ref
+	);
+
+	my $rt_arr = $ref->handle_day_change(
+		input    => $stop->{aTimeR},
+		offset   => $stop->{aTZOffset},
+		date     => $date,
+		strp_obj => $strp_obj,
+		ref      => $datetime_ref
+	);
+
+	my $sched_dep = $ref->handle_day_change(
+		input    => $stop->{dTimeS},
+		offset   => $stop->{dTZOffset},
+		date     => $date,
+		strp_obj => $strp_obj,
+		ref      => $datetime_ref
+	);
+
+	my $rt_dep = $ref->handle_day_change(
+		input    => $stop->{dTimeR},
+		offset   => $stop->{dTZOffset},
+		date     => $date,
+		strp_obj => $strp_obj,
+		ref      => $datetime_ref
+	);
+
+	$ref->{arr_delay}
 	  = ( $sched_arr and $rt_arr )
 	  ? ( $rt_arr->epoch - $sched_arr->epoch ) / 60
 	  : undef;
 
-	my $dep_delay
+	$ref->{dep_delay}
 	  = ( $sched_dep and $rt_dep )
 	  ? ( $rt_dep->epoch - $sched_dep->epoch ) / 60
 	  : undef;
 
-	my $arr_cancelled = $stop->{aCncl};
-	my $dep_cancelled = $stop->{dCncl};
-	my $is_additional = $stop->{isAdd};
+	$ref->{delay} = $ref->{dep_delay} // $ref->{arr_delay};
+
+	$ref->{sched_arr} = $sched_arr;
+	$ref->{sched_dep} = $sched_dep;
+	$ref->{rt_arr}    = $rt_arr;
+	$ref->{rt_dep}    = $rt_dep;
+	$ref->{arr}       = $rt_arr // $sched_arr;
+	$ref->{dep}       = $rt_dep // $sched_dep;
 
 	my @messages;
 	for my $msg ( @{ $stop->{msgL} // [] } ) {
@@ -92,39 +130,13 @@ sub new {
 			say "Unknown message type $msg->{type}";
 		}
 	}
+	$ref->{messages} = \@messages;
 
-	my $tco = {};
+	$ref->{load} = {};
 	for my $tco_id ( @{ $stop->{dTrnCmpSX}{tcocX} // [] } ) {
 		my $tco_kv = $common->{tcocL}[$tco_id];
-		$tco->{ $tco_kv->{c} } = $tco_kv->{r};
+		$ref->{load}{ $tco_kv->{c} } = $tco_kv->{r};
 	}
-
-	my $ref = {
-		loc                 => $opt{loc},
-		sched_arr           => $sched_arr,
-		rt_arr              => $rt_arr,
-		arr                 => $rt_arr // $sched_arr,
-		arr_delay           => $arr_delay,
-		arr_cancelled       => $arr_cancelled,
-		prod_arr            => $prod_arr,
-		sched_dep           => $sched_dep,
-		rt_dep              => $rt_dep,
-		dep                 => $rt_dep // $sched_dep,
-		dep_delay           => $dep_delay,
-		dep_cancelled       => $dep_cancelled,
-		prod_dep            => $prod_dep,
-		delay               => $dep_delay // $arr_delay,
-		direction           => $stop->{dDirTxt},
-		sched_platform      => $sched_platform,
-		rt_platform         => $rt_platform,
-		is_changed_platform => $changed_platform,
-		platform            => $rt_platform // $sched_platform,
-		is_additional       => $is_additional,
-		load                => $tco,
-		messages            => \@messages,
-	};
-
-	bless( $ref, $obj );
 
 	return $ref;
 }
@@ -132,9 +144,15 @@ sub new {
 # }}}
 
 sub handle_day_change {
-	my (%opt)   = @_;
+	my ( $self, %opt ) = @_;
 	my $date    = $opt{date};
 	my $timestr = $opt{input};
+	my $offset  = $opt{offset};
+
+	if ( not defined $timestr ) {
+		return;
+	}
+
 	if ( length($timestr) == 8 ) {
 
 		# arrival time includes a day offset
@@ -146,6 +164,12 @@ sub handle_day_change {
 	else {
 		$timestr = $opt{strp_obj}->parse_datetime("${date}T${timestr}");
 	}
+
+	if ( defined $offset and $offset != $timestr->offset / 60 ) {
+		$self->{tz_offset} = $timestr->offset / 60 - $offset;
+		$timestr->add( minutes => $self->{tz_offset} );
+	}
+
 	return $timestr;
 }
 
@@ -253,6 +277,13 @@ Departure delay in minutes.
 =item $stop->dep_cancelled
 
 Departure is cancelled.
+
+=item $stop->tz_offset
+
+Offset between the backend's time zone (default: Europe/Berlin) and this stop's
+time zone in minutes, if any. For instance, if the backend is currently in UTC+2
+(CEST) and the stop is in UTC+1 (IST), tz_offset is -60. undef if both are in
+the same time zone (or rather, the same UTC offset).
 
 =item $stop->delay
 

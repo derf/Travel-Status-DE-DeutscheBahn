@@ -14,7 +14,7 @@ use Travel::Status::DE::HAFAS::Stop;
 our $VERSION = '5.06';
 
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
-	qw(datetime sched_datetime rt_datetime
+	qw(datetime sched_datetime rt_datetime tz_offset
 	  is_additional is_cancelled is_partially_cancelled
 	  station station_eva platform sched_platform rt_platform operator
 	  product
@@ -185,6 +185,7 @@ sub new {
 			}
 
 			$timestr = Travel::Status::DE::HAFAS::Stop::handle_day_change(
+				$journey,
 				input    => $timestr,
 				date     => $date,
 				strp_obj => $hafas->{strptime_obj},
@@ -472,6 +473,13 @@ undef if no schedule data is available.
 DateTime object indicating the arrival/departure date and time.
 Real-time data if available, schedule data otherwise.
 undef if neither is available.
+
+=item $journey->tz_offset
+
+Offset between the backend's time zone (default: Europe/Berlin) and this
+journey's time zone in minutes, if any. For instance, if the backend is
+currently in UTC+2 (CEST) and the journey is in UTC+1 (IST), tz_offset is -60.
+undef if both are in the same time zone (or rather, the same UTC offset).
 
 =item $journey->delay (station only)
 
