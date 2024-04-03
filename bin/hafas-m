@@ -439,18 +439,10 @@ elsif ( $opt{journey} ) {
 		$delay_fmt = $delay_len + 3;
 	}
 
-	if ( @prods == 1 ) {
-		if ( $prev_prod->operator ) {
-			printf( "Betrieb: %s\n", $prev_prod->operator );
-		}
+	if ( $result->operators ) {
+		printf( "Betrieb: %s\n", join( q{, }, $result->operators ) );
 	}
-	else {
-		printf(
-			"Betrieb: %s\n",
-			join( q{, },
-				uniq map { $_->operator } grep { $_->operator } @prods )
-		);
-	}
+
 	$prev_prod = 0;
 
 	my $desc = Travel::Status::DE::HAFAS::get_service($service) // {};

@@ -8,7 +8,7 @@ use 5.014;
 
 use parent 'Class::Accessor';
 use DateTime::Format::Strptime;
-use List::Util qw(any);
+use List::Util qw(any uniq);
 use Travel::Status::DE::HAFAS::Stop;
 
 our $VERSION = '6.00';
@@ -268,6 +268,23 @@ sub messages {
 		return @{ $self->{messages} };
 	}
 	return;
+}
+
+sub operators {
+	my ($self) = @_;
+
+	if ( $self->{operators} ) {
+		return @{ $self->{operators} };
+	}
+
+	$self->{operators} = [
+		uniq map { ( $_->prod_arr // $_->prod_dep )->operator } grep {
+			      ( $_->prod_arr or $_->prod_dep )
+			  and ( $_->prod_arr // $_->prod_dep )->operator
+		} $self->route
+	];
+
+	return @{ $self->{operators} };
 }
 
 sub polyline {
@@ -549,7 +566,13 @@ detailed delay reasons (e.g. "switch damage between X and Y, expect delays").
 =item $journey->operator
 
 The operator responsible for this journey. Returns undef
-if the backend does not provide an operator.
+if the backend does not provide an operator. Note that the operator may
+change along the journey -- in this case, the returned operator depends on
+the backend and appears to be the first one in most cases.
+
+=item $journey->operators
+
+List of all operators observed along the journey.
 
 =item $journey->station (station only)
 
