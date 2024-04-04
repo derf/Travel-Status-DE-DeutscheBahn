@@ -95,6 +95,41 @@ my %hafas_instance = (
 			lang => 'en',
 		},
 	},
+	BLS => {
+		mgate       => 'https://bls.hafas.de/bin/mgate.exe',
+		stopfinder  => 'https://bls.hafas.de/bin/ajax-stopfinder.exe',
+		name        => 'BLS AG',
+		time_zone   => 'Europe/Zurich',
+		productbits => [
+			[ ice   => 'long distance trains' ],
+			[ ic_ec => 'long distance trains' ],
+			[ ir    => 'inter-regio trains' ],
+			[ regio => 'regional trains' ],
+			[ ferry => 'maritime transit' ],
+			[ s     => 'suburban trains' ],
+			[ bus   => 'busses' ],
+			[ fun   => 'funicular / gondola' ],
+			[ _     => undef ],
+			[ tram  => 'trams' ],
+			[ _     => undef ],
+			[ _     => undef ],
+			[ car   => 'Autoverlad' ]
+		],
+		languages => [qw[de fr it en]],
+		request   => {
+			client => {
+				id   => 'HAFAS',
+				type => 'WEB',
+				name => 'webapp',
+			},
+			ver  => '1.46',
+			auth => {
+				type => 'AID',
+				aid  => '3jkAncud78HSo' . 'qclmN54812A',
+			},
+			lang => 'deu',
+		},
+	},
 	CMTA => {
 		stopfinder  => 'https://capmetro.hafas.cloud/bin/ajax-getstop.exe',
 		mgate       => 'https://capmetro.hafas.cloud/bin/mgate.exe',
