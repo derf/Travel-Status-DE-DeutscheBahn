@@ -1486,17 +1486,10 @@ The non-default services (anything other than DB) are not well tested.
 
 =over
 
-=item * Travel::Status::DE::HAFAS::Journey(3pm)
+=item * L<https://dbf.finalrewind.org?hafas=1> provides a web frontend to most
+of this module's features. Set B<hafas=>I<service> to use a specific service.
 
-=item * Travel::Status::DE::HAFAS::Location(3pm)
-
-=item * Travel::Status::DE::HAFAS::Message(3pm)
-
-=item * Travel::Status::DE::HAFAS::Product(3pm)
-
-=item * Travel::Status::DE::HAFAS::StopFinder(3pm)
-
-=item * Travel::Status::DE::HAFAS::Stop(3pm)
+=item * Travel::Routing::DE::HAFAS(3pm) for itineraries.
 
 =back
 
