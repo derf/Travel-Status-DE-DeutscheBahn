@@ -1,3 +1,9 @@
+Travel::Status::DE::DeutscheBahn 6.01 - Thu Apr 04 2024
+
+    * Journey: Add operators accessor
+    * Add CMTA (Capital Metropolitan Transportation Authority) and BLS (BLS AG)
+      services
+
 Travel::Status::DE::DeutscheBahn 6.00 - Tue Apr 02 2024
 
     * Add AVV (Aachener Verkehrsverbund), BART (Bay Area Rapid Transit), and IE
