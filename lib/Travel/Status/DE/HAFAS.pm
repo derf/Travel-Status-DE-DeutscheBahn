@@ -25,6 +25,11 @@ our $VERSION = '6.00';
 
 # {{{ Endpoint Definition
 
+# Most of these have been adapted from
+# <https://github.com/public-transport/transport-apis> and
+# <https://github.com/public-transport/hafas-client/tree/main/p>.
+# Many thanks to Jannis R / @derhuerst and all contributors for maintaining
+# these resources.
 my %hafas_instance = (
 	AVV => {
 		stopfinder  => 'https://auskunft.avv.de/bin/ajax-getstop.exe',
