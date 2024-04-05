@@ -688,26 +688,28 @@ It has four operating modes that depend on the contents of its argument.
 
 Show departures (or arrivals) at I<station>, optionally filtered by mode of
 transport. I<station> may be given as a station name or HAFAS station ID.
+For each train, B<hafas-m> shows
 
 =over
 
-=item * estimated departure (or arrival) time
+=item * estimated departure (or arrival) time,
 
-=item * delay, if known
+=item * delay, if known,
 
-=item * trip name, number, or line
+=item * trip name, number, or line,
 
-=item * direction / destination
+=item * direction / destination,
 
-=item * platform, if known (B<!> indicates a platform change)
+=item * platform, if known (B<!> indicates a platform change), and
 
-=item * expected occupancy of first and second class, if known
+=item * expected occupancy of first and second class, if known.
 
 =back
 
-Departure/arrival times are marked with a C<< * >> if they differ from local
-time.  Occupancy indicators are, from least occupied to fully booked: B<.> B<o>
-B<*> B<!>.
+Times are always given in the selected service's default time zone (see
+B<--list>). Times that differ from the queried stop's local time are marked
+with C<< * >>. Occupancy indicators are, from least occupied to fully booked:
+B<.> B<o> B<*> B<!>.
 
 =head2 Location Search (B<?>I<query>|I<lat>B<:>I<lon>)
 
