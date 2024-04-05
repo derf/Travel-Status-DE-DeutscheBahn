@@ -1,10 +1,16 @@
 # hafas-m - Commandline Public Transit Departure Monitor
 
 **hafas-m** is a commandline client and Perl module for HAFAS public transit
-departure interfaces, with a focus on the one operated by Deutsche Bahn.
-See the [Travel::Status::DE::HAFAS
+departure interfaces. It supports a variety of transit services in Europe and
+parts of North America, with a special focus on the ones operated by
+Deutsche Bahn (DB) and Österreichische Bundesbahnen (ÖBB).
+
+This README documents installation of hafas-m and the associated
+Travel::Status::DE::HAFAS Perl module.  See the [Travel::Status::DE::HAFAS
 homepage](https://finalrewind.org/projects/Travel-Status-DE-DeutscheBahn) and
-[hafas-m manual](https://man.finalrewind.org/1/hafas-m) for details.
+[hafas-m manual](https://man.finalrewind.org/1/hafas-m) for a feature overview
+and usage instructions. A web frontend to Travel::Status::DE::HAFAS is
+available at [dbf.finalrewind.org](https://dbf.finalrewind.org/?hafas=DB).
 
 ## Installation
 
@@ -95,7 +101,7 @@ cpanm Travel::Status::DE::DeutscheBahn
 ```
 
 If you run this as root, it will install script and module to `/usr/local` by
-default.
+default. There is no well-defined uninstallation procedure.
 
 ### Installation from Source
 
@@ -133,6 +139,9 @@ If you are using the Git repository, use the following commands:
 ./Build test
 sudo ./Build install
 ```
+
+Note that system-wide installation does not have a well-defined uninstallation
+procedure.
 
 If you do not have superuser rights or do not want to perform a system-wide
 installation, you may leave out `Build install` and use **hafas-m** from the
