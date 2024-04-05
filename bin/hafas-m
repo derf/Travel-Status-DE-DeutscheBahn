@@ -666,8 +666,8 @@ hafas-m - Interface to the DeutscheBahn/HAFAS online departure monitor
 
 =head1 SYNOPSIS
 
-B<hafas-m> [B<-d> I<date>] [B<-t> I<time>] [B<-m> I<motlist>]
-[B<-s> I<service>] [B<-l> I<language>] I<station>
+B<hafas-m> [B<-a>] [B<-d> I<date>] [B<-t> I<time>] [B<-m> I<motlist>]
+[B<-v> I<via>] [B<-s> I<service>] [B<-l> I<language>] I<station>
 
 B<hafas-m> [B<-s> I<service>] B<?>I<query>|I<lat>B<:>I<lon>
 
