@@ -16,6 +16,7 @@ use Travel::Status::DE::HAFAS;
 
 my ( $date, $time, $language );
 my $arrivals;
+my $show_jid;
 my $types = q{};
 my $developer_mode;
 my $via;
@@ -37,6 +38,7 @@ GetOptions(
 	'a|arrivals'   => \$arrivals,
 	'd|date=s'     => \$date,
 	'h|help'       => sub { show_help(0) },
+	'j|with-jid'   => \$show_jid,
 	'l|language=s' => \$language,
 	'm|mot=s'      => \$types,
 	's|service=s'  => \$service,
@@ -611,6 +613,10 @@ for my $d (@results) {
 		  . $info_line;
 	}
 
+	if ($show_jid) {
+		$info_line = $d->id . '  ' . $info_line;
+	}
+
 	my $entry = [
 		  ( $d->is_cancelled ? '--:--' : $d->datetime->strftime('%H:%M') )
 		. ( $d->tz_offset    ? q{*}    : ( q{ } x $offset_len ) ),
@@ -744,6 +750,11 @@ the end station.
 =item B<-d>, B<--date> I<dd>.I<mm>.[I<yyyy>]
 
 Date to list departures for.  Default: today.
+
+=item B<-j>, B<--with-jid>
+
+Show journey IDs in arrival/departure board. These can be used to obtain
+details on individual journeys with subsequent B<hafas-m> invocations.
 
 =item B<--json>
 
