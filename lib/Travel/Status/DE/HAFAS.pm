@@ -1111,7 +1111,7 @@ sub station {
 		}
 	}
 
-	my @prefcounts = sort { $b->[0] <=> $a->[0] }
+	my @prefcounts = sort { $b->[1] <=> $a->[1] }
 	  map { [ $_, $prefc_by_loc{$_} ] } keys %prefc_by_loc;
 
 	if ( not @prefcounts ) {
