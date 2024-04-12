@@ -1,3 +1,9 @@
+Travel::Status::DE::DeutscheBahn 6.02 - Fri Apr 12 2024
+
+    * hafas-m: Add -j / --with-jid option
+    * $hafas->station: Correctly determine "name" and "eva" for stations that
+      have multiple EVA IDs and names.
+
 Travel::Status::DE::DeutscheBahn 6.01 - Thu Apr 04 2024
 
     * Journey: Add operators accessor
