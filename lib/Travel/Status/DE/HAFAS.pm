@@ -1104,10 +1104,19 @@ sub station {
 
 	my %prefc_by_loc;
 
-	for my $i ( 0 .. $#locL ) {
-		my $loc = $locL[$i];
-		if ( $loc->{pRefL} ) {
-			$prefc_by_loc{$i} = $#{ $loc->{pRefL} };
+	if ( $self->{active_service} and $self->{active_service} eq 'ÖBB' ) {
+		for my $jny ( @{ $self->{raw_json}{svcResL}[0]{res}{jnyL} // [] } ) {
+			if ( defined $jny->{stbStop}{locX} ) {
+				$prefc_by_loc{ $jny->{stbStop}{locX} } += 1;
+			}
+		}
+	}
+	else {
+		for my $i ( 0 .. $#locL ) {
+			my $loc = $locL[$i];
+			if ( $loc->{pRefL} ) {
+				$prefc_by_loc{$i} = $#{ $loc->{pRefL} };
+			}
 		}
 	}
 
