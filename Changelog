@@ -1,3 +1,7 @@
+Travel::Status::DE::DeutscheBahn 6.03 - Mon Apr 15 2024
+
+    * Journey: Add product_at accessor
+
 Travel::Status::DE::DeutscheBahn 6.02 - Fri Apr 12 2024
 
     * hafas-m: Add -j / --with-jid option
