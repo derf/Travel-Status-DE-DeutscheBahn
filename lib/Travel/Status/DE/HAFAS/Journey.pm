@@ -17,7 +17,7 @@ Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(datetime sched_datetime rt_datetime tz_offset
 	  is_additional is_cancelled is_partially_cancelled
 	  station station_eva platform sched_platform rt_platform operator
-	  product
+	  product product_at
 	  id name type type_long class number line line_no load delay
 	  route_end route_start origin destination direction)
 );
@@ -368,6 +368,16 @@ sub route_interesting {
 
 }
 
+sub product_at {
+	my ( $self, $req_stop ) = @_;
+	for my $stop ( $self->route ) {
+		if ( $stop->loc->name eq $req_stop or $stop->loc->eva eq $req_stop ) {
+			return $stop->prod_dep // $stop->prod_arr;
+		}
+	}
+	return;
+}
+
 sub TO_JSON {
 	my ($self) = @_;
 
@@ -529,6 +539,12 @@ Travel::Status::DE::HAFAS::Product(3pm) instance describing the product (mode
 of transport, line number / ID, operator, ...) associated with this journey.
 Note that journeys may be associated with multiple products -- see also
 C<< $journey->route >> and C<< $stop->product >>.
+
+=item $journey->product_at(I<stop>)
+
+Travel::Status::DE::HAFAS::Product(3pm) instance describing the product
+associated with I<stop> (name or EVA ID). Returns undef if product or I<stop>
+are unknown.
 
 =item $journey->rt_platform (station only)
 
