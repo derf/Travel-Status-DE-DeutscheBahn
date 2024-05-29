@@ -17,7 +17,8 @@ use Travel::Status::DE::HAFAS;
 my ( $date, $time, $language );
 my $arrivals;
 my $show_jid;
-my $types = q{};
+my $num_results = 30;
+my $types       = q{};
 my $developer_mode;
 my $via;
 my ( $json_output,   $raw_json_output );
@@ -35,20 +36,21 @@ my $output_bold  = -t STDOUT ? "\033[1m" : q{};
 my $output_reset = -t STDOUT ? "\033[0m" : q{};
 
 GetOptions(
-	'a|arrivals'   => \$arrivals,
-	'd|date=s'     => \$date,
-	'h|help'       => sub { show_help(0) },
-	'j|with-jid'   => \$show_jid,
-	'l|language=s' => \$language,
-	'm|mot=s'      => \$types,
-	's|service=s'  => \$service,
-	't|time=s'     => \$time,
-	'v|via=s'      => \$via,
-	'V|version'    => \&show_version,
-	'devmode'      => \$developer_mode,
-	'json'         => \$json_output,
-	'raw-json'     => \$raw_json_output,
-	'list'         => \$list_services,
+	'a|arrivals'      => \$arrivals,
+	'd|date=s'        => \$date,
+	'h|help'          => sub { show_help(0) },
+	'j|with-jid'      => \$show_jid,
+	'l|language=s'    => \$language,
+	'm|mot=s'         => \$types,
+	'n|num-results=s' => \$num_results,
+	's|service=s'     => \$service,
+	't|time=s'        => \$time,
+	'v|via=s'         => \$via,
+	'V|version'       => \&show_version,
+	'devmode'         => \$developer_mode,
+	'json'            => \$json_output,
+	'raw-json'        => \$raw_json_output,
+	'list'            => \$list_services,
 
 ) or show_help(1);
 
@@ -79,6 +81,7 @@ my %opt = (
 	developer_mode => $developer_mode,
 	service        => $service,
 	language       => $language,
+	results        => $num_results,
 );
 
 if ( $opt{station} =~ m{ ^ (?<lat> [0-9.]+ ) : (?<lon> [0-9].+ ) $ }x ) {
@@ -784,6 +787,10 @@ To exclude modes, set I<motlist> to B<!>I<mot1>,B<!>I<mot2>,...
 To show them exclusively, set I<motlist> to I<mot1>,I<mot2>,...
 
 The I<mot> types depend on the used service. Use C<< -m help >> to list them.
+
+=item B<-n>, B<--num-results> I<count>
+
+Request up to I<count> results. Default: 30.
 
 =item B<--raw-json>
 
