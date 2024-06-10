@@ -66,8 +66,7 @@ sub new {
 		my ( $date_ref, $parse_fmt );
 		if ( $jid =~ /#/ ) {
 
-			# ÖBB Journey ID - technically we ought to use Europe/Vienna tz
-			#  but let's not get into that...
+			# modern trip ID, used e.g. by DB and ÖBB
 			$date_ref  = ( split( /#/, $jid ) )[12];
 			$parse_fmt = '%d%m%y';
 			if ( length($date_ref) < 5 ) {
@@ -80,7 +79,7 @@ sub new {
 			}
 		}
 		else {
-			# DB Journey ID
+			# old (legacy?) trip ID
 			$date_ref  = ( split( qr{[|]}, $jid ) )[4];
 			$parse_fmt = '%d%m%Y';
 			if ( length($date_ref) < 7 ) {
