@@ -158,7 +158,7 @@ sub new {
 		}
 		$ref->{is_additional} = $journey->{stbStop}{isAdd};
 	}
-	else {
+	elsif ( $stops[0]{loc} ) {
 		$ref->{route_start} = $stops[0]{loc}->name;
 	}
 
