@@ -255,8 +255,9 @@ my %hafas_instance = (
 			[ tram     => 'trams' ],
 			[ _        => undef ],
 			[ bus      => 'buses' ],
-			[ ic       => 'national trains' ],
 			[ regio    => 'regional trains' ],
+			[ ic       => 'national trains' ],
+			[ _        => undef ],
 			[ _        => undef ],
 			[ ondemand => 'taxi buses' ]
 		],
