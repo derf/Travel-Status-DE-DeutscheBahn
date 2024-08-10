@@ -221,7 +221,16 @@ sub new {
 		my %tco;
 		for my $tco_id ( @{ $journey->{stbStop}{dTrnCmpSX}{tcocX} // [] } ) {
 			my $tco_kv = $tcocL[$tco_id];
-			$tco{ $tco_kv->{c} } = $tco_kv->{r};
+
+			# BVG has rRT (real-time?) and r (prognosed?); others only have r
+			my $load = $tco_kv->{rRT} // $tco_kv->{r};
+
+			# BVG uses 11 .. 13 rather than 1 .. 4
+			if ( $load > 10 ) {
+				$load -= 10;
+			}
+
+			$tco{ $tco_kv->{c} } = $load;
 		}
 		if (%tco) {
 			$ref->{load} = \%tco;
