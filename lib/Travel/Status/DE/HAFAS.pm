@@ -130,6 +130,29 @@ my %hafas_instance = (
 			lang => 'deu',
 		},
 	},
+	BVG => {
+		stopfinder  => 'https://bvg-apps-ext.hafas.de/bin/ajax-getstop.exe',
+		mgate       => 'https://bvg-apps-ext.hafas.de/bin/mgate.exe',
+		name        => 'Berliner Verkehrsbetriebe',
+		productbits => [qw[s u tram bus]],
+		languages   => [qw[de en]],
+		request     => {
+			client => {
+				type => 'WEB',
+				id   => 'VBB',
+				v    => 10002,
+				name => 'webapp',
+				l    => 'vs_webapp',
+			},
+			ext  => 'BVG.1',
+			ver  => '1.72',
+			auth => {
+				type => 'AID',
+				aid  => 'dVg4TZbW8anjx9z' . 'tPwe2uk4LVRi9wO',
+			},
+			lang => 'deu',
+		},
+	},
 	CMTA => {
 		stopfinder  => 'https://capmetro.hafas.cloud/bin/ajax-getstop.exe',
 		mgate       => 'https://capmetro.hafas.cloud/bin/mgate.exe',
