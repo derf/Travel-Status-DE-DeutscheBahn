@@ -247,6 +247,35 @@ my %hafas_instance = (
 		salt   => 'i5s7m3q9' . 'z6b4k1c2',
 		micmac => 1,
 	},
+	KVB => {
+		mgate       => 'https://auskunft.kvb.koeln/gate',
+		name        => 'Kölner Verkehrs-Betriebe',
+		productbits => [
+			[ s        => 'sub-urban trains' ],
+			[ tram     => 'trams' ],
+			[ _        => undef ],
+			[ bus      => 'buses' ],
+			[ ic       => 'national trains' ],
+			[ regio    => 'regional trains' ],
+			[ _        => undef ],
+			[ ondemand => 'taxi buses' ]
+		],
+		request => {
+			client => {
+				id   => 'HAFAS',
+				type => 'WEB',
+				name => 'webapp',
+				l    => 'vs_webapp',
+				v    => '154',
+			},
+			ver  => '1.58',
+			auth => {
+				type => 'AID',
+				aid  => 'Rt6foY5' . 'zcTTRXMQs',
+			},
+			lang => 'deu',
+		},
+	},
 	NAHSH => {
 		mgate       => 'https://nah.sh.hafas.de/bin/mgate.exe',
 		stopfinder  => 'https://nah.sh.hafas.de/bin/ajax-getstop.exe',
