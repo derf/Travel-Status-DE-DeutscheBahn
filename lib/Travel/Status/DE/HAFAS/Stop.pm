@@ -8,7 +8,7 @@ use 5.014;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '6.03';
+our $VERSION = '6.04';
 
 Travel::Status::DE::HAFAS::Stop->mk_ro_accessors(
 	qw(loc
@@ -140,7 +140,7 @@ sub new {
 		my $load = $tco_kv->{rRT} // $tco_kv->{r};
 
 		# BVG uses 11 .. 13 rather than 1 .. 4
-		if ( $load > 10 ) {
+		if ( defined $load and $load > 10 ) {
 			$load -= 10;
 		}
 
@@ -227,7 +227,7 @@ Travel::Status::DE::HAFAS::Stop - Information about a HAFAS stop.
 
 =head1 VERSION
 
-version 6.03
+version 6.04
 
 =head1 DESCRIPTION
 

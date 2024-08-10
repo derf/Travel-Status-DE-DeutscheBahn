@@ -1,3 +1,8 @@
+Travel::Status::DE::DeutscheBahn 6.04 - Sat Aug 10 2024
+
+    * hafas-m: Add -n / --num-results option
+    * HAFAS: Add BVG and VOS service definitions
+
 Travel::Status::DE::DeutscheBahn 6.03 - Mon Apr 15 2024
 
     * Journey: Add product_at accessor

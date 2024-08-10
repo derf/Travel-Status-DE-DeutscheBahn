@@ -11,7 +11,7 @@ use DateTime::Format::Strptime;
 use List::Util qw(any uniq);
 use Travel::Status::DE::HAFAS::Stop;
 
-our $VERSION = '6.03';
+our $VERSION = '6.04';
 
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(datetime sched_datetime rt_datetime tz_offset
@@ -226,7 +226,7 @@ sub new {
 			my $load = $tco_kv->{rRT} // $tco_kv->{r};
 
 			# BVG uses 11 .. 13 rather than 1 .. 4
-			if ( $load > 10 ) {
+			if ( defined $load and $load > 10 ) {
 				$load -= 10;
 			}
 
@@ -437,7 +437,7 @@ journey received by Travel::Status::DE::HAFAS
 
 =head1 VERSION
 
-version 6.03
+version 6.04
 
 =head1 DESCRIPTION
 
