@@ -392,6 +392,27 @@ my %hafas_instance = (
 			lang => 'deu',
 		},
 	},
+	VOS => {
+		stopfinder  => 'https://fahrplan.vos.info/bin/ajax-getstop.exe',
+		mgate       => 'https://fahrplan.vos.info/bin/mgate.exe',
+		name        => 'Verkehrsgemeinschaft Osnabrück',
+		productbits => [qw[ice ic_ec d regio s bus ferry u tram ondemand]],
+		languages   => [qw[de]],
+		request     => {
+			client => {
+				id   => 'SWO',
+				type => 'WEB',
+				name => 'webapp',
+				l    => 'vs_swo',
+			},
+			ver  => '1.72',
+			auth => {
+				type => 'AID',
+				aid  => 'PnYowCQ' . 'P7Tp1V'
+			},
+			lang => 'deu',
+		},
+	},
 );
 
 # }}}
