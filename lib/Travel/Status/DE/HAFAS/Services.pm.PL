@@ -178,6 +178,15 @@ my %hafas_instance = (
 		salt       => 'SP31mBufSyCLmNxp',
 		micmac     => 1,
 	},
+	VMT => {
+		load_instance(
+			'de/vmt',
+			lang => 'deu',
+			ver  => '1.34'
+		),
+		salt   => '7x8d3n2a5m1b3c6z',
+		micmac => 1,
+	},
 	VOS => {
 		load_instance(
 			'de/vos',
