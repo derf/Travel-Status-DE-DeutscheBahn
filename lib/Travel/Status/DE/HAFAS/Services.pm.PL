@@ -40,12 +40,16 @@ sub load_instance {
 		}
 	}
 
+	my $skipped = 0;
 	for my $bit ( 0 .. 15 ) {
 		if ( my $p = $bitmask_to_product{ 2**$bit } ) {
+			for ( 1 .. $skipped ) {
+				push( @{ $ret{productbits} }, [ "_", undef ] );
+			}
 			push( @{ $ret{productbits} }, [ $p->{id}, $p->{name} ] );
 		}
 		else {
-			push( @{ $ret{productbits} }, [ "_", undef ] );
+			$skipped += 1;
 		}
 	}
 
