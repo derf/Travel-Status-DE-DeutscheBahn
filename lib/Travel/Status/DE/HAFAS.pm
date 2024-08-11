@@ -14,7 +14,6 @@ use Digest::MD5 qw(md5_hex);
 use Encode      qw(decode encode);
 use JSON;
 use LWP::UserAgent;
-use Math::Polygon;
 use Travel::Status::DE::HAFAS::Journey;
 use Travel::Status::DE::HAFAS::Location;
 use Travel::Status::DE::HAFAS::Message;
