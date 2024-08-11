@@ -181,6 +181,7 @@ my %hafas_instance = (
 		),
 		stopfinder => 'https://fahrplan.vos.info/bin/ajax-getstop.exe',
 	},
+	VRN => { load_instance( 'de/vrn', lang => 'deu' ), }
 );
 
 my $perlobj = Data::Dumper->new( [ \%hafas_instance ], ['hafas_instance'] );
