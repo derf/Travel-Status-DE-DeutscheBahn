@@ -22,7 +22,7 @@ use Travel::Status::DE::HAFAS::Product;
 use Travel::Status::DE::HAFAS::Services;
 use Travel::Status::DE::HAFAS::StopFinder;
 
-our $VERSION = '6.05';
+our $VERSION = '6.06';
 
 # {{{ Endpoint Definition
 
@@ -885,7 +885,7 @@ monitors
 
 =head1 VERSION
 
-version 6.05
+version 6.06
 
 =head1 DESCRIPTION
 

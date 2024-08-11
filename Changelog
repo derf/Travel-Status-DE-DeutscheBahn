@@ -1,3 +1,9 @@
+Travel::Status::DE::DeutscheBahn 6.06 - Sun Aug 11 2024
+
+    * HAFAS: Remove undocumented Math::Polygon dependency that was accidentally
+      added in 6.05
+    * HAFAS: Add STV, RMV, VMT, VRN service definitions
+
 Travel::Status::DE::DeutscheBahn 6.05 - Sun Aug 11 2024
 
     * HAFAS: Add KVB service definition
