@@ -1,6 +1,7 @@
 FROM perl:5.30-slim
 
 COPY bin/ /app/bin/
+COPY ext/ /app/ext/
 COPY lib/ /app/lib/
 COPY Build.PL cpanfile* /app/
 
