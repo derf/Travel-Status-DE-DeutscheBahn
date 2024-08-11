@@ -4,8 +4,11 @@ export PERL5LIB=lib
 
 checks="AVV Ponttor, AC
 BART San Francisco International Airport, San Mateo
+BLS Bern
+BVG 900003104
 DB Berlin Jannowitzbrücke
 IE Dublin
+KVB 900000802
 NAHSH Flensburg
 NASA Wernigerode Hbf
 NVV Kassel Hauptbahnhof
