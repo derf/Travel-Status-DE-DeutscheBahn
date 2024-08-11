@@ -66,6 +66,11 @@ sub load_instance {
 	return %ret;
 }
 
+# HVV: 500 Can't connect to hvv-app.hafas.de:443 (Name or service not known)
+
+# SNCB: CLIENTVERSION error with default config;
+# "HCI Core: Invalid client version" with ver=1.21.
+
 my %hafas_instance = (
 	AVV => {
 		load_instance(
