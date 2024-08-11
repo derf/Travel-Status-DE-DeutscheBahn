@@ -14,436 +14,23 @@ use Digest::MD5 qw(md5_hex);
 use Encode      qw(decode encode);
 use JSON;
 use LWP::UserAgent;
+use Math::Polygon;
 use Travel::Status::DE::HAFAS::Journey;
 use Travel::Status::DE::HAFAS::Location;
 use Travel::Status::DE::HAFAS::Message;
 use Travel::Status::DE::HAFAS::Polyline qw(decode_polyline);
 use Travel::Status::DE::HAFAS::Product;
+use Travel::Status::DE::HAFAS::Services;
 use Travel::Status::DE::HAFAS::StopFinder;
 
 our $VERSION = '6.04';
 
 # {{{ Endpoint Definition
 
-# Most of these have been adapted from
-# <https://github.com/public-transport/transport-apis> and
-# <https://github.com/public-transport/hafas-client/tree/main/p>.
-# Many thanks to Jannis R / @derhuerst and all contributors for maintaining
-# these resources.
-my %hafas_instance = (
-	AVV => {
-		stopfinder  => 'https://auskunft.avv.de/bin/ajax-getstop.exe',
-		mgate       => 'https://auskunft.avv.de/bin/mgate.exe',
-		name        => 'Aachener Verkehrsverbund',
-		productbits => [
-			[ regio    => 'region trains' ],
-			[ ic_ec    => 'long distance trains' ],
-			[ ice      => 'long distance trains' ],
-			[ bus      => 'long distance busses' ],
-			[ s        => 'sububrban trains' ],
-			[ u        => 'underground trains' ],
-			[ tram     => 'trams' ],
-			[ bus      => 'busses' ],
-			[ bus      => 'additional busses' ],
-			[ ondemand => 'on-demand services' ],
-			[ ferry    => 'maritime transit' ]
-		],
-		languages => [qw[de]],
-		request   => {
-			client => {
-				id   => 'AVV_AACHEN',
-				type => 'WEB',
-				name => 'webapp',
-				l    => 'vs_avv',
-			},
-			ver  => '1.26',
-			auth => {
-				type => 'AID',
-				aid  => '4vV1AcH3' . 'N511icH',
-			},
-			lang => 'deu',
-		},
-	},
-	BART => {
-		stopfinder  => 'https://planner.bart.gov/bin/ajax-getstop.exe',
-		mgate       => 'https://planner.bart.gov/bin/mgate.exe',
-		name        => 'Bay Area Rapid Transit',
-		time_zone   => 'America/Los_Angeles',
-		productbits => [
-			[ _     => undef ],
-			[ _     => undef ],
-			[ cc    => 'cable cars' ],
-			[ regio => 'regional trains' ],
-			[ _     => undef ],
-			[ bus   => 'busses' ],
-			[ ferry => 'maritime transit' ],
-			[ bart  => 'BART trains' ],
-			[ tram  => 'trams' ],
-		],
-		languages => [qw[en]],
-		request   => {
-			client => {
-				id   => 'BART',
-				type => 'WEB',
-				name => 'webapp',
-			},
-			ver  => '1.40',
-			auth => {
-				type => 'AID',
-				aid  => 'kEwHkFUC' . 'IL500dym',
-			},
-			lang => 'en',
-		},
-	},
-	BLS => {
-		mgate       => 'https://bls.hafas.de/bin/mgate.exe',
-		stopfinder  => 'https://bls.hafas.de/bin/ajax-stopfinder.exe',
-		name        => 'BLS AG',
-		time_zone   => 'Europe/Zurich',
-		productbits => [
-			[ ice   => 'long distance trains' ],
-			[ ic_ec => 'long distance trains' ],
-			[ ir    => 'inter-regio trains' ],
-			[ regio => 'regional trains' ],
-			[ ferry => 'maritime transit' ],
-			[ s     => 'suburban trains' ],
-			[ bus   => 'busses' ],
-			[ fun   => 'funicular / gondola' ],
-			[ _     => undef ],
-			[ tram  => 'trams' ],
-			[ _     => undef ],
-			[ _     => undef ],
-			[ car   => 'Autoverlad' ]
-		],
-		languages => [qw[de fr it en]],
-		request   => {
-			client => {
-				id   => 'HAFAS',
-				type => 'WEB',
-				name => 'webapp',
-			},
-			ver  => '1.46',
-			auth => {
-				type => 'AID',
-				aid  => '3jkAncud78HSo' . 'qclmN54812A',
-			},
-			lang => 'deu',
-		},
-	},
-	BVG => {
-		stopfinder  => 'https://bvg-apps-ext.hafas.de/bin/ajax-getstop.exe',
-		mgate       => 'https://bvg-apps-ext.hafas.de/bin/mgate.exe',
-		name        => 'Berliner Verkehrsbetriebe',
-		productbits => [qw[s u tram bus]],
-		languages   => [qw[de en]],
-		request     => {
-			client => {
-				type => 'WEB',
-				id   => 'VBB',
-				v    => 10002,
-				name => 'webapp',
-				l    => 'vs_webapp',
-			},
-			ext  => 'BVG.1',
-			ver  => '1.72',
-			auth => {
-				type => 'AID',
-				aid  => 'dVg4TZbW8anjx9z' . 'tPwe2uk4LVRi9wO',
-			},
-			lang => 'deu',
-		},
-	},
-	CMTA => {
-		stopfinder  => 'https://capmetro.hafas.cloud/bin/ajax-getstop.exe',
-		mgate       => 'https://capmetro.hafas.cloud/bin/mgate.exe',
-		name        => 'Capital Metropolitan Transportation Authority',
-		time_zone   => 'America/Chicago',
-		productbits => [
-			[ _     => undef ],
-			[ _     => undef ],
-			[ _     => undef ],
-			[ regio => 'MetroRail' ],
-			[ _     => undef ],
-			[ bus   => 'MetroBus' ],
-			[ _     => undef ],
-			[ _     => undef ],
-			[ _     => undef ],
-			[ _     => undef ],
-			[ _     => undef ],
-			[ _     => undef ],
-			[ rapid => 'MetroRapid' ],
-		],
-		languages => [qw[en]],
-		request   => {
-			client => {
-				id   => 'CMTA',
-				type => 'IPH',
-				name => 'CapMetro',
-				v    => 2,
-			},
-			ver  => '1.40',
-			auth => {
-				type => 'AID',
-				aid  => 'ioslaskd' . 'cndrjcmlsd',
-			},
-			lang => 'en',
-		},
-	},
-	DB => {
-		stopfinder    => 'https://reiseauskunft.bahn.de/bin/ajax-getstop.exe',
-		mgate         => 'https://reiseauskunft.bahn.de/bin/mgate.exe',
-		name          => 'Deutsche Bahn',
-		productbits   => [qw[ice ic_ec d regio s bus ferry u tram ondemand]],
-		productgroups =>
-		  [ [qw[ice ic_ec d]], [qw[regio s]], [qw[bus ferry u tram ondemand]] ],
-		salt      => 'bdI8UVj4' . '0K5fvxwf',
-		languages => [qw[de en fr es]],
-		request   => {
-			client => {
-				id   => 'DB',
-				v    => '20100000',
-				type => 'IPH',
-				name => 'DB Navigator',
-			},
-			ext  => 'DB.R21.12.a',
-			ver  => '1.15',
-			auth => {
-				type => 'AID',
-				aid  => 'n91dB8Z77' . 'MLdoR0K'
-			},
-		},
-	},
-	IE => {
-		stopfinder =>
-		  'https://journeyplanner.irishrail.ie/bin/ajax-getstop.exe',
-		mgate       => 'https://journeyplanner.irishrail.ie/bin/mgate.exe',
-		name        => 'Iarnród Éireann',
-		time_zone   => 'Europe/Dublin',
-		productbits => [
-			[ _     => undef ],
-			[ ic    => 'national trains' ],
-			[ _     => undef ],
-			[ regio => 'regional trains' ],
-			[ dart  => 'DART trains' ],
-			[ _     => undef ],
-			[ luas  => 'LUAS trams' ],
-		],
-		languages => [qw[en ga]],
-		request   => {
-			client => {
-				id   => 'IRISHRAIL',
-				type => 'IPA',
-				name => 'IrishRailPROD-APPSTORE',
-				v    => '4000100',
-				os   => 'iOS 12.4.8',
-			},
-			ver  => '1.33',
-			auth => {
-				type => 'AID',
-				aid  => 'P9bplgVCG' . 'nozdgQE',
-			},
-			lang => 'en',
-		},
-		salt   => 'i5s7m3q9' . 'z6b4k1c2',
-		micmac => 1,
-	},
-	KVB => {
-		mgate       => 'https://auskunft.kvb.koeln/gate',
-		name        => 'Kölner Verkehrs-Betriebe',
-		productbits => [
-			[ s        => 'sub-urban trains' ],
-			[ tram     => 'trams' ],
-			[ _        => undef ],
-			[ bus      => 'buses' ],
-			[ regio    => 'regional trains' ],
-			[ ic       => 'national trains' ],
-			[ _        => undef ],
-			[ _        => undef ],
-			[ ondemand => 'taxi buses' ]
-		],
-		request => {
-			client => {
-				id   => 'HAFAS',
-				type => 'WEB',
-				name => 'webapp',
-				l    => 'vs_webapp',
-				v    => '154',
-			},
-			ver  => '1.58',
-			auth => {
-				type => 'AID',
-				aid  => 'Rt6foY5' . 'zcTTRXMQs',
-			},
-			lang => 'deu',
-		},
-	},
-	NAHSH => {
-		mgate       => 'https://nah.sh.hafas.de/bin/mgate.exe',
-		stopfinder  => 'https://nah.sh.hafas.de/bin/ajax-getstop.exe',
-		name        => 'Nahverkehrsverbund Schleswig-Holstein',
-		productbits => [qw[ice ice ice regio s bus ferry u tram ondemand]],
-		request     => {
-			client => {
-				id   => 'NAHSH',
-				v    => '3000700',
-				type => 'IPH',
-				name => 'NAHSHPROD',
-			},
-			ver  => '1.16',
-			auth => {
-				type => 'AID',
-				aid  => 'r0Ot9FLF' . 'NAFxijLW'
-			},
-		},
-	},
-	NASA => {
-		mgate       => 'https://reiseauskunft.insa.de/bin/mgate.exe',
-		stopfinder  => 'https://reiseauskunft.insa.de/bin/ajax-getstop.exe',
-		name        => 'Nahverkehrsservice Sachsen-Anhalt',
-		productbits => [qw[ice ice regio regio regio tram bus ondemand]],
-		languages   => [qw[de en]],
-		request     => {
-			client => {
-				id   => 'NASA',
-				v    => '4000200',
-				type => 'IPH',
-				name => 'nasaPROD',
-				os   => 'iPhone OS 13.1.2',
-			},
-			ver  => '1.18',
-			auth => {
-				type => 'AID',
-				aid  => 'nasa-' . 'apps',
-			},
-			lang => 'deu',
-		},
-	},
-	NVV => {
-		mgate      => 'https://auskunft.nvv.de/auskunft/bin/app/mgate.exe',
-		stopfinder =>
-		  'https://auskunft.nvv.de/auskunft/bin/jp/ajax-getstop.exe',
-		name        => 'Nordhessischer VerkehrsVerbund',
-		productbits =>
-		  [qw[ice ic_ec regio s u tram bus bus ferry ondemand regio regio]],
-		request => {
-			client => {
-				id   => 'NVV',
-				v    => '5000300',
-				type => 'IPH',
-				name => 'NVVMobilPROD_APPSTORE',
-				os   => 'iOS 13.1.2',
-			},
-			ext  => 'NVV.6.0',
-			ver  => '1.18',
-			auth => {
-				type => 'AID',
-				aid  => 'Kt8eNOH7' . 'qjVeSxNA',
-			},
-			lang => 'deu',
-		},
-	},
-	'ÖBB' => {
-		mgate       => 'https://fahrplan.oebb.at/bin/mgate.exe',
-		stopfinder  => 'https://fahrplan.oebb.at/bin/ajax-getstop.exe',
-		name        => 'Österreichische Bundesbahnen',
-		time_zone   => 'Europe/Vienna',
-		productbits => [
-			[ ice_rj => 'long distance trains' ],
-			[ sev    => 'rail replacement service' ],
-			[ ic_ec  => 'long distance trains' ],
-			[ d_n    => 'night trains and rapid trains' ],
-			[ regio  => 'regional trains' ],
-			[ s      => 'suburban trains' ],
-			[ bus    => 'busses' ],
-			[ ferry  => 'maritime transit' ],
-			[ u      => 'underground' ],
-			[ tram   => 'trams' ],
-			[ other  => 'other transit services' ]
-		],
-		productgroups =>
-		  [ qw[ice_rj ic_ec d_n], qw[regio s sev], qw[bus ferry u tram other] ],
-		request => {
-			client => {
-				id   => 'OEBB',
-				v    => '6030600',
-				type => 'IPH',
-				name => 'oebbPROD-ADHOC',
-			},
-			ver  => '1.57',
-			auth => {
-				type => 'AID',
-				aid  => 'OWDL4fE4' . 'ixNiPBBm',
-			},
-			lang => 'deu',
-		},
-	},
-	VBB => {
-		mgate       => 'https://fahrinfo.vbb.de/bin/mgate.exe',
-		stopfinder  => 'https://fahrinfo.vbb.de/bin/ajax-getstop.exe',
-		name        => 'Verkehrsverbund Berlin-Brandenburg',
-		productbits => [qw[s u tram bus ferry ice regio]],
-		languages   => [qw[de en]],
-		request     => {
-			client => {
-				id   => 'VBB',
-				type => 'WEB',
-				name => 'VBB WebApp',
-				l    => 'vs_webapp_vbb',
-			},
-			ext  => 'VBB.1',
-			ver  => '1.33',
-			auth => {
-				type => 'AID',
-				aid  => 'hafas-vb' . 'b-webapp',
-			},
-			lang => 'deu',
-		},
-	},
-	VBN => {
-		mgate       => 'https://fahrplaner.vbn.de/bin/mgate.exe',
-		stopfinder  => 'https://fahrplaner.vbn.de/hafas/ajax-getstop.exe',
-		name        => 'Verkehrsverbund Bremen/Niedersachsen',
-		productbits => [qw[ice ice regio regio s bus ferry u tram ondemand]],
-		salt        => 'SP31mBu' . 'fSyCLmNxp',
-		micmac      => 1,
-		languages   => [qw[de en]],
-		request     => {
-			client => {
-				id   => 'VBN',
-				v    => '6000000',
-				type => 'IPH',
-				name => 'vbn',
-			},
-			ver  => '1.42',
-			auth => {
-				type => 'AID',
-				aid  => 'kaoxIXLn' . '03zCr2KR',
-			},
-			lang => 'deu',
-		},
-	},
-	VOS => {
-		stopfinder  => 'https://fahrplan.vos.info/bin/ajax-getstop.exe',
-		mgate       => 'https://fahrplan.vos.info/bin/mgate.exe',
-		name        => 'Verkehrsgemeinschaft Osnabrück',
-		productbits => [qw[ice ic_ec d regio s bus ferry u tram ondemand]],
-		languages   => [qw[de]],
-		request     => {
-			client => {
-				id   => 'SWO',
-				type => 'WEB',
-				name => 'webapp',
-				l    => 'vs_swo',
-			},
-			ver  => '1.72',
-			auth => {
-				type => 'AID',
-				aid  => 'PnYowCQ' . 'P7Tp1V'
-			},
-			lang => 'deu',
-		},
-	},
-);
+# Data sources: <https://github.com/public-transport/transport-apis> and
+# <https://github.com/public-transport/hafas-client/tree/main/p>. Thanks to
+# Jannis R / @derhuerst and all contributors for maintaining these.
+my $hafas_instance = Travel::Status::DE::HAFAS::Services::get_service_ref();
 
 # }}}
 # {{{ Constructors
@@ -477,11 +64,11 @@ sub new {
 		$service = $conf{service} = 'DB';
 	}
 
-	if ( defined $service and not exists $hafas_instance{$service} ) {
+	if ( defined $service and not exists $hafas_instance->{$service} ) {
 		confess("The service '$service' is not supported");
 	}
 
-	my $now = DateTime->now( time_zone => $hafas_instance{$service}{time_zone}
+	my $now = DateTime->now( time_zone => $hafas_instance->{$service}{time_zone}
 		  // 'Europe/Berlin' );
 	my $self = {
 		active_service => $service,
@@ -514,7 +101,7 @@ sub new {
 					},
 				}
 			],
-			%{ $hafas_instance{$service}{request} }
+			%{ $hafas_instance->{$service}{request} }
 		};
 	}
 	elsif ( $conf{journeyMatch} ) {
@@ -535,7 +122,7 @@ sub new {
 					},
 				}
 			],
-			%{ $hafas_instance{$service}{request} }
+			%{ $hafas_instance->{$service}{request} }
 		};
 	}
 	elsif ( $conf{geoSearch} ) {
@@ -566,7 +153,7 @@ sub new {
 					}
 				}
 			],
-			%{ $hafas_instance{$service}{request} }
+			%{ $hafas_instance->{$service}{request} }
 		};
 	}
 	elsif ( $conf{locationSearch} ) {
@@ -587,7 +174,7 @@ sub new {
 					}
 				}
 			],
-			%{ $hafas_instance{$service}{request} }
+			%{ $hafas_instance->{$service}{request} }
 		};
 	}
 	else {
@@ -627,7 +214,7 @@ sub new {
 					},
 				},
 			],
-			%{ $hafas_instance{$service}{request} }
+			%{ $hafas_instance->{$service}{request} }
 		};
 	}
 
@@ -637,7 +224,7 @@ sub new {
 
 	$self->{strptime_obj} //= DateTime::Format::Strptime->new(
 		pattern   => '%Y%m%dT%H%M%S',
-		time_zone => $hafas_instance{$service}{time_zone} // 'Europe/Berlin',
+		time_zone => $hafas_instance->{$service}{time_zone} // 'Europe/Berlin',
 	);
 
 	my $json = $self->{json} = JSON->new->utf8;
@@ -651,10 +238,10 @@ sub new {
 	$req = $json->encode($req);
 	$self->{post} = $req;
 
-	my $url = $conf{url} // $hafas_instance{$service}{mgate};
+	my $url = $conf{url} // $hafas_instance->{$service}{mgate};
 
-	if ( my $salt = $hafas_instance{$service}{salt} ) {
-		if ( $hafas_instance{$service}{micmac} ) {
+	if ( my $salt = $hafas_instance->{$service}{salt} ) {
+		if ( $hafas_instance->{$service}{micmac} ) {
 			my $mic = md5_hex( $self->{post} );
 			my $mac = md5_hex( $mic . $salt );
 			$url .= "?mic=$mic&mac=$mac";
@@ -772,15 +359,15 @@ sub mot_mask {
 	my ($self) = @_;
 
 	my $service  = $self->{active_service};
-	my $mot_mask = 2**@{ $hafas_instance{$service}{productbits} } - 1;
+	my $mot_mask = 2**@{ $hafas_instance->{$service}{productbits} } - 1;
 
 	my %mot_pos;
-	for my $i ( 0 .. $#{ $hafas_instance{$service}{productbits} } ) {
-		if ( ref( $hafas_instance{$service}{productbits}[$i] ) eq 'ARRAY' ) {
-			$mot_pos{ $hafas_instance{$service}{productbits}[$i][0] } = $i;
+	for my $i ( 0 .. $#{ $hafas_instance->{$service}{productbits} } ) {
+		if ( ref( $hafas_instance->{$service}{productbits}[$i] ) eq 'ARRAY' ) {
+			$mot_pos{ $hafas_instance->{$service}{productbits}[$i][0] } = $i;
 		}
 		else {
-			$mot_pos{ $hafas_instance{$service}{productbits}[$i] } = $i;
+			$mot_pos{ $hafas_instance->{$service}{productbits}[$i] } = $i;
 		}
 	}
 
@@ -1129,10 +716,10 @@ sub similar_stops {
 
 	my $service = $self->{active_service};
 
-	if ( $service and exists $hafas_instance{$service}{stopfinder} ) {
+	if ( $service and exists $hafas_instance->{$service}{stopfinder} ) {
 
 		my $sf = Travel::Status::DE::HAFAS::StopFinder->new(
-			url            => $hafas_instance{$service}{stopfinder},
+			url            => $hafas_instance->{$service}{stopfinder},
 			input          => $self->{station},
 			ua             => $self->{ua},
 			developer_mode => $self->{developer_mode},
@@ -1151,11 +738,11 @@ sub similar_stops_p {
 
 	my $service = $self->{active_service};
 
-	if ( $service and exists $hafas_instance{$service}{stopfinder} ) {
+	if ( $service and exists $hafas_instance->{$service}{stopfinder} ) {
 		$opt{user_agent} //= $self->{ua};
 		$opt{promise}    //= $self->{promise};
 		return Travel::Status::DE::HAFAS::StopFinder->new_p(
-			url            => $hafas_instance{$service}{stopfinder},
+			url            => $hafas_instance->{$service}{stopfinder},
 			input          => $self->{station},
 			user_agent     => $opt{user_agent},
 			developer_mode => $self->{developer_mode},
@@ -1237,8 +824,8 @@ sub result {
 # static
 sub get_services {
 	my @services;
-	for my $service ( sort keys %hafas_instance ) {
-		my %desc = %{ $hafas_instance{$service} };
+	for my $service ( sort keys %{$hafas_instance} ) {
+		my %desc = %{ $hafas_instance->{$service} };
 		$desc{shortname} = $service;
 		push( @services, \%desc );
 	}
@@ -1249,8 +836,8 @@ sub get_services {
 sub get_service {
 	my ($service) = @_;
 
-	if ( defined $service and exists $hafas_instance{$service} ) {
-		return $hafas_instance{$service};
+	if ( defined $service and exists $hafas_instance->{$service} ) {
+		return $hafas_instance->{$service};
 	}
 	return;
 }
@@ -1259,7 +846,7 @@ sub get_active_service {
 	my ($self) = @_;
 
 	if ( defined $self->{active_service} ) {
-		return $hafas_instance{ $self->{active_service} };
+		return $hafas_instance->{ $self->{active_service} };
 	}
 	return;
 }

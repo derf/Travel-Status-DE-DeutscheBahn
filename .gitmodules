@@ -1,0 +1,3 @@
+[submodule "ext/transport-apis"]
+	path = ext/transport-apis
+	url = https://github.com/public-transport/transport-apis.git
