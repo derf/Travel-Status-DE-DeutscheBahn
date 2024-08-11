@@ -33,6 +33,22 @@ sub load_instance {
 		#}
 	);
 
+	my %bitmask_to_product;
+	for my $product ( @{ $data->{options}{products} // [] } ) {
+		for my $bitmask ( @{ $product->{bitmasks} // [] } ) {
+			$bitmask_to_product{$bitmask} = $product;
+		}
+	}
+
+	for my $bit ( 0 .. 15 ) {
+		if ( my $p = $bitmask_to_product{ 2**$bit } ) {
+			push( @{ $ret{productbits} }, [ $p->{id}, $p->{name} ] );
+		}
+		else {
+			push( @{ $ret{productbits} }, [ "_", undef ] );
+		}
+	}
+
 	if ( $opt{lang} ) {
 		$ret{request}{lang} = $opt{lang};
 	}
@@ -57,20 +73,7 @@ my %hafas_instance = (
 			lang => 'deu',
 			ver  => '1.26'
 		),
-		stopfinder  => 'https://auskunft.avv.de/bin/ajax-getstop.exe',
-		productbits => [
-			[ regio    => 'regional trains' ],
-			[ ic_ec    => 'long distance trains' ],
-			[ ice      => 'long distance trains' ],
-			[ bus      => 'long distance busses' ],
-			[ s        => 'sububrban trains' ],
-			[ u        => 'underground trains' ],
-			[ tram     => 'trams' ],
-			[ bus      => 'busses' ],
-			[ bus      => 'additional busses' ],
-			[ ondemand => 'on-demand services' ],
-			[ ferry    => 'maritime transit' ]
-		],
+		stopfinder => 'https://auskunft.avv.de/bin/ajax-getstop.exe',
 	},
 	BART => {
 		load_instance(
@@ -78,18 +81,7 @@ my %hafas_instance = (
 			lang => 'en',
 			ver  => '1.40'
 		),
-		stopfinder  => 'https://planner.bart.gov/bin/ajax-getstop.exe',
-		productbits => [
-			[ _     => undef ],
-			[ _     => undef ],
-			[ cc    => 'cable cars' ],
-			[ regio => 'regional trains' ],
-			[ _     => undef ],
-			[ bus   => 'busses' ],
-			[ ferry => 'maritime transit' ],
-			[ bart  => 'BART trains' ],
-			[ tram  => 'trams' ],
-		],
+		stopfinder => 'https://planner.bart.gov/bin/ajax-getstop.exe',
 	},
 	BLS => {
 		load_instance(
@@ -97,28 +89,12 @@ my %hafas_instance = (
 			lang => 'deu',
 			ver  => '1.46'
 		),
-		languages   => [qw[de fr it en]],
-		stopfinder  => 'https://bls.hafas.de/bin/ajax-stopfinder.exe',
-		productbits => [
-			[ ice   => 'long distance trains' ],
-			[ ic_ec => 'long distance trains' ],
-			[ ir    => 'inter-regio trains' ],
-			[ regio => 'regional trains' ],
-			[ ferry => 'maritime transit' ],
-			[ s     => 'suburban trains' ],
-			[ bus   => 'busses' ],
-			[ fun   => 'funicular / gondola' ],
-			[ _     => undef ],
-			[ tram  => 'trams' ],
-			[ _     => undef ],
-			[ _     => undef ],
-			[ car   => 'Autoverlad' ]
-		],
+		languages  => [qw[de fr it en]],
+		stopfinder => 'https://bls.hafas.de/bin/ajax-stopfinder.exe',
 	},
 	BVG => {
 		load_instance( 'de/bvg', lang => 'deu' ),
-		stopfinder  => 'https://bvg-apps-ext.hafas.de/bin/ajax-getstop.exe',
-		productbits => [qw[s u tram bus]],
+		stopfinder => 'https://bvg-apps-ext.hafas.de/bin/ajax-getstop.exe',
 	},
 	CMTA => {
 		load_instance(
@@ -126,32 +102,14 @@ my %hafas_instance = (
 			lang => 'en',
 			ver  => '1.40'
 		),
-		stopfinder  => 'https://capmetro.hafas.cloud/bin/ajax-getstop.exe',
-		productbits => [
-			[ _     => undef ],
-			[ _     => undef ],
-			[ _     => undef ],
-			[ regio => 'MetroRail' ],
-			[ _     => undef ],
-			[ bus   => 'MetroBus' ],
-			[ _     => undef ],
-			[ _     => undef ],
-			[ _     => undef ],
-			[ _     => undef ],
-			[ _     => undef ],
-			[ _     => undef ],
-			[ rapid => 'MetroRapid' ],
-		],
+		stopfinder => 'https://capmetro.hafas.cloud/bin/ajax-getstop.exe',
 	},
 	DB => {
 		load_instance('de/db'),
-		stopfinder    => 'https://reiseauskunft.bahn.de/bin/ajax-getstop.exe',
-		productbits   => [qw[ice ic_ec d regio s bus ferry u tram ondemand]],
-		productgroups =>
-		  [ [qw[ice ic_ec d]], [qw[regio s]], [qw[bus ferry u tram ondemand]] ],
-		salt      => 'bdI8UVj40K5fvxwf',
-		languages => [qw[de en fr es]],
-		request   => {
+		stopfinder => 'https://reiseauskunft.bahn.de/bin/ajax-getstop.exe',
+		salt       => 'bdI8UVj40K5fvxwf',
+		languages  => [qw[de en fr es]],
+		request    => {
 			client => {
 				id   => 'DB',
 				v    => '20100000',
@@ -175,48 +133,22 @@ my %hafas_instance = (
 		),
 		stopfinder =>
 		  'https://journeyplanner.irishrail.ie/bin/ajax-getstop.exe',
-		productbits => [
-			[ _     => undef ],
-			[ ic    => 'national trains' ],
-			[ _     => undef ],
-			[ regio => 'regional trains' ],
-			[ dart  => 'DART trains' ],
-			[ _     => undef ],
-			[ luas  => 'LUAS trams' ],
-		],
 		salt   => 'i5s7m3q9z6b4k1c2',
 		micmac => 1,
 	},
-	KVB => {
-		load_instance( 'de/kvb', lang => 'deu' ),
-		productbits => [
-			[ s        => 'sub-urban trains' ],
-			[ tram     => 'trams' ],
-			[ _        => undef ],
-			[ bus      => 'buses' ],
-			[ regio    => 'regional trains' ],
-			[ ic       => 'national trains' ],
-			[ _        => undef ],
-			[ _        => undef ],
-			[ ondemand => 'taxi buses' ]
-		],
-	},
+	KVB   => { load_instance( 'de/kvb', lang => 'deu' ), },
 	NAHSH => {
 		load_instance('de/nahsh'),
-		stopfinder  => 'https://nah.sh.hafas.de/bin/ajax-getstop.exe',
-		productbits => [qw[ice ice ice regio s bus ferry u tram ondemand]],
+		stopfinder => 'https://nah.sh.hafas.de/bin/ajax-getstop.exe',
 	},
 	NASA => {
 		load_instance( 'de/nasa', lang => 'deu' ),
-		stopfinder  => 'https://reiseauskunft.insa.de/bin/ajax-getstop.exe',
-		productbits => [qw[ice ice regio regio regio tram bus ondemand]],
+		stopfinder => 'https://reiseauskunft.insa.de/bin/ajax-getstop.exe',
 	},
 	NVV => {
 		load_instance( 'de/nvv', lang => 'deu' ),
 		stopfinder =>
 		  'https://auskunft.nvv.de/auskunft/bin/jp/ajax-getstop.exe',
-		productbits =>
-		  [qw[ice ic_ec regio s u tram bus bus ferry ondemand regio regio]],
 	},
 	'ÖBB' => {
 		load_instance(
@@ -224,27 +156,11 @@ my %hafas_instance = (
 			lang => 'deu',
 			ver  => '1.57'
 		),
-		stopfinder  => 'https://fahrplan.oebb.at/bin/ajax-getstop.exe',
-		productbits => [
-			[ ice_rj => 'long distance trains' ],
-			[ sev    => 'rail replacement service' ],
-			[ ic_ec  => 'long distance trains' ],
-			[ d_n    => 'night trains and rapid trains' ],
-			[ regio  => 'regional trains' ],
-			[ s      => 'suburban trains' ],
-			[ bus    => 'busses' ],
-			[ ferry  => 'maritime transit' ],
-			[ u      => 'underground' ],
-			[ tram   => 'trams' ],
-			[ other  => 'other transit services' ]
-		],
-		productgroups =>
-		  [ qw[ice_rj ic_ec d_n], qw[regio s sev], qw[bus ferry u tram other] ],
+		stopfinder => 'https://fahrplan.oebb.at/bin/ajax-getstop.exe',
 	},
 	VBB => {
 		load_instance( 'de/vbb', lang => 'deu' ),
-		stopfinder  => 'https://fahrinfo.vbb.de/bin/ajax-getstop.exe',
-		productbits => [qw[s u tram bus ferry ice regio]],
+		stopfinder => 'https://fahrinfo.vbb.de/bin/ajax-getstop.exe',
 	},
 	VBN => {
 		load_instance(
@@ -252,10 +168,9 @@ my %hafas_instance = (
 			lang => 'deu',
 			ver  => '1.42'
 		),
-		stopfinder  => 'https://fahrplaner.vbn.de/hafas/ajax-getstop.exe',
-		productbits => [qw[ice ice regio regio s bus ferry u tram ondemand]],
-		salt        => 'SP31mBufSyCLmNxp',
-		micmac      => 1,
+		stopfinder => 'https://fahrplaner.vbn.de/hafas/ajax-getstop.exe',
+		salt       => 'SP31mBufSyCLmNxp',
+		micmac     => 1,
 	},
 	VOS => {
 		load_instance(
@@ -263,8 +178,7 @@ my %hafas_instance = (
 			lang => 'deu',
 			ver  => '1.72'
 		),
-		stopfinder  => 'https://fahrplan.vos.info/bin/ajax-getstop.exe',
-		productbits => [qw[ice ic_ec d regio s bus ferry u tram ondemand]],
+		stopfinder => 'https://fahrplan.vos.info/bin/ajax-getstop.exe',
 	},
 );
 
