@@ -53,18 +53,18 @@ sub load_instance {
 		}
 	}
 
-	if ( $opt{lang} ) {
-		$ret{request}{lang} = $opt{lang};
-	}
-	if ( $opt{ver} ) {
-		$ret{request}{ver} = $opt{ver};
-	}
-
 	if ( $data->{options}{ext} ) {
 		$ret{request}{ext} = $data->{options}{ext};
 	}
 	if ( $data->{options}{ver} ) {
 		$ret{request}{ver} = $data->{options}{ver};
+	}
+
+	if ( $opt{lang} ) {
+		$ret{request}{lang} = $opt{lang};
+	}
+	if ( $opt{ver} ) {
+		$ret{request}{ver} = $opt{ver};
 	}
 
 	return %ret;
