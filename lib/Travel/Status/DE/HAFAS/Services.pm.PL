@@ -207,7 +207,7 @@ our $VERSION = '6.04';
 
 __EOF__
 
-$buf .= 'my ' . $perlobj->Sortkeys(1)->Indent(1)->Dump;
+$buf .= 'my ' . $perlobj->Sortkeys(1)->Indent(0)->Dump;
 
 $buf =~ s{\Q\x{d6}\E}{Ö}g;
 $buf =~ s{\Q\x{c9}\E}{É}g;
