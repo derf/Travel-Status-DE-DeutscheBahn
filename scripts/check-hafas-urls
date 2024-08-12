@@ -6,6 +6,7 @@ checks="AVV Ponttor, AC
 BART San Francisco International Airport, San Mateo
 BLS Bern
 BVG 900003104
+CMTA 6397
 DB Berlin Jannowitzbrücke
 IE Dublin
 KVB 900000802
@@ -13,8 +14,13 @@ NAHSH Flensburg
 NASA Wernigerode Hbf
 NVV Kassel Hauptbahnhof
 ÖBB Wien Meidling
+RMV Mainz Hauptbahnhof
+STV Graz
 VBB S+U Jannowitzbrücke (Berlin)
-VBN Diepholz"
+VBN Diepholz
+VMT Nordhausen
+VOS Osnabrück Neumarkt
+VRN Kaiserslautern Hbf"
 
 echo $checks | while read service stop; do
         echo -n "${service} ... "
