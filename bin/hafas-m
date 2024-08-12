@@ -658,11 +658,11 @@ if ($offset_len) {
 
 for my $m ( $status->messages ) {
 	if ( $m->ref_count > 0 and $m->{show} ) {
-		if ( $m->short ) {
+		if ( $m->short and $m->text ) {
 			printf( "\n# (%d) %s\n# %s\n", $m->{id}, $m->short, $m->text );
 		}
-		else {
-			printf( "\n# (%d) %s\n", $m->{id}, $m->text );
+		elsif ( $m->short or $m->text ) {
+			printf( "\n# (%d) %s\n", $m->{id}, $m->text || $m->short );
 		}
 	}
 }
