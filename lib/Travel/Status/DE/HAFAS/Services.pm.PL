@@ -167,9 +167,10 @@ my %hafas_instance = (
 		),
 		stopfinder => 'https://fahrplan.oebb.at/bin/ajax-getstop.exe',
 	},
-	RMV => { load_instance( 'de/rmv', lang => 'deu' ), },
-	STV => { load_instance( 'at/stv', lang => 'deu', ver => '1.32' ), },
-	VBB => {
+	RMV  => { load_instance( 'de/rmv',  lang => 'deu' ), },
+	RSAG => { load_instance( 'de/rsag', lang => 'deu' ), },
+	STV  => { load_instance( 'at/stv',  lang => 'deu', ver => '1.32' ), },
+	VBB  => {
 		load_instance( 'de/vbb', lang => 'deu' ),
 		stopfinder => 'https://fahrinfo.vbb.de/bin/ajax-getstop.exe',
 	},
