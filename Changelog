@@ -1,3 +1,8 @@
+Travel::Status::DE::DeutscheBahn 6.07 - Mon Aug 12 2024
+
+    * HAFAS: Fix enum error in ÖBB service
+    * HAFAS: Add RSAG service definition
+
 Travel::Status::DE::DeutscheBahn 6.06 - Sun Aug 11 2024
 
     * HAFAS: Remove undocumented Math::Polygon dependency that was accidentally
