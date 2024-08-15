@@ -171,6 +171,7 @@ my %hafas_instance = (
 	RMV  => { load_instance( 'de/rmv',  lang => 'deu' ), },
 	RSAG => { load_instance( 'de/rsag', lang => 'deu' ), },
 	STV  => { load_instance( 'at/stv',  lang => 'deu', ver => '1.32' ), },
+	TPG  => { load_instance( 'ch/tpg',  lang => 'deu', ver => '1.40' ), },
 	VBB  => {
 		load_instance( 'de/vbb', lang => 'deu' ),
 		stopfinder => 'https://fahrinfo.vbb.de/bin/ajax-getstop.exe',
