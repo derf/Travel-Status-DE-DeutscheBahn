@@ -134,7 +134,8 @@ my %hafas_instance = (
 			lang => 'deu'
 		},
 	},
-	IE => {
+	DSB => { load_instance( 'dk/rejseplanen', lang => 'deu' ), },
+	IE  => {
 		load_instance(
 			'ie/iarnrod-eireann',
 			lang => 'en',
