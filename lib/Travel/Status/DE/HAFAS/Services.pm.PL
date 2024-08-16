@@ -46,7 +46,12 @@ sub load_instance {
 			for ( 1 .. $skipped ) {
 				push( @{ $ret{productbits} }, [ "_", undef ] );
 			}
-			push( @{ $ret{productbits} }, [ $p->{id}, $p->{name} ] );
+			if ( $p->{name} ) {
+				push( @{ $ret{productbits} }, [ $p->{id}, $p->{name} ] );
+			}
+			else {
+				push( @{ $ret{productbits} }, $p->{id} );
+			}
 		}
 		else {
 			$skipped += 1;
