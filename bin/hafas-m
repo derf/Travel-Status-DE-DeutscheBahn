@@ -413,8 +413,15 @@ elsif ( $opt{journey} ) {
 	if ( $result->line_no ) {
 		printf( " / Linie %s", $result->line_no );
 	}
-	printf( "\nFahrt %s am %s\n",
-		$result->id, ( $result->route )[0]->sched_dep->strftime('%d.%m.%Y') );
+
+	if ( $result->route ) {
+		printf( "\nFahrt %s am %s\n",
+			$result->id,
+			( $result->route )[0]->sched_dep->strftime('%d.%m.%Y') );
+	}
+	else {
+		printf( "\nFahrt %s\n", $result->id );
+	}
 
 	my $delay_len     = 0;
 	my $delay_fmt     = 0;
@@ -454,7 +461,7 @@ elsif ( $opt{journey} ) {
 	my $now
 	  = DateTime->now( time_zone => $desc->{time_zone} // 'Europe/Berlin' );
 	my $mark_stop = 0;
-	for my $i ( reverse 1 .. scalar $result->route ) {
+	for my $i ( reverse 1 .. ( scalar $result->route // 0 ) ) {
 		my $stop = ( $result->route )[ $i - 1 ];
 		if ( not $stop->dep_cancelled and $stop->dep and $now <= $stop->dep ) {
 			$mark_stop = $stop;
@@ -468,6 +475,11 @@ elsif ( $opt{journey} ) {
 	my $message_id = 1;
 
 	print "\n";
+
+	if ( not $result->route ) {
+		say 'Route unknown: this backend does not provide intermediate stops';
+	}
+
 	for my $stop ( $result->route ) {
 		my $msg_line = q{};
 		for my $message ( $stop->messages ) {
