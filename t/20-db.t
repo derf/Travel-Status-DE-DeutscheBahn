@@ -12,7 +12,7 @@ use Test::More tests => 106;
 use Travel::Status::DE::HAFAS;
 
 my $json
-  = JSON->new->utf8->decode( read_file('t/in/DB.Berlin Jannowitzbrücke.json') );
+  = JSON->new->utf8->decode( read_file('t/in/DB.Berlin Jannowitzbruecke.json') );
 
 my $status = Travel::Status::DE::HAFAS->new(
 	service => 'DB',
