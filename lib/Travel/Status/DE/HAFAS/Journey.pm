@@ -158,7 +158,7 @@ sub new {
 		}
 		$ref->{is_additional} = $journey->{stbStop}{isAdd};
 	}
-	elsif ( $stops[0]{loc} ) {
+	elsif ( $stops[0] and $stops[0]{loc} ) {
 		$ref->{route_start} = $stops[0]{loc}->name;
 	}
 
@@ -307,7 +307,7 @@ sub polyline {
 sub route {
 	my ($self) = @_;
 
-	if ( $self->{route} ) {
+	if ( $self->{route} and @{ $self->{route} } ) {
 		if ( $self->{route}[0] and $self->{route}[0]{stop} ) {
 			$self->{route}
 			  = [ map { Travel::Status::DE::HAFAS::Stop->new( %{$_} ) }
