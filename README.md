@@ -134,6 +134,7 @@ sudo ./Build install
 If you are using the Git repository, use the following commands:
 
 ```
+git submodule update --init
 ./Build
 ./Build manifest
 ./Build test
