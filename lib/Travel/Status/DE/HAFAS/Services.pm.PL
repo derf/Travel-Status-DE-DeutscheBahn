@@ -26,8 +26,10 @@ sub load_instance {
 			client => $data->{options}{client},
 			auth   => $data->{options}{auth},
 		},
-		coverage =>
-		  { regions => $data->{coverage}{realtimeCoverage}{region} // [] },
+		coverage => {
+		  area => $data->{coverage}{realtimeCoverage}{area},
+		  regions => $data->{coverage}{realtimeCoverage}{region} // []
+		 },
 
 		#coverage => {
 		#	area => $data->{coverage}{realtimeCoverage}{area},
