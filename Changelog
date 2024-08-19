@@ -1,3 +1,10 @@
+Travel::Status::DE::DeutscheBahn 6.09 - Mon Aug 19 2024
+
+    * Improve handling of services which do not provide intermediate stops
+    * HAFAS: Add Resrobot service definition
+    * HAFAS: get_service et al.: return coverage data provided by
+      transport-apis, if available
+
 Travel::Status::DE::DeutscheBahn 6.08 - Thu Aug 15 2024
 
     * HAFAS: Add DSB (Rejseplanen), TPG and ZVV service definitions
