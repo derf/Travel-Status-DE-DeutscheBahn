@@ -1124,17 +1124,28 @@ nothing otherwise. The hashref contains the following keys.
 
 =over
 
-=item B<name> => I<string>
+=item B<coverage> => I<hashref>
 
-service name, e.g. Bay Area Rapid Transit or Deutsche Bahn.
+Area in which the service provides near-optimal coverage. Typically, this means
+a (nearly) complete list of departures and real-time data. The hashref contains
+two optional keys: B<area> (GeoJSON) and B<regions> (list of strings, e.g. "DE"
+or "CH-BE").
 
-=item B<mgate> => I<string>
+=item B<homepage> => I<string>
 
-HAFAS backend URL
+Homepage URL of the service provider.
 
 =item B<languages> => I<arrayref>
 
 Languages supported by the backend; see the constructor's B<language> argument.
+
+=item B<name> => I<string>
+
+Service name, e.g. Bay Area Rapid Transit or Deutsche Bahn.
+
+=item B<mgate> => I<string>
+
+HAFAS backend URL
 
 =item B<productbits> => I<arrayref>
 
