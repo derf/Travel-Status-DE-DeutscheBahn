@@ -376,6 +376,9 @@ sub mot_mask {
 			if ( exists $mot_pos{$mot} ) {
 				$mot_mask |= 1 << $mot_pos{$mot};
 			}
+			elsif ( $mot =~ m{ ^ \d+ $ }x ) {
+				$mot_mask |= 1 << $mot;
+			}
 		}
 	}
 
@@ -383,6 +386,9 @@ sub mot_mask {
 		for my $mot (@mots) {
 			if ( exists $mot_pos{$mot} ) {
 				$mot_mask &= ~( 1 << $mot_pos{$mot} );
+			}
+			elsif ( $mot =~ m{ ^ \d+ $ }x ) {
+				$mot_mask &= ~( 1 << $mot );
 			}
 		}
 	}
