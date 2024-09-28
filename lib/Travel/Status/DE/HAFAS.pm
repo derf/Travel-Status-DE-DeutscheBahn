@@ -401,7 +401,7 @@ sub post_with_cache {
 	my $cache = $self->{cache};
 
 	if ( $self->{developer_mode} ) {
-		say "POST $url";
+		say "POST $url $self->{post}";
 	}
 
 	if ($cache) {
