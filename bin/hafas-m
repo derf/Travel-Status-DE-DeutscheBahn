@@ -21,6 +21,8 @@ my $num_results = 30;
 my $types       = q{};
 my $developer_mode;
 my $via;
+my $use_cache = 1;
+my $cache;
 my ( $json_output,   $raw_json_output );
 my ( $list_services, $service );
 my ( @excluded_mots, @exclusive_mots );
@@ -47,6 +49,7 @@ GetOptions(
 	't|time=s'        => \$time,
 	'v|via=s'         => \$via,
 	'V|version'       => \&show_version,
+	'cache!'          => \$use_cache,
 	'devmode'         => \$developer_mode,
 	'json'            => \$json_output,
 	'raw-json'        => \$raw_json_output,
@@ -71,9 +74,26 @@ if ($list_services) {
 	exit 0;
 }
 
+if ($use_cache) {
+	my $cache_path = ( $ENV{XDG_CACHE_HOME} // "$ENV{HOME}/.cache" )
+	  . '/Travel-Status-DE-HAFAS';
+	eval {
+		require Cache::File;
+		$cache = Cache::File->new(
+			cache_root      => $cache_path,
+			default_expires => '90 seconds',
+			lock_level      => Cache::File::LOCK_LOCAL(),
+		);
+	};
+	if ($@) {
+		$cache = undef;
+	}
+}
+
 parse_mot_options();
 
 my %opt = (
+	cache          => $cache,
 	excluded_mots  => \@excluded_mots,
 	exclusive_mots => \@exclusive_mots,
 	station        => shift || show_help(1),
@@ -803,6 +823,13 @@ The I<mot> types depend on the used service. Use C<< -m help >> to list them.
 =item B<-n>, B<--num-results> I<count>
 
 Request up to I<count> results. Default: 30.
+
+=item B<--no-cache>
+
+If the Cache::File module is available, server replies are cached in
+F<~/.cache/Travel-Status-DE-HAFAS> (or a path relative to C<$XDG_CACHE_HOME>,
+if set) for 90 seconds. Use this option to disable caching. You can also use
+B<--cache> to re-enable it.
 
 =item B<--raw-json>
 
