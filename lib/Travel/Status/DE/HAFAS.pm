@@ -178,7 +178,7 @@ sub new {
 	}
 	else {
 		my $date = ( $conf{datetime} // $now )->strftime('%Y%m%d');
-		my $time = ( $conf{datetime} // $now )->strftime('%H%M%S');
+		my $time = ( $conf{datetime} // $now )->strftime('%H%M00');
 
 		my $lid;
 		if ( $self->{station} =~ m{ ^ [0-9]+ $ }x ) {
