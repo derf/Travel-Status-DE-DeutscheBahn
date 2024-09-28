@@ -1,3 +1,8 @@
+Travel::Status::DE::DeutscheBahn 6.10 - Sat Sep 28 2024
+
+    * HAFAS: Hardcode request seconds to 00 to improve caching
+    * hafas-m: Cache backend replies by default (if Cache::File is available)
+
 Travel::Status::DE::DeutscheBahn 6.09 - Mon Aug 19 2024
 
     * Improve handling of services which do not provide intermediate stops

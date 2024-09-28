@@ -230,7 +230,7 @@ use warnings;
 use 5.014;
 use utf8;
 
-our $VERSION = '6.09';
+our $VERSION = '6.10';
 
 # Most of these have been adapted from
 # <https://github.com/public-transport/transport-apis> and
