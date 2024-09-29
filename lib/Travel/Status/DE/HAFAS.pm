@@ -430,7 +430,6 @@ sub post_with_cache {
 	my $content = $reply->content;
 
 	if ($cache) {
-		say "freeeez";
 		$cache->freeze( $self->{post}, \$content );
 	}
 
