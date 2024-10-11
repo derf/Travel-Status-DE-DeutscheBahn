@@ -1,3 +1,7 @@
+Travel::Status::DE::DeutscheBahn 6.11 - Fri Oct 11 2024
+
+    * HAFAS: Add mobiliteit service definition
+
 Travel::Status::DE::DeutscheBahn 6.10 - Sat Sep 28 2024
 
     * HAFAS: Hardcode request seconds to 00 to improve caching
