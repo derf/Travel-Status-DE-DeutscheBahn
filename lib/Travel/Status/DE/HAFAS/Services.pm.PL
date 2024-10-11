@@ -154,6 +154,7 @@ my %hafas_instance = (
 		micmac => 1,
 	},
 	KVB   => { load_instance( 'de/kvb', lang => 'deu' ), },
+	mobiliteit => { load_instance( 'lu/mobiliteit-lu', lang => 'deu' ) },
 	NAHSH => {
 		load_instance('de/nahsh'),
 		stopfinder => 'https://nah.sh.hafas.de/bin/ajax-getstop.exe',
