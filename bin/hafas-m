@@ -723,7 +723,9 @@ version 6.10
 hafas-m is an interface to HAFAS public transport services such as the one
 operated by Deutsche Bahn.
 
-It has four operating modes that depend on the contents of its argument.
+It can serve as an arrival/departure monitor, request details about a specific
+trip/journey, and look up public transport stops by name or geolocation.
+The operating mode depends on the contents of its non-option argument.
 
 =head2 Arrival/Departure Monitor (I<station>)
 
@@ -765,8 +767,9 @@ Otherwise, list all journey IDs that match I<query>.
 
 =head2 Trip Details (I<journeyID>)
 
-List intermediate stops of I<journeyID> with arrival/departure time, delay (if
-available), occupancy (if available), and stop name. Also includes
+List intermediate stops of I<journeyID> (as given by arrival/departure monitor
+mode when invoked with B<-j>, B<--with-jid>) with arrival/departure time, delay
+(if available), occupancy (if available), and stop name. Also includes
 line/journey, operator, and heading information.
 
 Times are reported in the selected HAFAS service's default time zone (typically
@@ -774,9 +777,12 @@ Europe/Berlin). If a stop's local time differs, it is also provided.
 
 =head1 OPTIONS
 
+Values in brackets indicate options that only apply to the indicated operating
+mode(s).
+
 =over
 
-=item B<-a>, B<--arrivals>
+=item B<-a>, B<--arrivals> (monitor)
 
 Show arrivals instead of departures, including trains ending at the specified
 station. Note that this causes the output to display the start instead of
@@ -784,9 +790,9 @@ the end station.
 
 =item B<-d>, B<--date> I<dd>.I<mm>.[I<yyyy>]
 
-Date to list departures for.  Default: today.
+Request date.  Default: today.
 
-=item B<-j>, B<--with-jid>
+=item B<-j>, B<--with-jid> (monitor)
 
 Show journey IDs in arrival/departure board. These can be used to obtain
 details on individual journeys with subsequent B<hafas-m> invocations.
@@ -808,7 +814,7 @@ Note that requesting an invalid/unsupported language may lead to garbage output.
 List known HAFAS instances and exit. Use B<-s>|B<--service> to select a
 service from this list for a HAFAS request.
 
-=item B<-m>, B<--mot> I<motlist>
+=item B<-m>, B<--mot> I<motlist> (monitor)
 
 By default, B<hafas-m> shows all modes of transport arriving/departing at the
 specified station. With I<motlist>, it is possible to either exclude a list of
@@ -820,7 +826,7 @@ To show them exclusively, set I<motlist> to I<mot1>,I<mot2>,...
 
 The I<mot> types depend on the used service. Use C<< -m help >> to list them.
 
-=item B<-n>, B<--num-results> I<count>
+=item B<-n>, B<--num-results> I<count> (monitor)
 
 Request up to I<count> results. Default: 30.
 
@@ -841,12 +847,12 @@ Useful for debugging and development purposes.
 Request arrivals/departures using the API provided by I<service>, defaults
 to DB (Deutsche Bahn). See B<--list> for a list of known services.
 
-=item B<-t>, B<--time> I<hh>:I<mm>
+=item B<-t>, B<--time> I<hh>:I<mm> (monitor)
 
-Time to list departures for. Must be specified in the selected HAFAS
-service's default time zone, see B<--list>. Default: now.
+Request time. Must be specified in the selected HAFAS service's default time
+zone, see B<--list>. Default: now.
 
-=item B<-v>, B<--via> I<stopname>|I<eva1>,I<eva2>,...
+=item B<-v>, B<--via> I<stopname>|I<eva1>,I<eva2>,... (monitor)
 
 Only show departures that pass by I<stopname> (or arivals that have passed by
 I<stopname>). If I<stopname> is given as a list of numeric EVA IDs, only
