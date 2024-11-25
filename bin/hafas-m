@@ -412,13 +412,11 @@ if ( $opt{geoSearch} ) {
 			$result->eva, $result->name
 		);
 	}
-	exit 0;
 }
 elsif ( $opt{locationSearch} ) {
 	for my $result ( $status->results ) {
 		printf( "%8d  %s\n", $result->eva, $result->name );
 	}
-	exit 0;
 }
 elsif ( $opt{journey} ) {
 	my $result = $status->result;
@@ -597,104 +595,104 @@ elsif ( $opt{journey} ) {
 			printf( "(%d) %s\n", $msg->{id}, $msg->text );
 		}
 	}
-	exit 0;
 }
-
-my @results = map { $_->[1] }
-  sort { $a->[0] <=> $b->[0] }
-  map { [ $_->datetime->epoch, $_ ] } $status->results;
-
-if ($via) {
-	@results = grep { journey_has_via( $_, $via ) } @results;
-}
-
-my $delay_len     = 0;
-my $occupancy_len = 0;
-my $offset_len    = 0;
-for my $d (@results) {
-	if ( $d->delay ) {
-		$delay_len = max( $delay_len, length( $d->delay ) + 1 );
-	}
-	if ( $d->load and ( $d->load->{FIRST} or $d->load->{SECOND} ) ) {
-		$occupancy_len = 2;
-	}
-	if ( $d->tz_offset ) {
-		$offset_len = 1;
-	}
-}
-
-my $message_id = 1;
-for my $m ( $status->messages ) {
-	if ( $m->ref_count > 0 ) {
-		$m->{id} = $message_id++;
-	}
-}
-
-for my $d (@results) {
-
-	my $info_line = q{};
-
-	for my $message ( $d->messages ) {
-		if ( $message->ref_count > 0 ) {
-			$message->{show} = 1;
-			$info_line = sprintf( '(%d) %s', $message->{id}, $info_line );
-		}
-	}
-
-	if ( $d->load ) {
-		$info_line
-		  = display_occupancy( $d->load->{FIRST} )
-		  . display_occupancy( $d->load->{SECOND} ) . '  '
-		  . $info_line;
-	}
-
-	if ($show_jid) {
-		$info_line = $d->id . '  ' . $info_line;
-	}
-
-	my $entry = [
-		  ( $d->is_cancelled ? '--:--' : $d->datetime->strftime('%H:%M') )
-		. ( $d->tz_offset    ? q{*}    : ( q{ } x $offset_len ) ),
-		$d->is_cancelled
-		? q{}
-		: format_delay( $d->delay, $delay_len ),
-		$d->name,
-		$d->route_end,
-		( $d->platform // q{} ) . ( $d->is_changed_platform ? ' !' : q{} ),
-		$info_line,
-		$d
-	];
+else {
+	my @results = map { $_->[1] }
+	  sort { $a->[0] <=> $b->[0] }
+	  map { [ $_->datetime->epoch, $_ ] } $status->results;
 
 	if ($via) {
-		my $stop = journey_has_via( $d, $via );
-
-		# HAFAS does not provide real-time data for route entries, so we have to guesstimate the arrival time
-		$entry->[0] .= ' → '
-		  . (
-			$stop->arr_cancelled
-			? '--:--'
-			: $stop->arr->clone->add( minutes => $d->delay // 0 )
-			  ->strftime('%H:%M')
-		  );
+		@results = grep { journey_has_via( $_, $via ) } @results;
 	}
 
-	push( @output, $entry, );
-}
-
-display_result(@output);
-
-if ($offset_len) {
-	printf( "\n* reported for %s; local time differs\n",
-		$status->get_active_service->{time_zone} // 'Europe/Berlin' );
-}
-
-for my $m ( $status->messages ) {
-	if ( $m->ref_count > 0 and $m->{show} ) {
-		if ( $m->short and $m->text ) {
-			printf( "\n# (%d) %s\n# %s\n", $m->{id}, $m->short, $m->text );
+	my $delay_len     = 0;
+	my $occupancy_len = 0;
+	my $offset_len    = 0;
+	for my $d (@results) {
+		if ( $d->delay ) {
+			$delay_len = max( $delay_len, length( $d->delay ) + 1 );
 		}
-		elsif ( $m->short or $m->text ) {
-			printf( "\n# (%d) %s\n", $m->{id}, $m->text || $m->short );
+		if ( $d->load and ( $d->load->{FIRST} or $d->load->{SECOND} ) ) {
+			$occupancy_len = 2;
+		}
+		if ( $d->tz_offset ) {
+			$offset_len = 1;
+		}
+	}
+
+	my $message_id = 1;
+	for my $m ( $status->messages ) {
+		if ( $m->ref_count > 0 ) {
+			$m->{id} = $message_id++;
+		}
+	}
+
+	for my $d (@results) {
+
+		my $info_line = q{};
+
+		for my $message ( $d->messages ) {
+			if ( $message->ref_count > 0 ) {
+				$message->{show} = 1;
+				$info_line = sprintf( '(%d) %s', $message->{id}, $info_line );
+			}
+		}
+
+		if ( $d->load ) {
+			$info_line
+			  = display_occupancy( $d->load->{FIRST} )
+			  . display_occupancy( $d->load->{SECOND} ) . '  '
+			  . $info_line;
+		}
+
+		if ($show_jid) {
+			$info_line = $d->id . '  ' . $info_line;
+		}
+
+		my $entry = [
+			  ( $d->is_cancelled ? '--:--' : $d->datetime->strftime('%H:%M') )
+			. ( $d->tz_offset    ? q{*}    : ( q{ } x $offset_len ) ),
+			$d->is_cancelled
+			? q{}
+			: format_delay( $d->delay, $delay_len ),
+			$d->name,
+			$d->route_end,
+			( $d->platform // q{} ) . ( $d->is_changed_platform ? ' !' : q{} ),
+			$info_line,
+			$d
+		];
+
+		if ($via) {
+			my $stop = journey_has_via( $d, $via );
+
+			# HAFAS does not provide real-time data for route entries, so we have to guesstimate the arrival time
+			$entry->[0] .= ' → '
+			  . (
+				$stop->arr_cancelled
+				? '--:--'
+				: $stop->arr->clone->add( minutes => $d->delay // 0 )
+				  ->strftime('%H:%M')
+			  );
+		}
+
+		push( @output, $entry, );
+	}
+
+	display_result(@output);
+
+	if ($offset_len) {
+		printf( "\n* reported for %s; local time differs\n",
+			$status->get_active_service->{time_zone} // 'Europe/Berlin' );
+	}
+
+	for my $m ( $status->messages ) {
+		if ( $m->ref_count > 0 and $m->{show} ) {
+			if ( $m->short and $m->text ) {
+				printf( "\n# (%d) %s\n# %s\n", $m->{id}, $m->short, $m->text );
+			}
+			elsif ( $m->short or $m->text ) {
+				printf( "\n# (%d) %s\n", $m->{id}, $m->text || $m->short );
+			}
 		}
 	}
 }
@@ -777,8 +775,8 @@ Europe/Berlin). If a stop's local time differs, it is also provided.
 
 =head1 OPTIONS
 
-Values in brackets indicate options that only apply to the indicated operating
-mode(s).
+Values in brackets indicate options that only apply to the corresponding
+operating mode(s).
 
 =over
 
