@@ -406,7 +406,9 @@ sub post_with_cache {
 
 	if ($cache) {
 		my $content = $cache->thaw( $self->{post} );
-		if ($content) {
+		if ( $content
+			and not $content =~ m{ CGI_NO_SERVER | CGI_READ_FAILED }x )
+		{
 			if ( $self->{developer_mode} ) {
 				say '  cache hit';
 			}
