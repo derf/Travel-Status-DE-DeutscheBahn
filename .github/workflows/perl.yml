@@ -27,6 +27,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: perl -V
         run: perl -V
+      - name: Initialize Submodules
+        run: git submodule update --init
       - name: Install Dependencies
         run: curl -sL https://raw.githubusercontent.com/skaji/cpm/master/cpm | perl - install -g --show-build-log-on-failure
       - name: Prepare Build
