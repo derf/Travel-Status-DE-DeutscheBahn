@@ -29,5 +29,9 @@ jobs:
         run: perl -V
       - name: Install Dependencies
         run: curl -sL https://raw.githubusercontent.com/skaji/cpm/master/cpm | perl - install -g --show-build-log-on-failure
+      - name: Prepare Build
+        run: perl Build.PL
+      - name: build
+        run: ./Build
       - name: Run Tests
         run: prove -l t
