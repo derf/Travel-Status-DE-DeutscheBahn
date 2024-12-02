@@ -766,48 +766,37 @@ sub station {
 		return $self->{station_info};
 	}
 
-	# no need to use Location instances here
-	my @locL = @{ $self->{raw_json}{svcResL}[0]{res}{common}{locL} // [] };
+	my %eva_count;
+	my %name_count;
+	my %eva_by_name;
 
-	my %prefc_by_loc;
-
-	if ( $self->{active_service} and $self->{active_service} eq 'ÖBB' ) {
-		for my $jny ( @{ $self->{raw_json}{svcResL}[0]{res}{jnyL} // [] } ) {
-			if ( defined $jny->{stbStop}{locX} ) {
-				$prefc_by_loc{ $jny->{stbStop}{locX} } += 1;
-			}
-		}
-	}
-	else {
-		for my $i ( 0 .. $#locL ) {
-			my $loc = $locL[$i];
-			if ( $loc->{pRefL} ) {
-				$prefc_by_loc{$i} = $#{ $loc->{pRefL} };
-			}
-		}
+	for my $result ( $self->results ) {
+		$eva_count{ $result->station_eva } += 1;
+		$name_count{ $result->station }    += 1;
+		$eva_by_name{ $result->station_eva } = $result->station;
 	}
 
-	my @prefcounts = sort { $b->[1] <=> $a->[1] }
-	  map { [ $_, $prefc_by_loc{$_} ] } keys %prefc_by_loc;
+	my @most_frequent_evas = map { $_->[0] } sort { $b->[1] <=> $a->[1] }
+	  map { [ $_, $eva_count{$_} ] } keys %eva_count;
 
-	if ( not @prefcounts ) {
+	my @most_frequent_names = map { $_->[0] } sort { $b->[1] <=> $a->[1] }
+	  map { [ $_, $name_count{$_} ] } keys %name_count;
+
+	my @shortest_names = map { $_->[0] } sort { $a->[1] <=> $b->[1] }
+	  map { [ $_, length($_) ] } keys %name_count;
+
+	if ( not @shortest_names ) {
 		$self->{station_info} = {};
 		return $self->{station_info};
 	}
 
-	my $loc = $locL[ $prefcounts[0][0] ];
-
-	if ($loc) {
-		$self->{station_info} = {
-			name  => $loc->{name},
-			eva   => $loc->{extId},
-			names => [ map { $locL[ $_->[0] ]{name} } @prefcounts ],
-			evas  => [ map { $locL[ $_->[0] ]{extId} } @prefcounts ],
-		};
-	}
-	else {
-		$self->{station_info} = {};
-	}
+	# The shortest name is typically the most helpful one, e.g. "Wien Hbf" vs. "Wien Hbf Süd (Sonnwendgasse)"
+	$self->{station_info} = {
+		name  => $shortest_names[0],
+		eva   => $eva_by_name{ $shortest_names[0] },
+		names => \@most_frequent_names,
+		evas  => \@most_frequent_evas,
+	};
 
 	return $self->{station_info};
 }
