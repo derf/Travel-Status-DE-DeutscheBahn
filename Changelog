@@ -1,3 +1,8 @@
+Travel::Status::DE::DeutscheBahn 6.12 - Mon Dec 02 2024
+
+    * Do not cache upstream CGI_NO_SERVER and CGI_READ_FAILED errors. These
+      are typically temporary.
+
 Travel::Status::DE::DeutscheBahn 6.11 - Fri Oct 11 2024
 
     * HAFAS: Add mobiliteit service definition
