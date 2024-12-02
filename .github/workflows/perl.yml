@@ -25,10 +25,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: recursive
       - name: perl -V
         run: perl -V
-      - name: Initialize Submodules
-        run: git submodule update --init
       - name: Install Dependencies
         run: curl -sL https://raw.githubusercontent.com/skaji/cpm/master/cpm | perl - install -g --show-build-log-on-failure
       - name: Prepare Build
