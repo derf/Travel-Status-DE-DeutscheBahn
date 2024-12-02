@@ -1074,7 +1074,7 @@ Returns a list of Travel::Status::DE::HAFAS::Message(3pm) objects with service
 messages. Each message belongs to at least one arrival/departure (station,
 journey) or to at least stop alongside its route (journey).
 
-=item $status->station
+=item $status->station (station)
 
 Returns a hashref describing the departure stations in all requested journeys.
 The hashref contains four entries: B<names> (station names), B<name> (most
@@ -1084,8 +1084,6 @@ These are subject to change.
 Note that the most common name and ID may be different from the station for
 which departures were requested, as HAFAS uses different identifiers for train
 stations, bus stops, and other modes of transit even if they are interlinked.
-
-Not available in journey mode.
 
 =item $status->similar_stops
 
