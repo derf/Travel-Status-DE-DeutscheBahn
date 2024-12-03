@@ -8,7 +8,7 @@ use 5.014;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '6.12';
+our $VERSION = '6.13';
 
 Travel::Status::DE::HAFAS::Product->mk_ro_accessors(
 	qw(class line_id line_no name number type type_long operator));
@@ -105,7 +105,7 @@ associated with a journey.
 
 =head1 VERSION
 
-version 6.12
+version 6.13
 
 =head1 DESCRIPTION
 
