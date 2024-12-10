@@ -68,6 +68,9 @@ sub load_instance {
 	if ( $data->{options}{ver} ) {
 		$ret{request}{ver} = $data->{options}{ver};
 	}
+	elsif ( $data->{options}{version} ) {
+		$ret{request}{ver} = $data->{options}{version};
+	}
 
 	if ( $opt{lang} ) {
 		$ret{request}{lang} = $opt{lang};
