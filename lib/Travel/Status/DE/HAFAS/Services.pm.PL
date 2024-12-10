@@ -135,8 +135,8 @@ my %hafas_instance = (
 				type => 'IPH',
 				name => 'DB Navigator',
 			},
-			ext  => 'DB.R21.12.a',
-			ver  => '1.18',
+			ext  => 'DB.R22.04.a',
+			ver  => '1.78',
 			auth => {
 				type => 'AID',
 				aid  => 'n91dB8Z77MLdoR0K'
