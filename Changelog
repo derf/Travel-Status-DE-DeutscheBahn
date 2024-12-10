@@ -1,3 +1,9 @@
+Travel::Status::DE::DeutscheBahn 6.14 - Tue Dec 03 2024
+
+    * DB service: Bump HCI Core and ext versions. Note that the service
+      no longer reports route data for stationboard results after this change.
+    * ZVV service: Update HAFAS endpoint URL.
+
 Travel::Status::DE::DeutscheBahn 6.13 - Tue Dec 03 2024
 
     * HAFAS->station: correctly identify referenced stations in non-DB backends
