@@ -3,7 +3,7 @@
 export PERL5LIB=lib
 
 checks="AVV Ponttor, AC
-BART San Francisco International Airport, San Mateo
+BART San Francisco International Airport BART Station, San Francisco
 BLS Bern
 BVG 900003104
 CMTA 6397
@@ -16,6 +16,7 @@ NVV Kassel Hauptbahnhof
 ÖBB Wien Meidling
 RMV Mainz Hauptbahnhof
 RSAG Rostock Hbf
+SaarVV Saarbrücken Hbf
 STV Graz
 VBB S+U Jannowitzbrücke (Berlin)
 VBN Diepholz
