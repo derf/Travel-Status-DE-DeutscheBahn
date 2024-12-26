@@ -384,7 +384,7 @@ if ( $opt{journeyMatch} ) {
 		for my $result ( $status->results ) {
 			my $start = ( $result->route )[0];
 			my $end   = ( $result->route )[-1];
-			say $result->id;
+			say $result->id =~ s{ }{}gr;
 			print $result->name;
 			if ( $result->number ) {
 				printf( "  |  Nr  %s", $result->number );
@@ -646,7 +646,7 @@ else {
 		}
 
 		if ($show_jid) {
-			$info_line = $d->id . '  ' . $info_line;
+			$info_line = $d->id =~ s{ }{}gr . '  ' . $info_line;
 		}
 
 		my $entry = [
