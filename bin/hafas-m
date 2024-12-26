@@ -656,7 +656,7 @@ else {
 			? q{}
 			: format_delay( $d->delay, $delay_len ),
 			$d->name,
-			$d->route_end,
+			$d->route_end // q{???},
 			( $d->platform // q{} ) . ( $d->is_changed_platform ? ' !' : q{} ),
 			$info_line,
 			$d
