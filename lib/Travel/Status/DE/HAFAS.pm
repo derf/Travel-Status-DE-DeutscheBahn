@@ -1204,7 +1204,7 @@ of this module's features. Set B<hafas=>I<service> to use a specific service.
 
 =head1 AUTHOR
 
-Copyright (C) 2015-2024 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2015-2025 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

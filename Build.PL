@@ -14,7 +14,7 @@ Module::Build->new(
 	configure_requires => {
 		'Module::Build' => 0.40,
 	},
-	module_name => 'Travel::Status::DE::DeutscheBahn',
+	module_name => 'Travel::Status::DE::HAFAS',
 	license     => 'perl',
 	requires    => {
 		'perl'                       => '5.14.0',

@@ -64,6 +64,10 @@ if ($list_services) {
 		'time zone'
 	);
 	for my $service ( Travel::Status::DE::HAFAS::get_services() ) {
+		if ($service->{shortname} eq 'DB') {
+			# HTTP 503 Service Unavailable
+			next;
+		}
 		printf(
 			"%-40s %-14s %-15s %s\n",
 			@{$service}{qw(name shortname)},
@@ -190,7 +194,7 @@ sub parse_mot_options {
 
 	for my $type ( split( qr{,}, $types ) ) {
 		if ( $type eq 'help' or $type eq 'list' or $type eq q{?} ) {
-			$service //= 'DB';
+			$service //= 'ÖBB';
 			my $desc = Travel::Status::DE::HAFAS::get_service($service);
 			if ($desc) {
 				for my $mot ( @{ $desc->{productbits} } ) {
@@ -842,8 +846,8 @@ Useful for debugging and development purposes.
 
 =item B<-s>, B<--service> I<service>
 
-Request arrivals/departures using the API provided by I<service>, defaults
-to DB (Deutsche Bahn). See B<--list> for a list of known services.
+Request arrivals/departures using the API provided by I<service>, defaults to
+ÖBB (Österreichische Bundesbahnen). See B<--list> for a list of known services.
 
 =item B<-t>, B<--time> I<hh>:I<mm> (monitor)
 
@@ -885,8 +889,8 @@ None.
 
 =over
 
-=item * The non-default services (anything other than DB) are not well-tested.
-Unlike DB, many of those do not return routes for stationboard entries.
+=item * DB HAFAS is no more. At this point, there is no suitable HAFAS instance
+that covers local and regional / long-distance transit in Germany.
 
 =item * HAFAS does not provide real-time data for routes of stationboard
 entries.  Hence, B<--via> estimates the arrival time from scheduled
@@ -896,7 +900,7 @@ departure and departure delay
 
 =head1 AUTHOR
 
-Copyright (C) 2015-2023 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2015-2025 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 
