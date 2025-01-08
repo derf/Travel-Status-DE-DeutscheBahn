@@ -60,7 +60,7 @@ sub new {
 	}
 
 	if ( not defined $service ) {
-		$service = $conf{service} = 'DB';
+		confess("You must specify a service");
 	}
 
 	if ( defined $service and not exists $hafas_instance->{$service} ) {

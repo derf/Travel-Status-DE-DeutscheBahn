@@ -64,7 +64,8 @@ if ($list_services) {
 		'time zone'
 	);
 	for my $service ( Travel::Status::DE::HAFAS::get_services() ) {
-		if ($service->{shortname} eq 'DB') {
+		if ( $service->{shortname} eq 'DB' ) {
+
 			# HTTP 503 Service Unavailable
 			next;
 		}
@@ -76,6 +77,18 @@ if ($list_services) {
 		);
 	}
 	exit 0;
+}
+
+if ( not $service ) {
+	say STDERR 'Note: You have called hafas-m without specifying a service.';
+	say STDERR q{};
+	say STDERR 'Unfortunately, the previous default service (DB HAFAS)';
+	say STDERR 'is no more, and there is no generic replacement available.';
+	say STDERR q{};
+	say STDERR 'Please use "hafas-m --list" to list supported services,';
+	say STDERR 'and then select one via -s <service>.';
+	say STDERR 'Falling back to ÖBB for now.';
+	$service = 'ÖBB';
 }
 
 if ($use_cache) {
