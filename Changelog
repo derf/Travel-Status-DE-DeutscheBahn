@@ -1,3 +1,14 @@
+Travel::Status::DE::HAFAS 6.16 - Mon Jan 13 2024
+
+    * The DB HAFAS backend has been discontinued.
+      Travel::Status::DE::DeutscheBahn is no longer part of this
+      distribution; it is now called Travel::Status::DE::HAFAS.
+    * hafas-m: Use VRN service by default. Its coverage appears to closely
+      match the discontinued DB service.
+    * HAFAS->new, HAFAS->new_p: Do not use the (discontinued) DB service by
+      default, and do not replace it with a new default. The "service"
+      option is now mandatory.
+
 Travel::Status::DE::DeutscheBahn 6.15 - Sat Dec 21 2024
 
     * HAFAS: add SaarVV service definition
