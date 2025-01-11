@@ -850,7 +850,8 @@ Useful for debugging and development purposes.
 =item B<-s>, B<--service> I<service>
 
 Request arrivals/departures using the API provided by I<service>, defaults to
-ÖBB (Österreichische Bundesbahnen). See B<--list> for a list of known services.
+E<Ouml>BB (E<Ouml>sterreichische Bundesbahnen). See B<--list> for a list of
+known services.
 
 =item B<-t>, B<--time> I<hh>:I<mm> (monitor)
 
