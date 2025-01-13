@@ -902,7 +902,19 @@ Requests item(s) as specified by I<opt> and returns a new
 Travel::Status::DE::HAFAS element with the results.  Dies if the wrong
 I<opt> were passed.
 
-I<opt> must contain either a B<station>, B<geoSearch>, B<locationSearch>, B<journey>, or B<journeyMatch> flag:
+I<opt> must contain a HAFAS service identifier:
+
+=over
+
+=item B<service> => I<service> (mandatory)
+
+Request results from I<service>. See B<get_services> (and C<< hafas-m --list
+>>) for a list of supported services.
+
+=back
+
+Additionally, I<opt> must contain either a B<station>, B<geoSearch>,
+B<locationSearch>, B<journey>, or B<journeyMatch> flag:
 
 =over
 
@@ -937,6 +949,8 @@ of information: trip ID, train/line identifier, and first and last stop.  There
 is no real-time data.
 
 =back
+
+
 
 The following optional flags may be set.
 Values in brackets indicate flags that are only relevant in certain request
@@ -992,12 +1006,6 @@ pass an empty hashref to call the LWP::UserAgent constructor without arguments.
 
 Request up to I<count> results.
 Default: 30.
-
-=item B<service> => I<service>
-
-Request results from I<service>, defaults to "DB".
-See B<get_services> (and C<< hafas-m --list >>) for a list of supported
-services.
 
 =item B<with_polyline> => I<bool> (journey)
 
