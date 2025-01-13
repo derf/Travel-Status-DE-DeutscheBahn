@@ -28,7 +28,7 @@ perl Build.PL
 perl Build
 perl Build manifest
 perl Build dist
-mv Travel-Status-DE-DeutscheBahn-*.tar.gz ../app.tar.gz
+mv Travel-Status-DE-HAFAS-*.tar.gz ../app.tar.gz
 dh-make-perl --build --version "${VERSION}"
 chown ${USER}:${GROUP} ../*.deb
 mv -v ../*.deb /out
