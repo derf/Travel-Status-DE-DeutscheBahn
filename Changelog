@@ -1,8 +1,10 @@
 Travel::Status::DE::HAFAS 6.16 - Mon Jan 13 2024
 
-    * The DB HAFAS backend has been discontinued.
-      Travel::Status::DE::DeutscheBahn is no longer part of this
-      distribution; it is now called Travel::Status::DE::HAFAS.
+    * Remove DB HAFAS service. It has been returnig HTTP 503 Service
+      Temporarily Unavailable since Jan 8, 11:30 CET and has very likely been
+      shut down permanently.
+    * Travel::Status::DE::DeutscheBahn is no longer part of this
+      distribution (see above); it is now called Travel::Status::DE::HAFAS.
     * hafas-m: Use VRN service by default. Its coverage appears to closely
       match the discontinued DB service.
     * HAFAS->new, HAFAS->new_p: Do not use the (discontinued) DB service by
