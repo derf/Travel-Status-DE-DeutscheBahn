@@ -893,9 +893,6 @@ None.
 
 =over
 
-=item * DB HAFAS is no more. At this point, there is no suitable HAFAS instance
-that covers local and regional / long-distance transit in Germany.
-
 =item * HAFAS does not provide real-time data for routes of stationboard
 entries.  Hence, B<--via> estimates the arrival time from scheduled
 departure and departure delay
