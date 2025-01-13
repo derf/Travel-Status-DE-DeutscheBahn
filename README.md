@@ -3,14 +3,14 @@
 **hafas-m** is a commandline client and Perl module for HAFAS public transit
 departure interfaces. It supports a variety of transit services in Europe and
 parts of North America, with a special focus on the ones operated by
-Deutsche Bahn (DB) and Österreichische Bundesbahnen (ÖBB).
+Verkehrsverbund Rhein-Neckar (VRN) and Österreichische Bundesbahnen (ÖBB).
 
 This README documents installation of hafas-m and the associated
 Travel::Status::DE::HAFAS Perl module.  See the [Travel::Status::DE::HAFAS
-homepage](https://finalrewind.org/projects/Travel-Status-DE-DeutscheBahn) and
+homepage](https://finalrewind.org/projects/Travel-Status-DE-HAFAS) and
 [hafas-m manual](https://man.finalrewind.org/1/hafas-m) for a feature overview
 and usage instructions. A web frontend to Travel::Status::DE::HAFAS is
-available at [dbf.finalrewind.org](https://dbf.finalrewind.org/?hafas=DB).
+available at [dbf.finalrewind.org](https://dbf.finalrewind.org/?hafas=VRN).
 
 ## Installation
 
@@ -35,15 +35,15 @@ Debian repository and are not covered by its quality assurance process.
 To install the latest release, run:
 
 ```
-wget https://lib.finalrewind.org/deb/libtravel-status-de-deutschebahn-perl_latest_all.deb
-sudo apt install ./libtravel-status-de-deutschebahn-perl_latest_all.deb
-rm libtravel-status-de-deutschebahn-perl_latest_all.deb
+wget https://lib.finalrewind.org/deb/libtravel-status-de-hafas-perl_latest_all.deb
+sudo apt install ./libtravel-status-de-hafas-perl_latest_all.deb
+rm libtravel-status-de-hafas-perl_latest_all.deb
 ```
 
 Uninstallation works as usual:
 
 ```
-sudo apt remove libtravel-status-de-deutschebahn-perl
+sudo apt remove libtravel-status-de-hafas-perl
 ```
 
 ### finalrewind.org APT repository
@@ -55,23 +55,23 @@ use it you will have to trust me not to screw up your system with bogus
 packages. Also, note that the packages are not part of the official Debian
 repository and are not covered by its quality assurance process.
 
-To set up the repository and install the latest Travel::Status::DE::DeutscheBahn
+To set up the repository and install the latest Travel::Status::DE::HAFAS
 release, run:
 
 ```
 curl -s https://finalrewind.org/apt.asc | sudo tee /etc/apt/trusted.gpg.d/finalrewind.asc
 echo 'deb https://lib.finalrewind.org/apt stable main' | sudo tee /etc/apt/sources.list.d/finalrewind.list
 sudo apt update
-sudo apt install libtravel-status-de-deutschebahn-perl
+sudo apt install libtravel-status-de-hafas-perl
 ```
 
 Afterwards, `apt update` and `apt upgrade` will automatically install new
-Travel::Status::DE::DeutscheBahn releases.
+Travel::Status::DE::HAFAS releases.
 
-Uninstallation of Travel::Status::DE::DeutscheBahn works as usual:
+Uninstallation of Travel::Status::DE::HAFAS works as usual:
 
 ```
-sudo apt remove libtravel-status-de-deutschebahn-perl
+sudo apt remove libtravel-status-de-hafas-perl
 ```
 
 To remove the APT repository from your system, run:
@@ -83,7 +83,7 @@ sudo rm /etc/apt/trusted.gpg.d/finalrewind.asc \
 
 ### Installation from CPAN
 
-Travel::Status::DE::DeutscheBahn releases are published on the Comprehensive
+Travel::Status::DE::HAFAS releases are published on the Comprehensive
 Perl Archive Network (CPAN) and can be installed using standard Perl module
 tools such as `cpanminus`.
 
@@ -97,7 +97,7 @@ libraries with development headers:
 Now, use a tool of your choice to install the module. Minimum working example:
 
 ```
-cpanm Travel::Status::DE::DeutscheBahn
+cpanm Travel::Status::DE::HAFAS
 ```
 
 If you run this as root, it will install script and module to `/usr/local` by
