@@ -1143,7 +1143,7 @@ Languages supported by the backend; see the constructor's B<language> argument.
 
 =item B<name> => I<string>
 
-Service name, e.g. Bay Area Rapid Transit or Deutsche Bahn.
+Service name, e.g. Bay Area Rapid Transit or E<Ouml>sterreichische Bundesbahnen.
 
 =item B<mgate> => I<string>
 
@@ -1168,7 +1168,7 @@ not present, it is safe to assume that it uses Europe/Berlin.
 Returns an array containing all supported HAFAS services. Each element is a
 hashref and contains all keys mentioned in B<get_active_service>.
 It also contains a B<shortname> key, which is the service name used by
-the constructor's B<service> parameter, e.g. BART or DB.
+the constructor's B<service> parameter, e.g. BART or VRN.
 
 =item Travel::Status::DE::HAFAS::get_service(I<$service>)
 
@@ -1197,16 +1197,19 @@ None.
 
 =head1 BUGS AND LIMITATIONS
 
-The non-default services (anything other than DB) are not well tested.
+Some services are not well-tested.
 
 =head1 SEE ALSO
 
 =over
 
-=item * L<https://dbf.finalrewind.org?hafas=1> provides a web frontend to most
-of this module's features. Set B<hafas=>I<service> to use a specific service.
+=item * L<https://dbf.finalrewind.org?hafas=VRN> provides a web frontend to
+most of this module's features. Set B<hafas=>I<service> to use a specific
+service.
 
 =item * Travel::Routing::DE::HAFAS(3pm) for itineraries.
+
+=item * Travel::Status::DE::DBRIS(3pm) for Deutsche Bahn services.
 
 =back
 
