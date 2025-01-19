@@ -708,7 +708,7 @@ __END__
 
 =head1 NAME
 
-hafas-m - Interface to the DeutscheBahn/HAFAS online departure monitor
+hafas-m - Interface to the HAFAS-based online departure monitors
 
 =head1 SYNOPSIS
 
@@ -725,12 +725,10 @@ version 6.16
 
 =head1 DESCRIPTION
 
-hafas-m is an interface to HAFAS public transport services such as the one
-operated by Deutsche Bahn.
-
-It can serve as an arrival/departure monitor, request details about a specific
-trip/journey, and look up public transport stops by name or geolocation.
-The operating mode depends on the contents of its non-option argument.
+hafas-m is an interface to HAFAS public transport services. It can serve as an
+arrival/departure monitor, request details about a specific trip/journey, and
+look up public transport stops by name or geolocation.  The operating mode
+depends on the contents of its non-option argument.
 
 =head2 Arrival/Departure Monitor (I<station>)
 
