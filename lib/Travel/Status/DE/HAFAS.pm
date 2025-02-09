@@ -45,6 +45,13 @@ sub new {
 		if ( $service and $hafas_instance->{$service}{ua_string} ) {
 			$lwp_options{agent} = $hafas_instance->{$service}{ua_string};
 		}
+		if ( $service
+			and my $geoip_service = $hafas_instance->{$service}{geoip_lock} )
+		{
+			if ( my $proxy = $ENV{"HAFAS_PROXY_${geoip_service}"} ) {
+				$lwp_options{proxy} = [ [ 'http', 'https' ] => $proxy ];
+			}
+		}
 		$ua = LWP::UserAgent->new(%lwp_options);
 		$ua->env_proxy;
 	}

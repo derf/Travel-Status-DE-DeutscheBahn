@@ -72,6 +72,10 @@ sub load_instance {
 		$ret{request}{ver} = $data->{options}{version};
 	}
 
+	if ( $opt{geoip_lock} ) {
+		$ret{geoip_lock} = $opt{geoip_lock};
+	}
+
 	if ( $opt{lang} ) {
 		$ret{request}{lang} = $opt{lang};
 	}
@@ -182,8 +186,11 @@ my %hafas_instance = (
 		),
 		stopfinder => 'https://fahrplan.oebb.at/bin/ajax-getstop.exe',
 	},
-	PKP =>
-	  { load_instance( 'pl/pkp', lang => 'pol' ), ua_string => 'Dalvik/2.1.0' },
+	PKP => {
+		load_instance( 'pl/pkp', lang => 'pol' ),
+		ua_string  => 'Dalvik/2.1.0',
+		geoip_lock => 'PKP'
+	},
 	Resrobot => { load_instance( 'se/resrobot',  lang => 'sve' ), },
 	RMV      => { load_instance( 'de/rmv',       lang => 'deu' ), },
 	RSAG     => { load_instance( 'de/rsag',      lang => 'deu' ), },

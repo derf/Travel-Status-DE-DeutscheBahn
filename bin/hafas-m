@@ -59,7 +59,7 @@ GetOptions(
 
 if ($list_services) {
 	printf(
-		"%-40s %-14s %-15s %s\n\n",
+		"%-40s  %-14s %-15s %s\n\n",
 		'operator', 'abbr. (-s)', 'languages (-l)',
 		'time zone'
 	);
@@ -70,8 +70,10 @@ if ($list_services) {
 			next;
 		}
 		printf(
-			"%-40s %-14s %-15s %s\n",
-			@{$service}{qw(name shortname)},
+			"%-40s%1s %-14s %-15s %s\n",
+			$service->{name},
+			$service->{geoip_lock} ? q{!} : q{ },
+			$service->{shortname},
 			join( q{ }, @{ $service->{languages} // [] } ),
 			$service->{time_zone} // q{},
 		);
@@ -657,8 +659,8 @@ else {
 		}
 
 		my $entry = [
-			  ( $d->is_cancelled ? '--:--' : $d->datetime->strftime('%H:%M') )
-			. ( $d->tz_offset    ? q{*}    : ( q{ } x $offset_len ) ),
+			( $d->is_cancelled  ? '--:--' : $d->datetime->strftime('%H:%M') )
+			  . ( $d->tz_offset ? q{*}    : ( q{ } x $offset_len ) ),
 			$d->is_cancelled
 			? q{}
 			: format_delay( $d->delay, $delay_len ),
