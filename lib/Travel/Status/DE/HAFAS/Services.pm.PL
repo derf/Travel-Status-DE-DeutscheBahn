@@ -75,6 +75,9 @@ sub load_instance {
 	if ( $opt{lang} ) {
 		$ret{request}{lang} = $opt{lang};
 	}
+	if ( $opt{ua_string} ) {
+		$ret{ua_string} = $opt{ua_string};
+	}
 	if ( $opt{ver} ) {
 		$ret{request}{ver} = $opt{ver};
 	}
@@ -179,10 +182,12 @@ my %hafas_instance = (
 		),
 		stopfinder => 'https://fahrplan.oebb.at/bin/ajax-getstop.exe',
 	},
-	Resrobot => { load_instance( 'se/resrobot', lang => 'sve' ), },
-	RMV      => { load_instance( 'de/rmv',      lang => 'deu' ), },
-	RSAG     => { load_instance( 'de/rsag',     lang => 'deu' ), },
-	SaarVV   => { load_instance( 'de/saarvv',   lang => 'deu' ), },
+	PKP =>
+	  { load_instance( 'pl/pkp', lang => 'pol' ), ua_string => 'Dalvik/2.1.0' },
+	Resrobot => { load_instance( 'se/resrobot',  lang => 'sve' ), },
+	RMV      => { load_instance( 'de/rmv',       lang => 'deu' ), },
+	RSAG     => { load_instance( 'de/rsag',      lang => 'deu' ), },
+	SaarVV   => { load_instance( 'de/saarvv',    lang => 'deu' ), },
 	STV      => { load_instance( 'at/stv', lang => 'deu', ver => '1.32' ), },
 	TPG      => { load_instance( 'ch/tpg', lang => 'deu', ver => '1.40' ), },
 	VBB      => {

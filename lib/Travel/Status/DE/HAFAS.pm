@@ -42,6 +42,9 @@ sub new {
 
 	if ( not $ua ) {
 		my %lwp_options = %{ $conf{lwp_options} // { timeout => 10 } };
+		if ( $service and $hafas_instance->{$service}{ua_string} ) {
+			$lwp_options{agent} = $hafas_instance->{$service}{ua_string};
+		}
 		$ua = LWP::UserAgent->new(%lwp_options);
 		$ua->env_proxy;
 	}
@@ -137,7 +140,7 @@ sub new {
 								y => int( $conf{geoSearch}{lat} * 1e6 ),
 							},
 							maxDist => -1,
-							minDist => 0,
+							minDist =>  0,
 						},
 						locFltrL => [
 							{
