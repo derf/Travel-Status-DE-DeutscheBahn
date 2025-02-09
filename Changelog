@@ -1,3 +1,9 @@
+Travel::Status::DE::HAFAS 6.18 - Sun Feb 09 2025
+
+    * Add PKP service. Note that it is GeoIP-locked to "probably Polish" IP
+      addresses. Set HAFAS_PROXY_PKP to a suitable proxy address to work around
+      this, if needed.
+
 Travel::Status::DE::HAFAS 6.17 - Sun Jan 19 2025
 
     * Various documentation updates to reflect on the DB HAFAS removal
