@@ -819,6 +819,10 @@ Note that requesting an invalid/unsupported language may lead to garbage output.
 List known HAFAS instances and exit. Use B<-s>|B<--service> to select a
 service from this list for a HAFAS request.
 
+Instances marked with an exclamation mark (C<< ! >>) are behind a GeoIP filter
+and may need a proxy to work. See the documentation of get_active_service in
+Travel::Status::DE::HAFAS(3pm) for details.
+
 =item B<-m>, B<--mot> I<motlist> (monitor)
 
 By default, B<hafas-m> shows all modes of transport arriving/departing at the

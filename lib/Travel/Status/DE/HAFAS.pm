@@ -1156,6 +1156,14 @@ a (nearly) complete list of departures and real-time data. The hashref contains
 two optional keys: B<area> (GeoJSON) and B<regions> (list of strings, e.g. "DE"
 or "CH-BE").
 
+=item B<geoip_lock> => I<proxy_id>
+
+If present: the service filters requests based on the estimated location of the
+requesting IP address, and may return errors or time out when the requesting IP
+address does not satisfy its requirements. Set the B<HAFAS_PROXY_>I<proxy_id>
+environment variable to a proxy string (e.g. C<< socks://localhost:12345 >>) if
+needed to work around this.
+
 =item B<homepage> => I<string>
 
 Homepage URL of the service provider.
