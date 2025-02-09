@@ -472,7 +472,20 @@ sub post_with_cache_p {
 		say '  cache miss';
 	}
 
-	$self->{ua}->post_p( $url, $self->{post} )->then(
+	my $headers      = {};
+	my $service_desc = $hafas_instance->{ $self->{active_service} };
+
+	if ( $service_desc->{ua_string} ) {
+		$headers->{'User-Agent'} = $service_desc->{ua_string};
+	}
+	if ( my $geoip_service = $service_desc->{geoip_lock} ) {
+		if ( my $proxy = $ENV{"HAFAS_PROXY_${geoip_service}"} ) {
+			$self->{ua}->proxy->http($proxy);
+			$self->{ua}->proxy->https($proxy);
+		}
+	}
+
+	$self->{ua}->post_p( $url, $headers, $self->{post} )->then(
 		sub {
 			my ($tx) = @_;
 			if ( my $err = $tx->error ) {
