@@ -130,27 +130,6 @@ my %hafas_instance = (
 		),
 		stopfinder => 'https://capmetro.hafas.cloud/bin/ajax-getstop.exe',
 	},
-	DB => {
-		load_instance('de/db'),
-		stopfinder => 'https://reiseauskunft.bahn.de/bin/ajax-getstop.exe',
-		salt       => 'bdI8UVj40K5fvxwf',
-		languages  => [qw[de en fr es]],
-		request    => {
-			client => {
-				id   => 'DB',
-				v    => '20100000',
-				type => 'IPH',
-				name => 'DB Navigator',
-			},
-			ext  => 'DB.R22.04.a',
-			ver  => '1.78',
-			auth => {
-				type => 'AID',
-				aid  => 'n91dB8Z77MLdoR0K'
-			},
-			lang => 'deu'
-		},
-	},
 	DSB => { load_instance( 'dk/rejseplanen', lang => 'deu' ), },
 	IE  => {
 		load_instance(
