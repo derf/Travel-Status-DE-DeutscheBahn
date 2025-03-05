@@ -20,8 +20,7 @@ STV Graz
 VBB S+U Jannowitzbrücke (Berlin)
 VBN Diepholz
 VMT Nordhausen
-VOS Osnabrück Neumarkt
-VRN Kaiserslautern Hbf"
+VOS Osnabrück Neumarkt"
 
 echo $checks | while read service stop; do
         echo -n "${service} ... "

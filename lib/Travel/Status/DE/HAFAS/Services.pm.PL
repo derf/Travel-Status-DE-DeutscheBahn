@@ -207,7 +207,6 @@ my %hafas_instance = (
 		),
 		stopfinder => 'https://fahrplan.vos.info/bin/ajax-getstop.exe',
 	},
-	VRN => { load_instance( 'de/vrn', lang => 'deu' ), },
 	ZVV => { load_instance( 'ch/zvv', lang => 'deu' ), },
 );
 
