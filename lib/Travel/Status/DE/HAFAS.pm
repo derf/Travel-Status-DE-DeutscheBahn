@@ -12,6 +12,7 @@ use DateTime;
 use DateTime::Format::Strptime;
 use Digest::MD5 qw(md5_hex);
 use Encode      qw(decode encode);
+use IO::Socket::SSL;
 use JSON;
 use LWP::UserAgent;
 use Travel::Status::DE::HAFAS::Journey;
@@ -51,6 +52,11 @@ sub new {
 			if ( my $proxy = $ENV{"HAFAS_PROXY_${geoip_service}"} ) {
 				$lwp_options{proxy} = [ [ 'http', 'https' ] => $proxy ];
 			}
+		}
+		if ( $service and not $hafas_instance->{$service}{tls_verify} ) {
+			$lwp_options{ssl_opts}{SSL_verify_mode}
+			  = IO::Socket::SSL::SSL_VERIFY_NONE;
+			$lwp_options{ssl_opts}{verify_hostname} = 0;
 		}
 		$ua = LWP::UserAgent->new(%lwp_options);
 		$ua->env_proxy;
