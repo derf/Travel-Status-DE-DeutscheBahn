@@ -1,3 +1,9 @@
+Travel::Status::DE::HAFAS 6.19 - Thu Mar 06 2025
+
+    * Remove VRN HAFAS service (discontinued, returns HTTP 403 Forbidden)
+    * Disable certiicate verification for KVB HAFAS service
+      (they bodged their certificate renewal)
+
 Travel::Status::DE::HAFAS 6.18 - Sun Feb 09 2025
 
     * Add PKP service. Note that it is GeoIP-locked to "probably Polish" IP
