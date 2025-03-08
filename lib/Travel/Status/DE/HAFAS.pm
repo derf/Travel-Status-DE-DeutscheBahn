@@ -490,6 +490,9 @@ sub post_with_cache_p {
 			$self->{ua}->proxy->https($proxy);
 		}
 	}
+	if ( not $service_desc->{tls_verify} ) {
+		$self->{ua}->insecure(1);
+	}
 
 	$self->{ua}->post_p( $url, $headers, $self->{post} )->then(
 		sub {
