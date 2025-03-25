@@ -1,3 +1,10 @@
+Travel::Status::DE::HAFAS 6.20 - Tue Mar 25 2025
+
+    * hafas-m: Change default service to ÖBB
+    * hafas-m: Add --with-polyline option
+    * Disable certificate verification for KVB HAFAS service when using
+      the new_p constructor (see 6.19)
+
 Travel::Status::DE::HAFAS 6.19 - Thu Mar 06 2025
 
     * Remove VRN HAFAS service (discontinued, returns HTTP 403 Forbidden)
