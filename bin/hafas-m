@@ -23,7 +23,7 @@ my $developer_mode;
 my $via;
 my $use_cache = 1;
 my $cache;
-my ( $json_output,   $raw_json_output );
+my ( $json_output,   $raw_json_output, $with_polyline );
 my ( $list_services, $service );
 my ( @excluded_mots, @exclusive_mots );
 
@@ -53,6 +53,7 @@ GetOptions(
 	'devmode'         => \$developer_mode,
 	'json'            => \$json_output,
 	'raw-json'        => \$raw_json_output,
+	'with-polyline'   => \$with_polyline,
 	'list'            => \$list_services,
 
 ) or show_help(1);
@@ -125,7 +126,8 @@ elsif ( $opt{station} =~ m{ ^ [?] (?<query> .*) $ }x ) {
 	delete $opt{station};
 }
 elsif ( $opt{station} =~ m{[|]} ) {
-	$opt{journey} = { id => $opt{station} };
+	$opt{journey}       = { id => $opt{station} };
+	$opt{with_polyline} = $with_polyline;
 	delete $opt{station};
 }
 elsif ( $opt{station} =~ m{ ^ [!] (?<query> .*) $ }x ) {
@@ -872,6 +874,11 @@ is treated as a regular expression and matched against stop names.
 =item B<-V>, B<--version>
 
 Show version information and exit.
+
+=item B<--with-polyline> (trip details)
+
+Request polyline (geocoordinates of the trip's route) from the backend.
+Only sensible when combined with B<--json> or B<--raw-json>.
 
 =back
 
