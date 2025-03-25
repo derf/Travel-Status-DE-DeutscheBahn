@@ -82,7 +82,7 @@ if ($list_services) {
 	exit 0;
 }
 
-$service //= 'VRN';
+$service //= 'ÖBB';
 
 if ($use_cache) {
 	my $cache_path = ( $ENV{XDG_CACHE_HOME} // "$ENV{HOME}/.cache" )
