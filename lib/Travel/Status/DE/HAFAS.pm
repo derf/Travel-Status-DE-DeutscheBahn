@@ -1208,7 +1208,7 @@ not present, it is safe to assume that it uses Europe/Berlin.
 Returns an array containing all supported HAFAS services. Each element is a
 hashref and contains all keys mentioned in B<get_active_service>.
 It also contains a B<shortname> key, which is the service name used by
-the constructor's B<service> parameter, e.g. BART or VRN.
+the constructor's B<service> parameter, e.g. BART or NASA.
 
 =item Travel::Status::DE::HAFAS::get_service(I<$service>)
 
@@ -1243,7 +1243,7 @@ Some services are not well-tested.
 
 =over
 
-=item * L<https://dbf.finalrewind.org?hafas=VRN> provides a web frontend to
+=item * L<https://dbf.finalrewind.org?hafas=NASA> provides a web frontend to
 most of this module's features. Set B<hafas=>I<service> to use a specific
 service.
 
