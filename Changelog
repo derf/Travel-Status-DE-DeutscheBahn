@@ -1,3 +1,7 @@
+Travel::Status::DE::HAFAS 6.21 - Wed Jun 25 2025
+
+    * Stop: Handle platform specifiers provided by HAFAS v1 instances
+
 Travel::Status::DE::HAFAS 6.20 - Tue Mar 25 2025
 
     * hafas-m: Change default service to ÖBB

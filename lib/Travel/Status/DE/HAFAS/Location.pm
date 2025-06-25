@@ -6,7 +6,7 @@ use 5.014;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '6.20';
+our $VERSION = '6.21';
 
 Travel::Status::DE::HAFAS::Location->mk_ro_accessors(
 	qw(lid type name eva state lat lon distance_m weight));
@@ -57,7 +57,7 @@ Travel::Status::DE::HAFAS::Location - A single public transit location
 
 =head1 VERSION
 
-version 6.20
+version 6.21
 
 =head1 DESCRIPTION
 

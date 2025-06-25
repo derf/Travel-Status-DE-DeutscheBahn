@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.014;
 
-our $VERSION = '6.20';
+our $VERSION = '6.21';
 
 use utf8;
 use DateTime;
@@ -725,7 +725,7 @@ B<hafas-m> [B<-s> I<service>] [B<-l> I<language>] B<!>I<query>|I<journeyID>
 
 =head1 VERSION
 
-version 6.20
+version 6.21
 
 =head1 DESCRIPTION
 

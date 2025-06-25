@@ -16,7 +16,7 @@ use 5.014;
 use parent 'Exporter';
 our @EXPORT_OK = qw(decode_polyline);
 
-our $VERSION = '6.20';
+our $VERSION = '6.21';
 
 # Translated this php script
 # <http://unitstep.net/blog/2008/08/02/decoding-google-maps-encoded-polylines-using-php/>
