@@ -118,6 +118,7 @@ my %hafas_instance = (
 		load_instance( 'de/bvg', lang => 'deu' ),
 		stopfinder => 'https://bvg-apps-ext.hafas.de/bin/ajax-getstop.exe',
 	},
+	CFL  => { load_instance( 'lu/cfl', lang => 'fr', ver => '1.43' ) },
 	CMTA => {
 		load_instance(
 			'us/cmta',
