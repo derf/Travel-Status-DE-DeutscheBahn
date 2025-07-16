@@ -1,4 +1,4 @@
-FROM perl:5.30-slim
+FROM perl:5.40-slim
 
 COPY bin/ /app/bin/
 COPY ext/ /app/ext/
