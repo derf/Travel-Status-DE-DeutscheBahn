@@ -1,3 +1,7 @@
+Travel::Status::DE::HAFAS 6.22 - Wed Jul 16 2025
+
+    * Add CFL service
+
 Travel::Status::DE::HAFAS 6.21 - Wed Jun 25 2025
 
     * Stop: Handle platform specifiers provided by HAFAS v1 instances
